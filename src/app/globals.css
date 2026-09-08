@@ -1,26 +1,228 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f5f2;
+  --foreground: #0c0a09;
+  --card: #fffcf8;
+  --card-foreground: #0c0a09;
+  --primary: #1c1917;
+  --primary-foreground: #fafaf9;
+  --secondary: #44403c;
+  --muted: #ece7e1;
+  --muted-foreground: #57534e;
+  --accent: #a16207;
+  --accent-foreground: #fffbeb;
+  --destructive: #dc2626;
+  --border: #ddd6cc;
+  --input: #d6d3d1;
+  --ring: #1c1917;
+  --radius: 0.25rem;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+}
+
+.dark {
+  --background: #0c0a09;
+  --foreground: #fafaf9;
+  --card: #1c1917;
+  --card-foreground: #fafaf9;
+  --primary: #fafaf9;
+  --primary-foreground: #1c1917;
+  --secondary: #d6d3d1;
+  --muted: #292524;
+  --muted-foreground: #a8a29e;
+  --accent: #d97706;
+  --accent-foreground: #1c1917;
+  --destructive: #f87171;
+  --border: #44403c;
+  --input: #44403c;
+  --ring: #fafaf9;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-feature-settings: "ss01" on, "kern" on;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: var(--foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  section[id] {
+    scroll-margin-top: 5.75rem;
+  }
+
+  #top {
+    scroll-margin-top: 0;
+  }
+
+  .plan-option {
+    background: var(--background);
+  }
+
+  .plan-panel {
+    display: none;
+  }
+
+  .plan-field:has(:checked) .plan-empty {
+    display: none;
+  }
+
+  .plan-field:has(#count-1:checked) .plan-panel-1,
+  .plan-field:has(#count-2:checked) .plan-panel-2,
+  .plan-field:has(#count-3:checked) .plan-panel-3,
+  .plan-field:has(#count-4plus:checked) .plan-panel-4plus {
+    display: grid;
+  }
+
+  .plan-field:has(#count-2:checked) .plan-fill {
+    width: 25%;
+  }
+
+  .plan-field:has(#count-3:checked) .plan-fill {
+    width: 50%;
+  }
+
+  .plan-field:has(#count-4plus:checked) .plan-fill {
+    width: 75%;
+  }
+
+  .plan-option:has(:checked) {
+    background: var(--foreground);
+    color: var(--background);
+  }
+
+  .plan-option:has(:checked) .plan-dot {
+    border-color: var(--background);
+    background: var(--background);
+  }
+
+  .plan-option:has(:checked) .plan-index-text {
+    color: var(--foreground);
+  }
+
+  .plan-option:has(:checked) .plan-note,
+  .plan-option:has(:checked) .plan-plus {
+    color: color-mix(in srgb, var(--background) 70%, transparent);
+  }
+
+  .plan-option:has(:checked) .plan-screen {
+    border-color: color-mix(in srgb, var(--background) 80%, transparent);
+    background: color-mix(in srgb, var(--background) 20%, transparent);
+  }
+
+  @media (min-width: 1024px) {
+    .plan-option {
+      background: transparent;
+    }
+
+    .plan-option:hover {
+      background: transparent;
+    }
+
+    .plan-option:has(:checked) {
+      background: transparent;
+      color: var(--foreground);
+    }
+
+    .plan-option:has(:checked) .plan-dot {
+      border-color: var(--foreground);
+      background: var(--foreground);
+    }
+
+    .plan-option:has(:checked) .plan-index-text {
+      color: var(--background);
+    }
+
+    .plan-option:has(:checked) .plan-note,
+    .plan-option:has(:checked) .plan-plus {
+      color: var(--muted-foreground);
+    }
+
+    .plan-option:has(:checked) .plan-screen {
+      border-color: color-mix(in srgb, var(--foreground) 55%, transparent);
+      background: color-mix(in srgb, var(--foreground) 10%, transparent);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1.25rem;
+
+  @media (min-width: 768px) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
 }

@@ -1,0 +1,261 @@
+{
+  "version": 1,
+  "project": {
+    "name": "vlad-services-web",
+    "productType": null,
+    "stack": [
+      "nextjs",
+      "react",
+      "tailwind-v4"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/app/globals.css"
+    ],
+    "components": [],
+    "assets": [],
+    "instructions": [
+      "AGENTS.md",
+      "CLAUDE.md"
+    ]
+  },
+  "design": {
+    "colorMode": "light-and-dark",
+    "colors": {
+      "--background": {
+        "value": "#0c0a09",
+        "source": "src/app/globals.css"
+      },
+      "--foreground": {
+        "value": "#fafaf9",
+        "source": "src/app/globals.css"
+      },
+      "--card-foreground": {
+        "value": "#fafaf9",
+        "source": "src/app/globals.css"
+      },
+      "--primary": {
+        "value": "#fafaf9",
+        "source": "src/app/globals.css"
+      },
+      "--primary-foreground": {
+        "value": "#1c1917",
+        "source": "src/app/globals.css"
+      },
+      "--secondary": {
+        "value": "#d6d3d1",
+        "source": "src/app/globals.css"
+      },
+      "--muted": {
+        "value": "#292524",
+        "source": "src/app/globals.css"
+      },
+      "--muted-foreground": {
+        "value": "#a8a29e",
+        "source": "src/app/globals.css"
+      },
+      "--accent": {
+        "value": "#d97706",
+        "source": "src/app/globals.css"
+      },
+      "--accent-foreground": {
+        "value": "#1c1917",
+        "source": "src/app/globals.css"
+      },
+      "--destructive": {
+        "value": "#f87171",
+        "source": "src/app/globals.css"
+      },
+      "--border": {
+        "value": "#44403c",
+        "source": "src/app/globals.css"
+      },
+      "--ring": {
+        "value": "#fafaf9",
+        "source": "src/app/globals.css"
+      },
+      "--color-background": {
+        "value": "var(--background)",
+        "source": "src/app/globals.css"
+      },
+      "--color-foreground": {
+        "value": "var(--foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-card": {
+        "value": "var(--card)",
+        "source": "src/app/globals.css"
+      },
+      "--color-card-foreground": {
+        "value": "var(--card-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-primary": {
+        "value": "var(--primary)",
+        "source": "src/app/globals.css"
+      },
+      "--color-primary-foreground": {
+        "value": "var(--primary-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-secondary": {
+        "value": "var(--secondary)",
+        "source": "src/app/globals.css"
+      },
+      "--color-muted": {
+        "value": "var(--muted)",
+        "source": "src/app/globals.css"
+      },
+      "--color-muted-foreground": {
+        "value": "var(--muted-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent": {
+        "value": "var(--accent)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-foreground": {
+        "value": "var(--accent-foreground)",
+        "source": "src/app/globals.css"
+      },
+      "--color-destructive": {
+        "value": "var(--destructive)",
+        "source": "src/app/globals.css"
+      },
+      "--color-border": {
+        "value": "var(--border)",
+        "source": "src/app/globals.css"
+      },
+      "--color-input": {
+        "value": "var(--input)",
+        "source": "src/app/globals.css"
+      },
+      "--color-ring": {
+        "value": "var(--ring)",
+        "source": "src/app/globals.css"
+      }
+    },
+    "typography": {
+      "--font-sans": {
+        "value": "var(--font-sans)",
+        "source": "src/app/globals.css"
+      },
+      "--font-serif": {
+        "value": "var(--font-serif)",
+        "source": "src/app/globals.css"
+      },
+      "--font-mono": {
+        "value": "var(--font-mono)",
+        "source": "src/app/globals.css"
+      }
+    },
+    "spacing": {
+      "--space-xs": {
+        "value": "0.25rem",
+        "source": "src/app/globals.css"
+      },
+      "--space-sm": {
+        "value": "0.5rem",
+        "source": "src/app/globals.css"
+      },
+      "--space-md": {
+        "value": "1rem",
+        "source": "src/app/globals.css"
+      },
+      "--space-lg": {
+        "value": "1.5rem",
+        "source": "src/app/globals.css"
+      },
+      "--space-xl": {
+        "value": "2rem",
+        "source": "src/app/globals.css"
+      },
+      "--space-2xl": {
+        "value": "3rem",
+        "source": "src/app/globals.css"
+      },
+      "--space-3xl": {
+        "value": "4rem",
+        "source": "src/app/globals.css"
+      }
+    },
+    "radius": {
+      "--radius": {
+        "value": "0.25rem",
+        "source": "src/app/globals.css"
+      },
+      "--radius-sm": {
+        "value": "calc(var(--radius) - 2px)",
+        "source": "src/app/globals.css"
+      },
+      "--radius-md": {
+        "value": "var(--radius)",
+        "source": "src/app/globals.css"
+      },
+      "--radius-lg": {
+        "value": "calc(var(--radius) + 4px)",
+        "source": "src/app/globals.css"
+      }
+    },
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [
+      "Quiet luxury, readable, simple navigation",
+      "TV mounting is the primary service (~80% of demand)",
+      "Cyrillic-capable fonts only",
+      "No database, no deploy — local development only"
+    ],
+    "avoid": [
+      "Glassmorphism",
+      "Quiz funnels and aggressive lead-gen popups",
+      "Rainbow gradients and cheap discount banners"
+    ]
+  },
+  "decisions": [
+    {
+      "id": "direction-editorial-precision",
+      "choice": "Editorial atelier + precision tech",
+      "rationale": "Unobtrusive, simple, technological and expensive. Rejected liquid glass and competitor quiz funnels."
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "design.colorMode:light-and-dark",
+      "source": "src/app/globals.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/app/globals.css"
+    },
+    {
+      "fact": "project.instructions",
+      "source": "AGENTS.md"
+    },
+    {
+      "fact": "project.instructions",
+      "source": "CLAUDE.md"
+    },
+    {
+      "fact": "project.stack:nextjs",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v4",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-09-08T17:38:14.765Z"
+}
