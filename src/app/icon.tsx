@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 
+export const dynamic = "force-static";
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
@@ -13,10 +14,11 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#1c1917",
-          color: "#fafaf9",
-          fontSize: 18,
-          fontFamily: "Georgia, serif",
+          background: "#171717",
+          color: "#fafafa",
+          fontSize: 16,
+          fontWeight: 500,
+          fontFamily: "system-ui, sans-serif",
         }}
       >
         V

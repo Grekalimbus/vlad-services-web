@@ -8,7 +8,7 @@ export function TvMounting() {
           <p className="eyebrow">The work</p>
           <h2
             id="tv-heading"
-            className="mt-4 font-serif text-4xl font-medium tracking-tight md:text-5xl"
+            className="mt-4 text-4xl font-medium tracking-[-0.03em] md:text-5xl"
           >
             Mounted as if it were always there
           </h2>
@@ -22,10 +22,10 @@ export function TvMounting() {
         <ol className="mt-14 grid gap-px overflow-hidden rounded-sm border border-border bg-border md:grid-cols-3">
           {mountTypes.map((item, index) => (
             <li key={item.id} className="bg-background p-7 md:p-9">
-              <p className="font-mono text-[0.68rem] tracking-[0.14em] text-accent">
+              <p className="text-[0.75rem] font-medium text-accent">
                 0{index + 1}
               </p>
-              <h3 className="mt-5 font-serif text-2xl font-medium md:text-3xl">
+              <h3 className="mt-5 text-2xl font-medium tracking-[-0.02em] md:text-3xl">
                 {item.title}
               </h3>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">

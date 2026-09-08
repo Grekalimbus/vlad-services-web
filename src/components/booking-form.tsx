@@ -7,7 +7,7 @@ type Status = "idle" | "loading" | "success" | "error";
 const phonePattern = /^[\d+\s()-]{10,20}$/;
 
 const fieldClass =
-  "mt-2 h-12 w-full rounded-sm border border-input bg-background px-3 text-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+  "mt-2 h-12 w-full rounded-xl border border-input bg-background px-4 text-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 type BookingFormProps = {
   submitLabel?: string;
@@ -161,7 +161,7 @@ export function BookingForm({
             name="note"
             rows={4}
             placeholder={notePlaceholder}
-            className="mt-2 w-full rounded-sm border border-input bg-background px-3 py-3 text-sm transition-colors duration-200 placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm transition-colors duration-200 placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           />
         </div>
       ) : null}
@@ -169,7 +169,7 @@ export function BookingForm({
       <button
         type="submit"
         disabled={status === "loading"}
-        className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-sm bg-primary px-6 text-sm font-semibold text-primary-foreground transition-opacity duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-full bg-accent px-6 text-sm font-medium text-accent-foreground transition-colors duration-200 hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "loading" ? "Sending…" : submitLabel}
       </button>

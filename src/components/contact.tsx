@@ -9,7 +9,7 @@ export function Contact() {
           <p className="eyebrow">Contact</p>
           <h2
             id="contact-heading"
-            className="mt-4 font-serif text-4xl font-medium tracking-tight md:text-5xl"
+            className="mt-4 text-4xl font-medium tracking-[-0.03em] md:text-5xl"
           >
             Prefer to write, or call now
           </h2>
@@ -20,7 +20,7 @@ export function Contact() {
           <p className="mt-8">
             <a
               href={site.phoneHref}
-              className="font-serif text-3xl tracking-tight text-foreground"
+              className="text-3xl font-medium tracking-[-0.03em] text-foreground transition-colors duration-200 hover:text-accent"
             >
               {site.phoneDisplay}
             </a>

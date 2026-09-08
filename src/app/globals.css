@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f5f2;
-  --foreground: #0c0a09;
-  --card: #fffcf8;
-  --card-foreground: #0c0a09;
-  --primary: #1c1917;
-  --primary-foreground: #fafaf9;
-  --secondary: #44403c;
-  --muted: #ece7e1;
-  --muted-foreground: #57534e;
-  --accent: #a16207;
-  --accent-foreground: #fffbeb;
+  --background: #f5f4f2;
+  --foreground: #171717;
+  --card: #faf9f7;
+  --card-foreground: #171717;
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #3f3f46;
+  --muted: #eceae6;
+  --muted-foreground: #5c5a56;
+  --accent: #3f5f7a;
+  --accent-foreground: #f5f8fa;
   --destructive: #dc2626;
-  --border: #ddd6cc;
+  --border: #e4e2dc;
   --input: #d6d3d1;
-  --ring: #1c1917;
+  --ring: #171717;
   --radius: 0.25rem;
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
@@ -36,8 +36,8 @@
   --secondary: #d6d3d1;
   --muted: #292524;
   --muted-foreground: #a8a29e;
-  --accent: #d97706;
-  --accent-foreground: #1c1917;
+  --accent: #8aa4b8;
+  --accent-foreground: #15202a;
   --destructive: #f87171;
   --border: #44403c;
   --input: #44403c;
@@ -61,8 +61,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
-  --font-mono: var(--font-mono);
+  --font-serif: var(--font-sans);
+  --font-mono: var(--font-sans);
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 4px);
@@ -96,7 +96,7 @@
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans), system-ui, sans-serif;
-    font-feature-settings: "ss01" on, "kern" on;
+    font-feature-settings: "ss01" on, "kern" on, "cv11" on;
   }
 
   ::selection {
@@ -110,7 +110,7 @@
   }
 
   section[id] {
-    scroll-margin-top: 5.75rem;
+    scroll-margin-top: 5.25rem;
   }
 
   #top {
@@ -219,10 +219,29 @@
 }
 
 @utility eyebrow {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--accent);
+}
+
+@utility floating-surface {
+  background: color-mix(in srgb, #f4f3f1 92%, white);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.5),
+    0 1px 2px rgb(23 23 23 / 0.04),
+    0 10px 24px rgb(23 23 23 / 0.06);
+}
+
+@keyframes hero-drift {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@utility animate-hero-drift {
+  animation: hero-drift 42s ease-in-out infinite alternate;
 }

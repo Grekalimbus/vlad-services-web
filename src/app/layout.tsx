@@ -1,24 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant, Geist_Mono, Montserrat } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Header } from "@/components/header";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-const serif = Cormorant({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-serif",
-  display: "swap",
-});
-
-const sans = Montserrat({
-  subsets: ["latin", "latin-ext"],
+const sans = Inter({
+  subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
   variable: "--font-sans",
-  display: "swap",
-});
-
-const mono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
   display: "swap",
 });
 
@@ -64,21 +52,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c0a09",
+  themeColor: "#f5f4f2",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${serif.variable} ${sans.variable} ${mono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+    <html lang="en" className={`${sans.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <a
           href="#content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
         >
           Skip to content
         </a>

@@ -5,8 +5,8 @@ export function Footer() {
     <footer className="bg-primary text-primary-foreground">
       <div className="container-page grid gap-10 py-12 md:grid-cols-12 md:py-16">
         <div className="md:col-span-5">
-          <p className="font-serif text-3xl">{site.wordmark}</p>
-          <p className="mt-2 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-primary-foreground/55">
+          <p className="text-2xl font-medium tracking-[-0.03em]">{site.wordmark}</p>
+          <p className="mt-2 text-[0.75rem] font-medium text-primary-foreground/55">
             {site.hoursShort}
           </p>
           <p className="mt-4 max-w-sm text-sm leading-6 text-primary-foreground/70">
@@ -18,7 +18,10 @@ export function Footer() {
           <ul className="mt-4 flex flex-col gap-2 text-sm">
             {nav.map((item) => (
               <li key={item.href}>
-                <a href={item.href} className="hover:underline">
+                <a
+                  href={item.href}
+                  className="text-primary-foreground/80 transition-colors duration-200 hover:text-primary-foreground"
+                >
                   {item.label}
                 </a>
               </li>
@@ -27,10 +30,16 @@ export function Footer() {
         </nav>
         <div className="md:col-span-4">
           <p className="eyebrow">Reach us</p>
-          <a href={site.phoneHref} className="mt-4 block font-serif text-2xl">
+          <a
+            href={site.phoneHref}
+            className="mt-4 block text-2xl font-medium tracking-[-0.03em] transition-colors duration-200 hover:text-accent"
+          >
             {site.phoneDisplay}
           </a>
-          <a href={`mailto:${site.email}`} className="mt-2 block text-sm">
+          <a
+            href={`mailto:${site.email}`}
+            className="mt-2 block text-sm text-primary-foreground/80 transition-colors duration-200 hover:text-primary-foreground"
+          >
             {site.email}
           </a>
           <p className="mt-4 text-sm text-primary-foreground/70">{site.hours}</p>

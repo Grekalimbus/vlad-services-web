@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 
+export const dynamic = "force-static";
 export const alt = "Vlad 24 Hours Daily — TV wall mounting";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -14,31 +15,38 @@ export default function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0c0a09",
-          color: "#fafaf9",
+          background: "#171717",
+          color: "#fafafa",
           padding: "72px",
-          fontFamily: "Georgia, serif",
+          fontFamily: "system-ui, sans-serif",
         }}
       >
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            fontSize: 20,
-            letterSpacing: 4,
-            textTransform: "uppercase",
-            color: "#d6d3d1",
+            fontSize: 18,
+            fontWeight: 500,
+            color: "#b45309",
           }}
         >
           <span>Vlad</span>
-          <span>24 Hours Daily</span>
+          <span>Available 24 hours daily</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ fontSize: 68, lineHeight: 1.05, maxWidth: 920 }}>
+          <div
+            style={{
+              fontSize: 64,
+              fontWeight: 500,
+              lineHeight: 1.08,
+              letterSpacing: -1.5,
+              maxWidth: 900,
+            }}
+          >
             Your television belongs on the wall.
           </div>
-          <div style={{ fontSize: 26, color: "#a8a29e", maxWidth: 720 }}>
-            Concealed cables. Fireplace work. Three-year warranty.
+          <div style={{ fontSize: 24, color: "#a1a1aa", maxWidth: 680 }}>
+            Concealed cables, fireplace work, and a three-year warranty.
           </div>
         </div>
       </div>

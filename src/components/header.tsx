@@ -6,9 +6,7 @@ import { nav, site } from "@/lib/site";
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [overHero, setOverHero] = useState(true);
   const panelId = useId();
-  const inverted = overHero && !open;
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -26,118 +24,77 @@ export function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  useEffect(() => {
-    const update = () => {
-      setOverHero(window.scrollY < 24);
-    };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-200 ${
-        inverted
-          ? "border-b border-white/10 bg-transparent text-white"
-          : "border-b border-border bg-background text-foreground"
-      }`}
-    >
-      <div className="container-page flex h-16 items-center justify-between gap-4 md:h-[4.25rem]">
-        <a href="#top" className="flex min-w-0 flex-col leading-none">
-          <span className="font-serif text-[1.65rem] font-medium tracking-tight">
-            {site.wordmark}
-          </span>
-          <span
-            className={`mt-1 font-mono text-[0.62rem] font-medium tracking-[0.16em] uppercase ${
-              inverted ? "text-white/70" : "text-muted-foreground"
-            }`}
-          >
-            {site.hoursShort}
-          </span>
-        </a>
-
-        <nav
-          className="hidden items-center gap-7 lg:flex"
-          aria-label="Primary"
-        >
-          {nav.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`text-[0.8125rem] font-medium transition-colors duration-200 ${
-                inverted ? "text-white/80 hover:text-white" : "text-secondary hover:text-foreground"
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <div className="relative z-10 flex justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))] md:pt-5">
+        <div className="pointer-events-auto flex items-center gap-2">
           <a
-            href={site.phoneHref}
-            className="hidden text-[0.8125rem] font-medium tracking-wide sm:inline"
+            href="#top"
+            className="floating-surface flex size-11 shrink-0 items-center justify-center rounded-full text-[0.92rem] font-medium tracking-tight text-foreground transition-colors duration-200 hover:bg-white"
+            onClick={() => setOpen(false)}
           >
-            {site.phoneDisplay}
+            <span aria-hidden="true">{site.wordmark[0]}</span>
+            <span className="sr-only">{site.name}</span>
           </a>
-          <a
-            href="#plan"
-            className={
-              inverted
-                ? "hidden"
-                : "hidden min-h-10 cursor-pointer items-center rounded-sm bg-primary px-4 text-[0.75rem] font-semibold tracking-wide text-primary-foreground transition-opacity duration-200 hover:opacity-90 sm:inline-flex"
-            }
+
+          <nav
+            className="floating-surface hidden items-center rounded-full p-1.5 lg:flex"
+            aria-label="Primary"
           >
-            Plan a visit
-          </a>
+            {nav.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
           <button
             type="button"
-            className={`inline-flex size-11 cursor-pointer items-center justify-center rounded-sm border lg:hidden ${
-              inverted ? "border-white/30" : "border-border"
-            }`}
+            className="floating-surface inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-foreground transition-colors duration-200 hover:bg-white lg:hidden"
             aria-expanded={open}
             aria-controls={panelId}
             onClick={() => setOpen((value) => !value)}
           >
-            {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+            {open ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
             <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
           </button>
         </div>
       </div>
 
       {open ? (
-        <div id={panelId} className="border-t border-border bg-background text-foreground lg:hidden">
-          <nav className="container-page flex flex-col gap-1 py-4" aria-label="Mobile">
-            {nav.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="rounded-sm px-2 py-3 text-base font-medium"
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </a>
-            ))}
+        <nav
+          id={panelId}
+          aria-label="Mobile"
+          className="pointer-events-auto floating-surface relative z-10 mx-auto mt-2 w-[calc(100%-2rem)] max-w-xs rounded-3xl p-2 lg:hidden"
+        >
+          {nav.map((item) => (
             <a
-              href={site.phoneHref}
-              className="mt-2 rounded-sm border border-border px-3 py-3 text-sm font-medium"
-            >
-              {site.phoneDisplay}
-            </a>
-            <a
-              href="#plan"
-              className="cursor-pointer rounded-sm bg-primary px-3 py-3 text-center text-sm font-semibold text-primary-foreground"
+              key={item.href}
+              href={item.href}
+              className="block rounded-2xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
               onClick={() => setOpen(false)}
             >
-              Plan a visit
+              {item.label}
             </a>
-          </nav>
-        </div>
+          ))}
+          <a
+            href={site.phoneHref}
+            className="mt-1 block rounded-2xl px-4 py-3 text-sm font-medium text-foreground"
+          >
+            {site.phoneDisplay}
+          </a>
+          <a
+            href="#plan"
+            className="mt-1 flex min-h-11 cursor-pointer items-center justify-center rounded-full bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors duration-200 hover:bg-foreground hover:text-background"
+            onClick={() => setOpen(false)}
+          >
+            Plan the visit
+          </a>
+        </nav>
       ) : null}
     </header>
   );

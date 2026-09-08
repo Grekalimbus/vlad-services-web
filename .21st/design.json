@@ -225,6 +225,11 @@
       "id": "direction-editorial-precision",
       "choice": "Editorial atelier + precision tech",
       "rationale": "Unobtrusive, simple, technological and expensive. Rejected liquid glass and competitor quiz funnels."
+    },
+    {
+      "id": "homepage-fullscreen-hero",
+      "choice": "Fullscreen photo hero with split floating nav and bottom-left copy",
+      "rationale": "Centered circular wordmark plus a compact pill for sections. Copy stays in a narrow left column so the install photography remains the visual. Inter for Cyrillic-capable product type; amber accent from the existing brand, not a blue SaaS palette. Floating surfaces are off-white, not glass."
     }
   ],
   "evidence": [

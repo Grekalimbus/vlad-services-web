@@ -14,7 +14,7 @@ export default function Home() {
       <div className="sticky top-0 z-0">
         <Hero />
       </div>
-      <div className="relative z-10 bg-background shadow-[0_-16px_48px_rgb(12_10_9/0.18)]">
+      <div className="relative z-10 bg-background shadow-[0_-24px_64px_rgb(23_23_23/0.22)]">
         <main id="content">
           <Plan />
           <TvMounting />

@@ -9,7 +9,7 @@ export function Faq() {
           <p className="eyebrow">Questions</p>
           <h2
             id="faq-heading"
-            className="mt-4 max-w-[10ch] font-serif text-4xl font-medium tracking-tight md:text-5xl"
+            className="mt-4 max-w-[10ch] text-4xl font-medium tracking-[-0.03em] md:text-5xl"
           >
             Straight answers
           </h2>

@@ -14,7 +14,7 @@ export function Plan() {
             <p className="eyebrow">The visit</p>
             <h2
               id="plan-heading"
-              className="mt-4 max-w-[12ch] font-serif text-4xl font-medium tracking-tight md:text-6xl md:leading-[1.02]"
+              className="mt-4 max-w-[12ch] text-4xl font-medium tracking-[-0.03em] md:text-5xl md:leading-[1.06]"
             >
               How many televisions?
             </h2>
@@ -51,11 +51,11 @@ export function Plan() {
                 />
                 <span className="plan-index relative flex size-10 items-center justify-center">
                   <span className="plan-dot absolute inset-0 rounded-full border border-border bg-card" />
-                  <span className="plan-index-text relative font-mono text-[0.65rem] font-medium text-muted-foreground">
+                  <span className="plan-index-text relative text-[0.65rem] font-medium text-muted-foreground">
                     0{index + 1}
                   </span>
                 </span>
-                <span className="mt-5 font-serif text-5xl font-medium leading-none tracking-tight md:text-6xl">
+                <span className="mt-5 text-5xl font-medium leading-none tracking-[-0.04em] md:text-6xl">
                   {item.count}
                 </span>
                 <TvMarks count={item.screens} />
@@ -81,10 +81,10 @@ export function Plan() {
             >
               <div className="md:col-span-5">
                 <p className="eyebrow">Next</p>
-                <p className="mt-4 font-serif text-3xl font-medium leading-snug md:text-4xl">
+                <p className="mt-4 text-3xl font-medium leading-snug tracking-[-0.03em] md:text-4xl">
                   {item.title}
                 </p>
-                <p className="mt-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-accent">
+                <p className="mt-3 text-[0.75rem] font-medium text-accent">
                   {item.duration}
                 </p>
                 <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
@@ -114,7 +114,7 @@ function TvMarks({ count }: { readonly count: number }) {
         <span key={index} className="plan-screen block h-3 w-[1.15rem] rounded-[1px] border border-foreground/25" />
       ))}
       {count === 4 ? (
-        <span className="plan-plus -mb-px pl-0.5 font-serif text-sm leading-none text-muted-foreground">
+        <span className="plan-plus -mb-px pl-0.5 text-sm leading-none text-muted-foreground">
           +
         </span>
       ) : null}
