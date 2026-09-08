@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { assetPath } from "@/lib/site";
 
 export function Works() {
   return (
@@ -10,7 +11,7 @@ export function Works() {
       <div className="md:grid md:min-h-[90svh] md:grid-cols-12">
         <figure className="relative min-h-[72vh] bg-muted md:order-2 md:col-span-8 md:col-start-5 md:min-h-0">
           <Image
-            src="/works/tv-fireplace.jpg"
+            src={assetPath("/works/tv-fireplace.jpg")}
             alt="Bright living room after a clean installation visit"
             fill
             sizes="(min-width: 768px) 68vw, 100vw"

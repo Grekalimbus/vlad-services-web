@@ -28,6 +28,7 @@ jobs:
         env:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_SITE_URL: https://grekalimbus.github.io/vlad-services-web
+          NEXT_PUBLIC_BASE_PATH: /vlad-services-web
       - run: touch out/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

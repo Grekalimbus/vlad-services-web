@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { assetPath } from "@/lib/site";
 
 export function Hero() {
   return (
@@ -9,7 +10,7 @@ export function Hero() {
       className="relative h-dvh max-h-dvh overflow-hidden bg-foreground"
     >
       <Image
-        src="/works/hero.jpg"
+        src={assetPath("/works/hero.jpg")}
         alt="Large television and soundbar mounted above a marble fireplace, cables concealed"
         fill
         priority

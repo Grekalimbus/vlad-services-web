@@ -1,3 +1,6 @@
+export const assetPath = (path: string) =>
+  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path.startsWith("/") ? path : `/${path}`}`;
+
 export const site = {
   name: "Vlad 24 Hours Daily",
   wordmark: "Vlad",
