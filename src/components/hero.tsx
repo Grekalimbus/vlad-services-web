@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { assetPath } from "@/lib/site";
+import { CallNow, QuoteCta } from "@/components/cta";
+import { assetPath, ctas, site } from "@/lib/site";
 
 export function Hero() {
   return (
@@ -11,7 +12,7 @@ export function Hero() {
     >
       <Image
         src={assetPath("/works/hero.jpg")}
-        alt="Large television and soundbar mounted above a marble fireplace, cables concealed"
+        alt="Finished living room with a wall-mounted television"
         fill
         priority
         quality={75}
@@ -28,20 +29,11 @@ export function Hero() {
       />
 
       <div className="relative z-10 flex h-full items-end">
-        <div className="container-page w-full pb-10 pt-28 sm:pb-14 md:pb-16 lg:pb-20">
+        <div className="container-page w-full pb-32 pt-28 sm:pb-14 md:pb-16 lg:pb-20">
           <div className="max-w-88 sm:max-w-104 md:max-w-md">
-            <a
-              href="#contact"
-              className="group inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-[#9eb6c4] transition-colors duration-200 hover:text-white"
-            >
-              Available 24 hours daily
-              <ArrowRight
-                size={14}
-                strokeWidth={2}
-                aria-hidden="true"
-                className="transition-transform duration-200 group-hover:translate-x-0.5"
-              />
-            </a>
+            <p className="text-[0.8125rem] font-medium text-[#9eb6c4]">
+              {site.areaServedShort} · TV mounting, electrical & handyman
+            </p>
 
             <h1
               id="hero-heading"
@@ -51,21 +43,19 @@ export function Hero() {
             </h1>
 
             <p className="mt-4 max-w-88 text-[0.9375rem] leading-6 text-white/78">
-              Concealed cables, fireplace work, and a three-year warranty.
+              TV mounting, electrical, and general handyman work. Insured, with a two-year
+              workmanship guarantee.
             </p>
 
-            <a
-              href="#plan"
-              className="group mt-7 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-[0.8125rem] font-medium text-accent-foreground transition-colors duration-200 hover:bg-white hover:text-foreground"
-            >
-              Plan the visit
-              <ArrowRight
-                size={15}
-                strokeWidth={2}
-                aria-hidden="true"
-                className="transition-transform duration-200 group-hover:translate-x-0.5"
-              />
-            </a>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <QuoteCta className="group inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-[0.8125rem] font-medium text-accent-foreground transition-colors duration-200 hover:bg-white hover:text-foreground">
+                {ctas.quote}
+              </QuoteCta>
+              <CallNow className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/35 px-5 text-[0.8125rem] font-medium text-white transition-colors duration-200 hover:bg-white hover:text-foreground">
+                {ctas.call}
+                <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
+              </CallNow>
+            </div>
           </div>
         </div>
       </div>

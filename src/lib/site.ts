@@ -1,26 +1,72 @@
 export const assetPath = (path: string) =>
-  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path.startsWith("/") ? path : `/${path}`}`;
+	`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path.startsWith("/") ? path : `/${path}`}`;
 
+export const routes = {
+	home: "/",
+	services: "/services",
+	service: (slug: string) => `/services/${slug}`,
+	portfolio: "/portfolio",
+	portfolioCategory: (slug: string) => `/portfolio/${slug}`,
+	contact: "/contact",
+	privacy: "/privacy-policy",
+	messagingTerms: "/messaging-terms",
+	terms: "/terms",
+} as const;
+
+/**
+ * Public company identity only.
+ * Do not add the registered business address to this object or to any
+ * public-facing component. That address is private and must stay off the site.
+ */
 export const site = {
-  name: "Vlad 24 Hours Daily",
-  wordmark: "Vlad",
-  hoursShort: "24 Hours Daily",
-  tagline: "Professional television mounting, any hour of the day.",
-  description:
-    "Same-day TV wall mounting with concealed cables, fireplace installs, and a three-year workmanship warranty. Available 24 hours daily.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  locale: "en_US",
-  phoneDisplay: "(213) 555-2400",
-  phoneHref: "tel:+12135552400",
-  email: "hello@vlad.services",
-  hours: "24 hours daily",
-  areaServed: "Greater Los Angeles",
+	name: "PrimeFix Home & Handyman Services LLC",
+	shortName: "PrimeFix",
+	wordmark: "PrimeFix",
+	legalName: "PrimeFix Home & Handyman Services LLC",
+	tagline: "TV mounting, electrical, and handyman services in San Diego.",
+	description:
+		"PrimeFix Home & Handyman Services LLC provides TV mounting, electrical, and general handyman work in San Diego and surrounding areas, California.",
+	url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+	websiteHost: "primefixpros.com",
+	locale: "en_US",
+	phoneDisplay: "(619) 736-3016",
+	phoneHref: "tel:+16197363016",
+	email: "info@primefixhandyman.com",
+	logo: "/brand/logo.webp",
+	availability:
+		"Fast response with same-day or week availability when the schedule allows.",
+	guarantee: "2-Year Workmanship Guarantee",
+	insured: "Insured business",
+	areaServed: "San Diego and surrounding areas, California",
+	areaServedShort: "San Diego, CA",
+} as const;
+
+export const ctas = {
+	quote: "GET A FREE QUOTE",
+	call: "CALL NOW",
+	book: "BOOK A SERVICE",
 } as const;
 
 export const nav = [
-  { href: "#plan", label: "Plan" },
-  { href: "#tv", label: "Services" },
-  { href: "#works", label: "Work" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#contact", label: "Contact" },
+	{ href: routes.home, label: "Home" },
+	{ href: routes.services, label: "Services" },
+	{ href: routes.service("tv-mounting"), label: "TV Mounting" },
+	{ href: routes.portfolio, label: "Projects" },
+	{ href: routes.contact, label: "Contact" },
+] as const;
+
+export const footerNav = [
+	{ href: routes.home, label: "Home" },
+	{ href: routes.services, label: "Services" },
+	{ href: routes.service("tv-mounting"), label: "TV Mounting" },
+	{ href: routes.service("electrical"), label: "Electrical" },
+	{ href: routes.service("handyman"), label: "General Handyman" },
+	{ href: routes.portfolio, label: "Projects" },
+	{ href: routes.contact, label: "Free Quote" },
+] as const;
+
+export const legalNav = [
+	{ href: routes.privacy, label: "Privacy Policy" },
+	{ href: routes.messagingTerms, label: "Messaging Terms & Conditions" },
+	{ href: routes.terms, label: "Terms & Conditions" },
 ] as const;

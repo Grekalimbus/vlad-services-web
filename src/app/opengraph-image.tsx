@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const dynamic = "force-static";
-export const alt = "Vlad 24 Hours Daily — TV wall mounting";
+export const alt = "PrimeFix — TV mounting, electrical, and handyman services in San Diego";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -27,11 +27,11 @@ export default function OpenGraphImage() {
             justifyContent: "space-between",
             fontSize: 18,
             fontWeight: 500,
-            color: "#b45309",
+            color: "#9eb6c4",
           }}
         >
-          <span>Vlad</span>
-          <span>Available 24 hours daily</span>
+          <span>PrimeFix</span>
+          <span>San Diego, CA</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div
@@ -46,7 +46,8 @@ export default function OpenGraphImage() {
             Your television belongs on the wall.
           </div>
           <div style={{ fontSize: 24, color: "#a1a1aa", maxWidth: 680 }}>
-            Concealed cables, fireplace work, and a three-year warranty.
+            TV mounting, electrical, and handyman services. Insured, with a two-year workmanship
+            guarantee.
           </div>
         </div>
       </div>

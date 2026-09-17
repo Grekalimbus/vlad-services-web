@@ -1,35 +1,37 @@
-import { nav, site } from "@/lib/site";
+import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
+import { footerNav, legalNav, site } from "@/lib/site";
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="bg-primary pb-[5.5rem] text-primary-foreground lg:pb-0">
       <div className="container-page grid gap-10 py-12 md:grid-cols-12 md:py-16">
         <div className="md:col-span-5">
-          <p className="text-2xl font-medium tracking-[-0.03em]">{site.wordmark}</p>
-          <p className="mt-2 text-[0.75rem] font-medium text-primary-foreground/55">
-            {site.hoursShort}
+          <BrandLogo size="footer" />
+          <p className="mt-4 text-[0.75rem] font-medium text-primary-foreground/55">
+            {site.areaServedShort}
           </p>
           <p className="mt-4 max-w-sm text-sm leading-6 text-primary-foreground/70">
             {site.tagline}
           </p>
         </div>
         <nav className="md:col-span-3" aria-label="Footer">
-          <p className="eyebrow">On this page</p>
+          <p className="eyebrow text-[#9eb6c4]">Pages</p>
           <ul className="mt-4 flex flex-col gap-2 text-sm">
-            {nav.map((item) => (
+            {footerNav.map((item) => (
               <li key={item.href}>
-                <a
+                <Link
                   href={item.href}
                   className="text-primary-foreground/80 transition-colors duration-200 hover:text-primary-foreground"
                 >
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
         </nav>
         <div className="md:col-span-4">
-          <p className="eyebrow">Reach us</p>
+          <p className="eyebrow text-[#9eb6c4]">Reach us</p>
           <a
             href={site.phoneHref}
             className="mt-4 block text-2xl font-medium tracking-[-0.03em] transition-colors duration-200 hover:text-accent"
@@ -42,14 +44,25 @@ export function Footer() {
           >
             {site.email}
           </a>
-          <p className="mt-4 text-sm text-primary-foreground/70">{site.hours}</p>
+          <p className="mt-4 text-sm text-primary-foreground/70">{site.areaServed}</p>
+          <p className="mt-2 text-sm text-primary-foreground/70">{site.availability}</p>
         </div>
       </div>
-      <div className="container-page flex flex-col gap-2 border-t border-primary-foreground/15 py-6 text-xs text-primary-foreground/55 sm:flex-row sm:justify-between">
+      <div className="container-page flex flex-col gap-3 border-t border-primary-foreground/15 py-6 text-xs text-primary-foreground/55 sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {new Date().getFullYear()} {site.name}
         </p>
-        <p>Local development</p>
+        <nav className="flex flex-col gap-2 sm:flex-row sm:gap-4" aria-label="Legal">
+          {legalNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="transition-colors duration-200 hover:text-primary-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </footer>
   );

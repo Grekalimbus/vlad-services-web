@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Header } from "@/components/header";
+import { Providers } from "@/components/providers";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -13,19 +14,20 @@ const sans = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — TV wall mounting`,
-    template: `%s · ${site.name}`,
+    default: `${site.shortName} — TV mounting, electrical & handyman in San Diego`,
+    template: `%s · ${site.shortName}`,
   },
   description: site.description,
-  applicationName: site.name,
+  applicationName: site.legalName,
   keywords: [
-    "TV mounting",
-    "wall mount television",
+    "TV mounting San Diego",
+    "electrical San Diego",
+    "handyman San Diego",
     "hide TV cables",
-    "TV above fireplace",
-    "same day TV installation",
+    "PrimeFix",
+    "home services San Diego",
   ],
-  authors: [{ name: site.name }],
+  authors: [{ name: site.legalName }],
   alternates: {
     canonical: "/",
   },
@@ -33,13 +35,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: site.locale,
     url: site.url,
-    siteName: site.name,
-    title: `${site.name} — TV wall mounting`,
+    siteName: site.legalName,
+    title: `${site.shortName} — TV mounting, electrical & handyman in San Diego`,
     description: site.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — TV wall mounting`,
+    title: `${site.shortName} — TV mounting, electrical & handyman in San Diego`,
     description: site.description,
   },
   robots: {
@@ -67,8 +69,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <Header />
-        {children}
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );

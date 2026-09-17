@@ -1,7 +1,17 @@
-import { BookingForm } from "@/components/booking-form";
-import { site } from "@/lib/site";
+import { BookService, CallNow } from "@/components/cta";
+import { QuoteForm } from "@/components/quote-form";
+import { buttonSecondaryClass } from "@/lib/forms";
+import { ctas, site } from "@/lib/site";
 
-export function Contact() {
+export function Contact({
+  heading = "Get a free quote",
+  formId = "general-quote",
+  defaultService,
+}: {
+  heading?: string;
+  formId?: "general-quote" | "quote-dialog";
+  defaultService?: string;
+}) {
   return (
     <section id="contact" aria-labelledby="contact-heading">
       <div className="container-page grid gap-12 py-20 md:grid-cols-12 md:py-28">
@@ -11,11 +21,11 @@ export function Contact() {
             id="contact-heading"
             className="mt-4 text-4xl font-medium tracking-[-0.03em] md:text-5xl"
           >
-            Prefer to write, or call now
+            {heading}
           </h2>
           <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-            We answer around the clock. Leave a note if you already know the
-            wall and the screen size.
+            The free quote form is the main path for electrical and handyman work. Include
+            photos so the project can be reviewed before a visit.
           </p>
           <p className="mt-8">
             <a
@@ -25,10 +35,15 @@ export function Contact() {
               {site.phoneDisplay}
             </a>
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">{site.hours}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{site.areaServed}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{site.availability}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <CallNow />
+            <BookService className={buttonSecondaryClass}>{ctas.book}</BookService>
+          </div>
         </div>
         <div className="md:col-span-7">
-          <BookingForm />
+          <QuoteForm formId={formId} defaultService={defaultService} />
         </div>
       </div>
     </section>

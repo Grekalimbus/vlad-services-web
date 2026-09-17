@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { Menu, X } from "lucide-react";
-import { nav, site } from "@/lib/site";
+import Link from "next/link";
+import { Menu, Phone, X } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
+import { QuoteCta } from "@/components/cta";
+import { nav, site, ctas } from "@/lib/site";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -28,29 +31,39 @@ export function Header() {
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
       <div className="relative z-10 flex justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))] md:pt-5">
         <div className="pointer-events-auto flex items-center gap-2">
-          <a
-            href="#top"
-            className="floating-surface flex size-11 shrink-0 items-center justify-center rounded-full text-[0.92rem] font-medium tracking-tight text-foreground transition-colors duration-200 hover:bg-white"
+          <Link
+            href="/"
+            className="floating-surface flex items-center rounded-full p-0.5"
             onClick={() => setOpen(false)}
           >
-            <span aria-hidden="true">{site.wordmark[0]}</span>
+            <BrandLogo priority />
             <span className="sr-only">{site.name}</span>
-          </a>
+          </Link>
 
           <nav
             className="floating-surface hidden items-center rounded-full p-1.5 lg:flex"
             aria-label="Primary"
           >
             {nav.map((item) => (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className="rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
+
+          <a
+            href={site.phoneHref}
+            className="floating-surface hidden min-h-11 items-center gap-2 rounded-full px-4 text-[0.8125rem] font-medium text-foreground lg:inline-flex"
+          >
+            <Phone size={14} aria-hidden="true" />
+            {ctas.call}
+          </a>
+
+          <QuoteCta className="hidden min-h-11 cursor-pointer items-center rounded-full bg-accent px-4 text-[0.75rem] font-medium tracking-wide text-accent-foreground shadow-[0_1px_2px_rgb(23_23_23/0.04),0_10px_24px_rgb(23_23_23/0.06)] transition-colors duration-200 hover:bg-foreground hover:text-background lg:inline-flex" />
 
           <button
             type="button"
@@ -72,28 +85,26 @@ export function Header() {
           className="pointer-events-auto floating-surface relative z-10 mx-auto mt-2 w-[calc(100%-2rem)] max-w-xs rounded-3xl p-2 lg:hidden"
         >
           {nav.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className="block rounded-2xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
               onClick={() => setOpen(false)}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
           <a
             href={site.phoneHref}
-            className="mt-1 block rounded-2xl px-4 py-3 text-sm font-medium text-foreground"
-          >
-            {site.phoneDisplay}
-          </a>
-          <a
-            href="#plan"
-            className="mt-1 flex min-h-11 cursor-pointer items-center justify-center rounded-full bg-accent px-4 text-sm font-medium text-accent-foreground transition-colors duration-200 hover:bg-foreground hover:text-background"
+            className="mt-1 flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-4 text-sm font-medium text-accent-foreground"
             onClick={() => setOpen(false)}
           >
-            Plan the visit
+            <Phone size={15} aria-hidden="true" />
+            {ctas.call}
           </a>
+          <QuoteCta
+            className="mt-2 flex min-h-11 w-full cursor-pointer items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background"
+          />
         </nav>
       ) : null}
     </header>

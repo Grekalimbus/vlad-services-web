@@ -1,48 +1,72 @@
-import Image from "next/image";
-import { assetPath } from "@/lib/site";
+import Link from "next/link";
+import { MediaPlaceholder } from "@/components/media-placeholder";
+import { itemsInCategory } from "@/lib/gallery";
+import { routes } from "@/lib/site";
 
 export function Works() {
+  const tvItems = itemsInCategory("tv-mounting").slice(0, 3);
+  const beforeAfter = itemsInCategory("before-after");
+
   return (
     <section
       id="works"
       aria-labelledby="works-heading"
       className="overflow-hidden border-b border-border bg-card"
     >
-      <div className="md:grid md:min-h-[90svh] md:grid-cols-12">
-        <figure className="relative min-h-[72vh] bg-muted md:order-2 md:col-span-8 md:col-start-5 md:min-h-0">
-          <Image
-            src={assetPath("/works/tv-fireplace.jpg")}
-            alt="Bright living room after a clean installation visit"
-            fill
-            sizes="(min-width: 768px) 68vw, 100vw"
-            className="object-cover object-[70%_50%]"
-          />
-          <figcaption className="absolute right-5 bottom-5 text-[0.6875rem] tracking-wide text-white/70">
-            Living room · finished visit
-          </figcaption>
-        </figure>
-
-        <div className="flex flex-col justify-center px-5 py-14 md:order-1 md:col-span-4 md:px-8 md:py-20 lg:pl-10 xl:pl-[max(2rem,calc((100vw-72rem)/2))] xl:pr-8">
-          <p className="eyebrow">Work</p>
-          <h2
-            id="works-heading"
-            className="mt-5 max-w-[8ch] text-4xl font-medium tracking-[-0.035em] md:text-5xl lg:text-[3.35rem] lg:leading-[1.08]"
-          >
-            Quiet results
-          </h2>
-          <p className="mt-6 max-w-[17rem] text-[0.9375rem] leading-7 text-muted-foreground">
-            The room stays yours. We add a level screen and order in the cables.
-          </p>
-
-          <p className="mt-12 flex items-center gap-3 text-[0.75rem] leading-5 text-muted-foreground">
-            <span className="font-medium text-accent">03</span>
-            <span className="h-px w-5 bg-accent/60" aria-hidden="true" />
-            Years on the workmanship
-          </p>
-          <p className="mt-2 text-[0.75rem] leading-5 text-muted-foreground">
-            Concealed cables · no visible trace
+      <div className="container-page py-20 md:py-28">
+        <div className="grid gap-6 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-7">
+            <p className="eyebrow">Project photos</p>
+            <h2
+              id="works-heading"
+              className="mt-4 max-w-[12ch] text-4xl font-medium tracking-[-0.035em] md:text-5xl"
+            >
+              Quiet results
+            </h2>
+          </div>
+          <p className="max-w-sm text-base leading-7 text-muted-foreground md:col-span-5">
+            Wall-mounted televisions, finished rooms, and the kind of small jobs that leave the
+            house tidier than we found it.
           </p>
         </div>
+
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {tvItems.map((entry) => (
+            <MediaPlaceholder
+              key={entry.id}
+              label={entry.title}
+              src={entry.src}
+              alt={entry.alt}
+            />
+          ))}
+        </div>
+
+        <div className="mt-16">
+          <p className="eyebrow">Before & After</p>
+          <h3 className="mt-4 text-2xl font-medium tracking-[-0.02em]">Side by side</h3>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {beforeAfter.map((entry) => (
+              <MediaPlaceholder
+                key={entry.id}
+                label={entry.title}
+                variant="split"
+                beforeSrc={entry.beforeSrc}
+                afterSrc={entry.afterSrc}
+                beforeAlt={`Before: ${entry.title}`}
+                afterAlt={`After: ${entry.title}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <p className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.75rem] leading-5 text-muted-foreground">
+          <span className="font-medium text-accent">2 years</span>
+          <span>Workmanship guarantee</span>
+          <span>San Diego and surrounding areas</span>
+        </p>
+        <Link href={routes.portfolio} className="mt-6 inline-block text-sm font-medium text-accent">
+          View project gallery
+        </Link>
       </div>
     </section>
   );
