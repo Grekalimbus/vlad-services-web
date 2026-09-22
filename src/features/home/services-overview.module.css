@@ -1,0 +1,27 @@
+.section {
+  composes: section from "../../styles/shared.module.css";
+}
+
+.container {
+  composes: sectionInner from "../../styles/shared.module.css";
+}
+
+.heading {
+  composes: heading from "../../styles/shared.module.css";
+}
+
+.grid {
+  display: grid;
+  gap: 1px;
+  margin-top: 3rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--border);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

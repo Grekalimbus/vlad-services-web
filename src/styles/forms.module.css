@@ -1,0 +1,219 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.success {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.75rem;
+  color: var(--foreground);
+}
+
+.alert {
+  border: 1px solid color-mix(in srgb, var(--destructive) 30%, transparent);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--destructive);
+}
+
+.grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.twoColumns {
+  grid-template-columns: 1fr;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.optional {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+
+.error {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--destructive);
+}
+
+.helper,
+.fileNames {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.fileNames {
+  margin-top: 0.5rem;
+}
+
+.fileInput {
+  margin-top: 0.5rem;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+.fileInput::file-selector-button {
+  margin-right: 0.75rem;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--foreground);
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--background);
+}
+
+.submit {
+  composes: primaryButton from "./shared.module.css";
+}
+
+.submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.consent {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+.consentLink {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.choice {
+  display: flex;
+  min-height: 2.75rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--input);
+  border-radius: 0.75rem;
+  background: var(--background);
+  padding-inline: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.choice:has(input:checked) {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.dialogDismiss {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+.dialog {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 32rem;
+  max-height: min(92dvh, calc(100dvh - 5.5rem));
+  margin-bottom: 4.75rem;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 1rem 1rem 0 0;
+  background: var(--background);
+  padding: 1.25rem;
+  box-shadow: 0 20px 50px rgb(23 23 23 / 0.2);
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dialogTitleWrap {
+  flex: 1;
+}
+
+.dialogTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.dialogClose {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: transparent;
+}
+
+.dialogBody {
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .twoColumns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .choiceGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dialogBackdrop {
+    align-items: center;
+    padding: 1.5rem;
+  }
+
+  .dialog {
+    max-height: 92dvh;
+    margin-bottom: 0;
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+
+  .success {
+    padding: 2rem;
+  }
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Contact } from "@/components/contact";
-import { PageFrame } from "@/components/page-frame";
+import { Contact } from "@/features/quote";
+import { PageFrame } from "@/shared/layout";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {

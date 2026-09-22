@@ -1,0 +1,71 @@
+.legal {
+  composes: container from "../../styles/shared.module.css";
+  max-width: 48rem;
+  padding-block: 3rem;
+}
+
+.muted,
+.intro,
+.body,
+.questions {
+  color: var(--muted-foreground);
+}
+
+.muted {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.intro {
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  line-height: 1.75rem;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin-top: 3rem;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.body {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.75rem;
+}
+
+.questions {
+  margin: 3rem 0 0;
+  font-size: 0.875rem;
+}
+
+.email {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 2.5rem;
+  font-size: 0.875rem;
+}
+
+.link {
+  color: var(--accent);
+}
+
+@media (min-width: 768px) {
+  .legal {
+    padding-block: 4rem;
+  }
+}

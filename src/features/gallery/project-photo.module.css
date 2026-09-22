@@ -1,0 +1,55 @@
+.figure {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--muted);
+}
+
+.media {
+  position: relative;
+  min-height: 13rem;
+  aspect-ratio: 4 / 3;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.caption {
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+
+.splitMedia {
+  position: relative;
+  min-height: 10rem;
+  aspect-ratio: 4 / 3;
+}
+
+.badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+  padding: 0.25rem 0.625rem;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .media {
+    min-height: 16rem;
+  }
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { LegalDocument } from "@/components/legal-document";
-import { PageFrame } from "@/components/page-frame";
+import { LegalDocument } from "@/features/legal";
+import { PageFrame } from "@/shared/layout";
 import { getLegalPage } from "@/lib/legal";
 
 const page = getLegalPage("privacy-policy")!;

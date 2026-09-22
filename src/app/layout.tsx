@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import { Header } from "@/components/header";
-import { Providers } from "@/components/providers";
+import { Header, Providers } from "@/shared/layout";
 import { site } from "@/lib/site";
+import styles from "./layout.module.css";
 import "./globals.css";
 
 const sans = Inter({
@@ -61,11 +61,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${sans.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+    <html lang="en" className={sans.variable}>
+      <body className={styles.body}>
         <a
           href="#content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+          className={styles.skipLink}
         >
           Skip to content
         </a>

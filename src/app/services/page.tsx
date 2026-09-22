@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { PageFrame } from "@/components/page-frame";
-import { QuoteCta } from "@/components/cta";
-import { ServiceCategoryCard } from "@/components/service-category-card";
+import { PageFrame } from "@/shared/layout";
+import { QuoteCta } from "@/features/quote";
+import { ServiceCategoryCard } from "@/features/services";
 import { buttonPrimaryClass } from "@/lib/forms";
 import { featuredCategories } from "@/lib/services";
 import { site } from "@/lib/site";
+import styles from "./services.module.css";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -18,14 +19,14 @@ export default function ServicesPage() {
       title="TV mounting, electrical, and handyman work"
       description="Three primary services. Open a section for the details that belong with that job."
     >
-      <div className="container-page py-16 md:py-24">
-        <div className="grid gap-px overflow-hidden rounded-sm border border-border bg-border md:grid-cols-3">
+      <div className={styles.page}>
+        <div className={styles.categoryGrid}>
           {featuredCategories.map((category) => (
             <ServiceCategoryCard key={category.id} category={category} heading="h2" />
           ))}
         </div>
 
-        <div className="mt-10">
+        <div className={styles.ctaWrap}>
           <QuoteCta className={buttonPrimaryClass} />
         </div>
       </div>

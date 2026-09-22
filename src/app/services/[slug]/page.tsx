@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Contact } from "@/components/contact";
-import { PackageCards } from "@/components/package-cards";
-import { PageFrame } from "@/components/page-frame";
-import { Plan } from "@/components/plan";
-import { ProjectPhoto } from "@/components/project-photo";
-import { QuoteCta, TvQuoteCta } from "@/components/cta";
+import { ProjectPhoto } from "@/features/gallery";
+import { Contact, QuoteCta, TvQuoteCta } from "@/features/quote";
+import { PackageCards, Plan } from "@/features/services";
+import { PageFrame } from "@/shared/layout";
 import { buttonPrimaryClass } from "@/lib/forms";
 import { itemsInCategory } from "@/lib/gallery";
 import {
@@ -21,6 +19,7 @@ import {
   type ServiceCategory,
 } from "@/lib/services";
 import { assetPath, site } from "@/lib/site";
+import styles from "../services.module.css";
 
 export const dynamicParams = false;
 
@@ -71,21 +70,21 @@ function TvMountingPage() {
     >
       <Plan />
 
-      <section className="border-b border-border">
-        <div className="container-page py-20 md:py-28">
-          <p className="eyebrow">Screen size</p>
-          <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] md:text-4xl">
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <p className={styles.eyebrow}>Screen size</p>
+          <h2 className={styles.sectionHeading}>
             Common TV sizes
           </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
+          <p className={styles.description}>
             We mount compact screens through 85&quot; and larger. Size is part of the quote so the
             bracket and the wall can be matched before the visit.
           </p>
-          <ul className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-border bg-border sm:grid-cols-4 lg:grid-cols-7">
+          <ul className={styles.sizeGrid}>
             {displaySizes.map((size) => (
               <li
                 key={size}
-                className="bg-background px-4 py-8 text-center text-xl font-medium tracking-[-0.03em]"
+                className={styles.size}
               >
                 {size.replace(" or smaller", "").replace(" or larger", "+")}
               </li>
@@ -94,27 +93,27 @@ function TvMountingPage() {
         </div>
       </section>
 
-      <section className="border-b border-border">
-        <div className="container-page py-20 md:py-28">
-          <p className="eyebrow">Mount types</p>
-          <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] md:text-4xl">
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <p className={styles.eyebrow}>Mount types</p>
+          <h2 className={styles.sectionHeading}>
             Four ways to hang the screen
           </h2>
-          <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className={styles.fourGrid}>
             {mountTypes.map((item) => (
-              <li key={item.id} className="overflow-hidden rounded-sm border border-border bg-background">
-                <div className="relative aspect-4/3">
+              <li key={item.id} className={styles.card}>
+                <div className={styles.media}>
                   <Image
                     src={assetPath(item.image)}
                     alt={item.alt}
                     fill
                     sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover"
+                    className={styles.image}
                   />
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-medium tracking-[-0.02em]">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.text}</p>
+                <div className={styles.cardBody}>
+                  <h3 className={styles.cardTitle}>{item.title}</h3>
+                  <p className={styles.cardText}>{item.text}</p>
                 </div>
               </li>
             ))}
@@ -122,50 +121,50 @@ function TvMountingPage() {
         </div>
       </section>
 
-      <section className="border-b border-border bg-card">
-        <div className="container-page py-20 md:py-28">
-          <p className="eyebrow">On the same visit</p>
-          <h2 className="mt-4 max-w-[18ch] text-3xl font-medium tracking-[-0.03em] md:text-4xl">
+      <section className={styles.sectionCard}>
+        <div className={styles.container}>
+          <p className={styles.eyebrow}>On the same visit</p>
+          <h2 className={styles.sectionHeadingWide}>
             Concealment and a TV outlet
           </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
+          <p className={styles.description}>
             Everything that belongs with the television stays on this page: hiding cords in the
             wall, covering them on the surface, and adding power behind the screen.
           </p>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className={styles.threeGrid}>
             {tvAddons.map((item) => (
               <article
                 key={item.id}
-                className="overflow-hidden rounded-sm border border-border bg-background"
+                className={styles.card}
               >
-                <div className="relative aspect-4/3">
+                <div className={styles.media}>
                   <Image
                     src={assetPath(item.image)}
                     alt={item.alt}
                     fill
                     sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover"
+                    className={styles.image}
                   />
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-medium tracking-[-0.02em]">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.text}</p>
+                <div className={styles.cardBody}>
+                  <h3 className={styles.cardTitle}>{item.title}</h3>
+                  <p className={styles.cardText}>{item.text}</p>
                 </div>
               </article>
             ))}
           </div>
-          <div className="mt-14">
+          <div className={styles.packages}>
             <PackageCards packages={packages} form="tv" />
           </div>
         </div>
       </section>
 
-      <section className="border-b border-border">
-        <div className="container-page py-20 md:py-28">
-          <h2 className="text-3xl font-medium tracking-[-0.03em] md:text-4xl">
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <h2 className={styles.photoHeading}>
             TV mounting photos
           </h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className={styles.photoGrid}>
             {photos.map((entry) => (
               <ProjectPhoto
                 key={entry.id}
@@ -178,9 +177,9 @@ function TvMountingPage() {
         </div>
       </section>
 
-      <section id="tv-quote" className="border-b border-border">
-        <div className="container-page flex flex-col gap-4 py-16 md:flex-row md:items-center md:justify-between md:py-20">
-          <p className="max-w-xl text-base leading-7 text-muted-foreground">
+      <section id="tv-quote" className={styles.section}>
+        <div className={styles.quoteContainer}>
+          <p className={styles.quoteText}>
             Prefer to skip the count selector? Send a TV mounting quote with a photo of the wall.
           </p>
           <TvQuoteCta className={buttonPrimaryClass} />
@@ -243,26 +242,26 @@ function CategoryLandingPage({ category }: { category: ServiceCategory }) {
 
   return (
     <PageFrame eyebrow="Services" title={category.name} description={category.summary}>
-      <section className="border-b border-border">
-        <div className="container-page py-16 md:py-24">
-          <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section className={styles.section}>
+        <div className={styles.compactContainer}>
+          <ol className={styles.offeringGrid}>
             {offerings.map((item) => (
               <OfferingCard key={item.id} service={item} />
             ))}
           </ol>
-          <div className="mt-10">
+          <div className={styles.ctaWrap}>
             <QuoteCta className={buttonPrimaryClass} />
           </div>
         </div>
       </section>
 
       {photos.length > 0 ? (
-        <section className="border-b border-border bg-card">
-          <div className="container-page py-16 md:py-24">
-            <h2 className="text-3xl font-medium tracking-[-0.03em] md:text-4xl">
+        <section className={styles.sectionCard}>
+          <div className={styles.compactContainer}>
+            <h2 className={styles.photoHeading}>
               {category.name} photos
             </h2>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className={styles.photoGrid}>
               {photos.map((entry) => (
                 <ProjectPhoto
                   key={entry.id}
@@ -284,21 +283,21 @@ function CategoryLandingPage({ category }: { category: ServiceCategory }) {
 function OfferingCard({ service }: { service: Service }) {
   const media = offeringImages[service.id];
   return (
-    <li className="overflow-hidden rounded-sm border border-border bg-background">
+    <li className={styles.card}>
       {media ? (
-        <div className="relative aspect-4/3">
+        <div className={styles.media}>
           <Image
             src={assetPath(media.src)}
             alt={media.alt}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover"
+            className={styles.image}
           />
         </div>
       ) : null}
-      <div className="p-6">
-        <h2 className="text-xl font-medium tracking-[-0.02em]">{service.name}</h2>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">{service.summary}</p>
+      <div className={styles.cardBody}>
+        <h2 className={styles.cardTitle}>{service.name}</h2>
+        <p className={styles.cardText}>{service.summary}</p>
       </div>
     </li>
   );

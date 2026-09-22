@@ -1,0 +1,55 @@
+.section {
+  composes: sectionCard from "../../styles/shared.module.css";
+}
+
+.container {
+  composes: sectionInner from "../../styles/shared.module.css";
+}
+
+.heading {
+  composes: heading from "../../styles/shared.module.css";
+  letter-spacing: -0.035em;
+}
+
+.beforeAfter {
+  margin-top: 4rem;
+}
+
+.subheading {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.projectsButton {
+  display: inline-flex;
+  min-height: 3rem;
+  margin-top: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--accent);
+  padding-inline: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent-foreground);
+  transition: color 200ms, background-color 200ms;
+}
+
+.projectsButton:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

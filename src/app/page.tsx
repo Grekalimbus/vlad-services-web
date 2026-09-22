@@ -1,19 +1,15 @@
-import { DealsSignup } from "@/components/deals-signup";
-import { Faq } from "@/components/faq";
-import { Footer } from "@/components/footer";
-import { Hero } from "@/components/hero";
-import { JsonLd } from "@/components/json-ld";
-import { Reviews } from "@/components/reviews";
-import { ServicesOverview } from "@/components/services-overview";
-import { Trust } from "@/components/trust";
-import { Works } from "@/components/works";
+import { DealsSignup, Faq, Hero, ServicesOverview, Trust, Works } from "@/features/home";
+import { Reviews } from "@/features/reviews";
+import { Footer } from "@/shared/layout";
+import { JsonLd } from "@/shared/seo";
+import styles from "./page.module.css";
 
 export default function Home() {
   return (
     <>
       <JsonLd />
       <Hero />
-      <div className="relative bg-background">
+      <div className={styles.homeContent}>
         <main id="content">
           <ServicesOverview />
           <Trust />

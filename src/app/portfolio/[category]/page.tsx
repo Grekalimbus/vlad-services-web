@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PageFrame } from "@/components/page-frame";
-import { PortfolioBrowser } from "@/components/portfolio-browser";
+import { PageFrame } from "@/shared/layout";
+import { PortfolioBrowser } from "@/features/gallery";
 import { galleryCategories, getGalleryCategory } from "@/lib/gallery";
 import { site } from "@/lib/site";
+import styles from "@/styles/shared.module.css";
 
 export const dynamicParams = false;
 
@@ -36,7 +37,7 @@ export default async function PortfolioCategoryPage({
 
   return (
     <PageFrame eyebrow="Projects" title={item.name} description={item.summary}>
-      <div className="container-page py-16 md:py-24">
+      <div className={styles.pageContent}>
         <PortfolioBrowser initialCategory={item} />
       </div>
     </PageFrame>

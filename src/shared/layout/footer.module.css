@@ -1,0 +1,148 @@
+.footer {
+  background: var(--primary);
+  padding-bottom: 5.5rem;
+  color: var(--primary-foreground);
+}
+
+.grid {
+  composes: container from "../../styles/shared.module.css";
+  display: grid;
+  gap: 2.5rem;
+  padding-block: 3rem;
+}
+
+.brand {
+  min-width: 0;
+}
+
+.area {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: rgb(250 250 250 / 0.7);
+}
+
+.nav {
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.link {
+  color: rgb(250 250 250 / 0.8);
+  transition: color 200ms;
+}
+
+.link:hover {
+  color: var(--primary-foreground);
+}
+
+.contact {
+  min-width: 0;
+}
+
+.phone {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  transition: color 200ms;
+}
+
+.phone:hover {
+  color: var(--accent);
+}
+
+.email {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(250 250 250 / 0.8);
+  transition: color 200ms;
+}
+
+.email:hover {
+  color: var(--primary-foreground);
+}
+
+.text {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: rgb(250 250 250 / 0.7);
+}
+
+.textSecondary {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgb(250 250 250 / 0.7);
+}
+
+.bottom {
+  composes: container from "../../styles/shared.module.css";
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-top: 1px solid rgb(250 250 250 / 0.15);
+  padding-block: 1.5rem;
+  font-size: 0.75rem;
+  color: rgb(250 250 250 / 0.55);
+}
+
+.legalNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legalLink {
+  transition: color 200ms;
+}
+
+.legalLink:hover {
+  color: var(--primary-foreground);
+}
+
+@media (min-width: 640px) {
+  .bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .legalNav {
+    flex-direction: row;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    padding-block: 4rem;
+  }
+
+  .brand {
+    grid-column: span 5;
+  }
+
+  .nav {
+    grid-column: span 3;
+  }
+
+  .contact {
+    grid-column: span 4;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer {
+    padding-bottom: 0;
+  }
+}

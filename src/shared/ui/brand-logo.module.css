@@ -1,0 +1,29 @@
+.logo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: #fff;
+}
+
+.header {
+  width: 12.5rem;
+  height: 2.75rem;
+}
+
+.footer {
+  width: 15.5rem;
+  height: 4.5rem;
+}
+
+.image {
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (min-width: 768px) {
+  .footer {
+    width: 18rem;
+    height: 5rem;
+  }
+}

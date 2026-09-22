@@ -1,0 +1,103 @@
+.section {
+  composes: section from "../../styles/shared.module.css";
+}
+
+.container {
+  composes: container from "../../styles/shared.module.css";
+  padding-block: 4rem;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.form {
+  max-width: 56rem;
+  margin: 2rem auto 0;
+}
+
+.formError {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  color: var(--destructive);
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.consentWrap {
+  max-width: 42rem;
+  margin: 1.5rem auto 0;
+}
+
+.submit {
+  display: inline-flex;
+  min-height: 3rem;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--accent);
+  padding-inline: 1.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent-foreground);
+  transition: color 200ms, background-color 200ms;
+}
+
+.submit:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.success {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 1.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.error {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--destructive);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-block: 5rem;
+  }
+
+  .heading {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

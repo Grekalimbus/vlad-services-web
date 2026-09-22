@@ -1,0 +1,28 @@
+.body {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.skipLink {
+  composes: visuallyHidden from "../styles/shared.module.css";
+}
+
+.skipLink:focus {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  border-radius: 9999px;
+  background: var(--primary);
+  padding: 0.5rem 1rem;
+  color: var(--primary-foreground);
+}

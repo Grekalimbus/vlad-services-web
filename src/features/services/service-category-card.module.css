@@ -1,0 +1,89 @@
+.card {
+  display: flex;
+  cursor: pointer;
+  flex-direction: column;
+  background: var(--background);
+  text-align: center;
+  transition: background-color 200ms;
+}
+
+.card:hover {
+  background: var(--card);
+}
+
+.header {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  transition: color 200ms;
+}
+
+.card:hover .title {
+  color: var(--accent);
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 500ms;
+}
+
+.card:hover .image {
+  transform: scale(1.05);
+}
+
+.imageOverlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  transition: background-color 200ms;
+}
+
+.card:hover .imageOverlay {
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+.action {
+  display: inline-flex;
+  width: 100%;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: var(--accent);
+  padding-inline: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent-foreground);
+  transition: color 200ms, background-color 200ms;
+}
+
+.card:hover .action {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: 2rem;
+  }
+
+  .title {
+    font-size: 1.875rem;
+  }
+}

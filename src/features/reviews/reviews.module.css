@@ -1,0 +1,251 @@
+.section {
+  composes: section from "../../styles/shared.module.css";
+}
+
+.container {
+  composes: sectionInner from "../../styles/shared.module.css";
+}
+
+.heading {
+  composes: heading from "../../styles/shared.module.css";
+  text-align: center;
+}
+
+.summary {
+  display: flex;
+  width: 100%;
+  max-width: 56rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2.5rem auto 0;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--muted) 70%, transparent);
+  padding: 1rem 1.25rem;
+}
+
+.rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.ratingValue {
+  font-size: 1.125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.stars,
+.reviewStars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.reviewStars {
+  margin-top: 0.75rem;
+}
+
+.star {
+  fill: #fbbc04;
+  color: #fbbc04;
+}
+
+.muted {
+  color: var(--muted-foreground);
+}
+
+.reviewLink {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--accent);
+  padding-inline: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent-foreground);
+  transition: color 200ms, background-color 200ms;
+}
+
+.reviewLink:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.carousel {
+  position: relative;
+  margin-top: 2.5rem;
+  padding-inline: 1.5rem;
+}
+
+.list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  min-height: 17rem;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--card);
+  padding: 1.5rem;
+}
+
+.cardHidden {
+  display: none;
+}
+
+.author {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.authorCopy {
+  min-width: 0;
+}
+
+.authorName {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.date {
+  margin: 0.125rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.quote {
+  flex: 1;
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--muted-foreground);
+}
+
+.more {
+  align-self: center;
+  margin-top: 0.75rem;
+  border: 0;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent);
+  transition: color 200ms;
+}
+
+.more:hover {
+  color: var(--foreground);
+}
+
+.previous,
+.next {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: 0 8px 24px rgb(23 23 23 / 0.12);
+  transition: color 200ms, background-color 200ms;
+}
+
+.previous {
+  left: 0.25rem;
+}
+
+.next {
+  right: 0.25rem;
+}
+
+.previous:hover,
+.next:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.googleMark {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .summary {
+    flex-direction: row;
+    border-radius: 9999px;
+    padding-block: 0.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .carousel {
+    padding-inline: 2rem;
+  }
+
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cardHidden {
+    display: flex;
+  }
+
+  .previous {
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  .next {
+    right: 0;
+    transform: translate(50%, -50%);
+  }
+
+  .previous:hover {
+    transform: translate(-50%, -50%);
+  }
+
+  .next:hover {
+    transform: translate(50%, -50%);
+  }
+}
