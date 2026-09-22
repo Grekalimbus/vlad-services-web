@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
-import { CallNow, QuoteCta } from "@/components/cta";
-import { assetPath, ctas, site } from "@/lib/site";
+import { ChevronDown } from "lucide-react";
+import { QuoteCta } from "@/components/cta";
+import { assetPath } from "@/lib/site";
 
 export function Hero() {
   return (
@@ -17,44 +17,41 @@ export function Hero() {
         priority
         quality={75}
         sizes="100vw"
-        className="object-cover object-[36%_42%] md:object-[42%_40%]"
+        className="scale-[1.02] object-cover object-[36%_42%] blur-[2px] md:object-[42%_40%]"
       />
       <div
-        className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-black/10"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-y-0 left-0 w-[min(32rem,72%)] bg-linear-to-r from-black/40 via-black/10 to-transparent"
+        className="absolute inset-0 bg-black/70"
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex h-full items-end">
-        <div className="container-page w-full pb-32 pt-28 sm:pb-14 md:pb-16 lg:pb-20">
-          <div className="max-w-88 sm:max-w-104 md:max-w-md">
-            <p className="text-[0.8125rem] font-medium text-[#9eb6c4]">
-              {site.areaServedShort} · TV mounting, electrical & handyman
-            </p>
-
+      <div className="relative z-10 flex h-full items-center justify-center">
+        <div className="container-page py-28 text-center">
+          <div className="mx-auto max-w-4xl">
             <h1
               id="hero-heading"
-              className="mt-4 text-[2.35rem] font-medium leading-[1.08] tracking-[-0.035em] text-white sm:text-[2.85rem] md:text-[3.35rem] lg:text-[3.6rem]"
+              className="text-[clamp(1.45rem,5.8vw,3.6rem)] font-medium leading-[1.15] tracking-[-0.035em] text-white"
             >
-              Your television belongs on the wall.
+              <span className="block whitespace-nowrap">Take a brief quiz</span>
+              <span className="block whitespace-nowrap">
+                and get <strong className="font-bold text-[#f6c453]">$30</strong> off your quote
+              </span>
             </h1>
 
-            <p className="mt-4 max-w-88 text-[0.9375rem] leading-6 text-white/78">
-              TV mounting, electrical, and general handyman work. Insured, with a two-year
-              workmanship guarantee.
+            <p className="mt-6 whitespace-nowrap text-[clamp(0.75rem,2.4vw,1.125rem)] font-medium text-white/90">
+              1 Hour On Your Site – Serving SoCal Swiftly!
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              <QuoteCta className="group inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-[0.8125rem] font-medium text-accent-foreground transition-colors duration-200 hover:bg-white hover:text-foreground">
-                {ctas.quote}
+            <div className="mt-8 flex flex-col items-center">
+              <QuoteCta className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-full bg-accent px-7 text-sm font-semibold tracking-wide text-accent-foreground transition-colors duration-200 hover:bg-white hover:text-foreground">
+                LET&apos;S START
               </QuoteCta>
-              <CallNow className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/35 px-5 text-[0.8125rem] font-medium text-white transition-colors duration-200 hover:bg-white hover:text-foreground">
-                {ctas.call}
-                <ArrowRight size={15} strokeWidth={2} aria-hidden="true" />
-              </CallNow>
+              <a
+                href="#services"
+                className="scroll-cue mt-10 inline-flex size-11 items-center justify-center rounded-full border border-white/60 text-white transition-colors hover:border-white hover:bg-white hover:text-foreground"
+                aria-label="Scroll to services"
+              >
+                <ChevronDown size={20} strokeWidth={2} aria-hidden="true" />
+              </a>
             </div>
           </div>
         </div>

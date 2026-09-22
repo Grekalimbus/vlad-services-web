@@ -8,7 +8,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Services",
-  description: `TV mounting, electrical, and general handyman services from ${site.legalName} in San Diego and surrounding areas.`,
+  description: `TV mounting, electrical, and general handyman services from ${site.legalName} across Southern California.`,
 };
 
 export default function ServicesPage() {

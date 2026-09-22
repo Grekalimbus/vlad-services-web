@@ -1,4 +1,4 @@
-import { Contact } from "@/components/contact";
+import { DealsSignup } from "@/components/deals-signup";
 import { Faq } from "@/components/faq";
 import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
@@ -12,17 +12,15 @@ export default function Home() {
   return (
     <>
       <JsonLd />
-      <div className="sticky top-0 z-0">
-        <Hero />
-      </div>
-      <div className="relative z-10 bg-background shadow-[0_-24px_64px_rgb(23_23_23/0.22)]">
+      <Hero />
+      <div className="relative bg-background">
         <main id="content">
-          <Trust />
           <ServicesOverview />
+          <Trust />
           <Works />
           <Reviews />
           <Faq />
-          <Contact />
+          <DealsSignup />
         </main>
         <Footer />
       </div>

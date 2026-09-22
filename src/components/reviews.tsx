@@ -80,7 +80,7 @@ export function Reviews() {
                     index === 0 ? "" : "hidden md:flex"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start justify-center gap-3">
                     <span
                       aria-hidden="true"
                       className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-medium text-foreground"
@@ -106,7 +106,7 @@ export function Reviews() {
                   {isLong ? (
                     <button
                       type="button"
-                      className="mt-3 self-start text-sm font-medium text-accent transition-colors duration-200 hover:text-foreground"
+                      className="mt-3 self-center text-sm font-medium text-accent transition-colors duration-200 hover:text-foreground"
                       onClick={() =>
                         setExpanded((current) => ({
                           ...current,
@@ -121,7 +121,7 @@ export function Reviews() {
                       href={googleListing.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 self-start text-sm font-medium text-accent transition-colors duration-200 hover:text-foreground"
+                      className="mt-3 self-center text-sm font-medium text-accent transition-colors duration-200 hover:text-foreground"
                     >
                       Read more
                     </a>

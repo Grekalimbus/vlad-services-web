@@ -36,8 +36,6 @@ type FieldErrors = {
   description?: string;
   photos?: string;
   email?: string;
-  smsConsent?: string;
-  emailConsent?: string;
 };
 
 export function QuoteForm({
@@ -55,16 +53,12 @@ export function QuoteForm({
     description: useId(),
     photos: useId(),
     date: useId(),
-    sms: useId(),
-    emailConsent: useId(),
     error: useId(),
   };
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [photoNames, setPhotoNames] = useState<string[]>([]);
-  const [smsConsent, setSmsConsent] = useState(false);
-  const [emailConsent, setEmailConsent] = useState(false);
-  const canSubmit = smsConsent && emailConsent && status !== "loading";
+  const canSubmit = status !== "loading";
 
   function validate(data: FormData): FieldErrors {
     const next: FieldErrors = {};
@@ -85,8 +79,6 @@ export function QuoteForm({
       next.description = "Briefly describe the project.";
     }
     if (photos.length === 0) next.photos = "Upload at least one photo of the project.";
-    if (data.get("smsConsent") !== "on") next.smsConsent = "Check this box to continue.";
-    if (data.get("emailConsent") !== "on") next.emailConsent = "Check this box to continue.";
     return next;
   }
 
@@ -116,16 +108,14 @@ export function QuoteForm({
         preferredDate: String(data.get("preferredDate") ?? ""),
       },
       photos: filesFromFormData(data, "photos"),
-      smsConsent: data.get("smsConsent") === "on",
-      emailConsent: data.get("emailConsent") === "on" && Boolean(String(data.get("email") ?? "").trim()),
+      smsConsent: true,
+      emailConsent: Boolean(String(data.get("email") ?? "").trim()),
     });
 
     await submitLead(payload);
     setStatus("success");
     form.reset();
     setPhotoNames([]);
-    setSmsConsent(false);
-    setEmailConsent(false);
     onSuccess?.();
   }
 
@@ -149,7 +139,7 @@ export function QuoteForm({
           role="alert"
           className="rounded-sm border border-destructive/30 bg-card px-4 py-3 text-sm text-destructive"
         >
-          Check the fields below and both consent boxes before sending.
+          Check the fields below before sending.
         </p>
       ) : null}
 
@@ -283,23 +273,11 @@ export function QuoteForm({
         className={fieldClass}
       />
 
-      <ConsentFields
-        smsId={ids.sms}
-        emailId={ids.emailConsent}
-        smsChecked={smsConsent}
-        emailChecked={emailConsent}
-        onSmsChange={setSmsConsent}
-        onEmailChange={setEmailConsent}
-        smsError={errors.smsConsent}
-        emailError={errors.emailConsent}
-      />
+      <ConsentFields />
 
       <button type="submit" disabled={!canSubmit} className="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-full bg-accent px-6 text-sm font-medium text-accent-foreground transition-colors duration-200 hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-60">
         {status === "loading" ? "Sending…" : ctas.quote}
       </button>
-      <p className="text-xs leading-5 text-muted-foreground">
-        Check both boxes to send your quote. Fields are still checked before the request is sent.
-      </p>
     </form>
   );
 }

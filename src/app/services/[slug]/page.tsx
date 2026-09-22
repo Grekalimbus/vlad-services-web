@@ -66,7 +66,7 @@ function TvMountingPage() {
   return (
     <PageFrame
       eyebrow="TV Mounting"
-      title="TV mounting in San Diego"
+      title="TV Mounting"
       description="Choose how many televisions you need mounted, pick a size, and tell us the wall. Concealment, a TV outlet, and all four mount types live on this page."
     >
       <Plan />
@@ -276,7 +276,7 @@ function CategoryLandingPage({ category }: { category: ServiceCategory }) {
         </section>
       ) : null}
 
-      <Contact heading="Get a free quote" defaultService={category.id} />
+      <Contact heading="Get Quote" defaultService={category.id} />
     </PageFrame>
   );
 }

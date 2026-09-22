@@ -45,10 +45,9 @@ export function QuoteDialog() {
         className="relative z-10 mb-[4.75rem] max-h-[min(92dvh,calc(100dvh-5.5rem))] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-border bg-background p-5 shadow-[0_20px_50px_rgb(23_23_23/0.2)] sm:mb-0 sm:max-h-[92dvh] sm:rounded-sm sm:p-8"
       >
         <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="eyebrow">Free quote</p>
-            <h2 id={titleId} className="mt-2 text-2xl font-medium tracking-[-0.03em]">
-              {form === "tv" ? "TV mounting quote" : "Get a free quote"}
+          <div className="flex-1">
+            <h2 id={titleId} className="text-2xl font-medium tracking-[-0.03em]">
+              {form === "tv" ? "TV Mounting Quote" : "Get Quote"}
             </h2>
           </div>
           <button

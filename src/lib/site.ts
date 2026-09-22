@@ -23,9 +23,9 @@ export const site = {
 	shortName: "PrimeFix",
 	wordmark: "PrimeFix",
 	legalName: "PrimeFix Home & Handyman Services LLC",
-	tagline: "TV mounting, electrical, and handyman services in San Diego.",
+	tagline: "TV mounting, electrical, and handyman services across Southern California.",
 	description:
-		"PrimeFix Home & Handyman Services LLC provides TV mounting, electrical, and general handyman work in San Diego and surrounding areas, California.",
+		"PrimeFix Home & Handyman Services LLC provides TV mounting, electrical, and general handyman work across Southern California.",
 	url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 	websiteHost: "primefixpros.com",
 	locale: "en_US",
@@ -33,25 +33,23 @@ export const site = {
 	phoneHref: "tel:+16197363016",
 	email: "info@primefixhandyman.com",
 	logo: "/brand/logo.webp",
-	availability:
-		"Fast response with same-day or week availability when the schedule allows.",
+	availability: "Available 24 hours.",
 	guarantee: "2-Year Workmanship Guarantee",
 	insured: "Insured business",
-	areaServed: "San Diego and surrounding areas, California",
-	areaServedShort: "San Diego, CA",
+	areaServed: "California",
+	areaServedShort: "California",
 } as const;
 
 export const ctas = {
-	quote: "GET A FREE QUOTE",
-	call: "CALL NOW",
+	quote: "Get Quote",
+	call: site.phoneDisplay,
 	book: "BOOK A SERVICE",
 } as const;
 
 export const nav = [
 	{ href: routes.home, label: "Home" },
 	{ href: routes.services, label: "Services" },
-	{ href: routes.service("tv-mounting"), label: "TV Mounting" },
-	{ href: routes.portfolio, label: "Projects" },
+	{ href: "/#reviews", label: "Reviews" },
 	{ href: routes.contact, label: "Contact" },
 ] as const;
 
@@ -60,9 +58,9 @@ export const footerNav = [
 	{ href: routes.services, label: "Services" },
 	{ href: routes.service("tv-mounting"), label: "TV Mounting" },
 	{ href: routes.service("electrical"), label: "Electrical" },
-	{ href: routes.service("handyman"), label: "General Handyman" },
+	{ href: routes.service("handyman"), label: "Handyman" },
 	{ href: routes.portfolio, label: "Projects" },
-	{ href: routes.contact, label: "Free Quote" },
+	{ href: routes.contact, label: "Get Quote" },
 ] as const;
 
 export const legalNav = [

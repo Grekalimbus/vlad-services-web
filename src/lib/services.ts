@@ -62,7 +62,7 @@ export const serviceCategories: ServiceCategory[] = [
   {
     id: "handyman",
     slug: "handyman",
-    name: "General Handyman Services",
+    name: "Handyman",
     featured: true,
     status: "active",
     summary:
@@ -97,7 +97,7 @@ export const services: Service[] = [
     slug: "tv-mounting",
     categoryId: "tv-mounting",
     name: "TV Mounting",
-    summary: "Professional television mounting for homes in San Diego.",
+    summary: "Professional television mounting for homes across Southern California.",
     featured: true,
     status: "active",
     form: "tv",

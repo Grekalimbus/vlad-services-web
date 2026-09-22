@@ -3,9 +3,10 @@ import { buildConsentRecord, type ConsentRecord } from "@/lib/consent";
 export type LeadFormId =
   | "general-quote"
   | "tv-mounting-quote"
-  | "quote-dialog";
+  | "quote-dialog"
+  | "deals-signup";
 
-export type LeadType = "quote" | "tv-mounting";
+export type LeadType = "quote" | "tv-mounting" | "deals";
 
 export type LeadPhotoMeta = {
   name: string;

@@ -57,7 +57,7 @@ export function MediaPlaceholder({
     <figure
       className={`flex min-h-52 flex-col justify-end overflow-hidden rounded-sm border border-dashed border-border bg-muted md:min-h-64 ${className}`}
     >
-      <div className="flex flex-1 flex-col items-start justify-end p-5">
+      <div className="flex flex-1 flex-col items-center justify-end p-5">
         <p className="text-[0.65rem] font-medium tracking-wide text-accent uppercase">
           Project photo
         </p>

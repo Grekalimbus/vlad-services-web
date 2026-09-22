@@ -89,10 +89,6 @@ export function PortfolioBrowser({
         </div>
       ) : null}
 
-      <p className="mt-8 max-w-2xl text-sm leading-6 text-muted-foreground">
-        {category.summary}
-      </p>
-
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((entry) => (
           <MediaPlaceholder

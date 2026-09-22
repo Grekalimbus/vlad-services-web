@@ -14,18 +14,18 @@ const sans = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.shortName} — TV mounting, electrical & handyman in San Diego`,
+    default: `${site.shortName} — TV mounting, electrical & handyman in Southern California`,
     template: `%s · ${site.shortName}`,
   },
   description: site.description,
   applicationName: site.legalName,
   keywords: [
-    "TV mounting San Diego",
-    "electrical San Diego",
-    "handyman San Diego",
+    "TV mounting Southern California",
+    "electrical Southern California",
+    "handyman Southern California",
     "hide TV cables",
     "PrimeFix",
-    "home services San Diego",
+    "home services Southern California",
   ],
   authors: [{ name: site.legalName }],
   alternates: {
@@ -36,12 +36,12 @@ export const metadata: Metadata = {
     locale: site.locale,
     url: site.url,
     siteName: site.legalName,
-    title: `${site.shortName} — TV mounting, electrical & handyman in San Diego`,
+    title: `${site.shortName} — TV mounting, electrical & handyman in Southern California`,
     description: site.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.shortName} — TV mounting, electrical & handyman in San Diego`,
+    title: `${site.shortName} — TV mounting, electrical & handyman in Southern California`,
     description: site.description,
   },
   robots: {

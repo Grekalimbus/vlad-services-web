@@ -9,7 +9,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { usePathname } from "next/navigation";
 import type { LeadFormId } from "@/lib/leads";
 
 export type QuoteFormKind = "quote" | "tv";
@@ -25,7 +24,6 @@ type QuoteContextValue = {
 const QuoteContext = createContext<QuoteContextValue | null>(null);
 
 export function QuoteProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<QuoteFormKind>("quote");
 
@@ -37,8 +35,20 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
   const closeQuote = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+    const key = "primefix-quote-shown";
+    if (window.sessionStorage.getItem(key)) return;
+    const timeout = window.setTimeout(() => {
+      if (window.sessionStorage.getItem(key)) return;
+      window.sessionStorage.setItem(key, "true");
+      setForm("quote");
+      setOpen(true);
+    }, 12000);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (open) window.sessionStorage.setItem("primefix-quote-shown", "true");
+  }, [open]);
 
   const value = useMemo(
     () => ({

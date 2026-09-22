@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { MousePointerClick } from "lucide-react";
 import { categoryHref, type ServiceCategory } from "@/lib/services";
 import { assetPath } from "@/lib/site";
 
@@ -17,8 +17,15 @@ export function ServiceCategoryCard({
   return (
     <Link
       href={categoryHref(category)}
-      className="group flex cursor-pointer flex-col bg-background transition-colors duration-200 hover:bg-card"
+      className="group flex cursor-pointer flex-col bg-background text-center transition-colors duration-200 hover:bg-card"
     >
+      <div className="flex flex-1 flex-col items-center p-7 md:p-8">
+        {heading === "h2" ? (
+          <h2 className={titleClass}>{category.name}</h2>
+        ) : (
+          <h3 className={titleClass}>{category.name}</h3>
+        )}
+      </div>
       {category.coverImage ? (
         <div className="relative aspect-4/3 overflow-hidden">
           <Image
@@ -34,25 +41,14 @@ export function ServiceCategoryCard({
           />
         </div>
       ) : null}
-      <div className="flex flex-1 flex-col p-7 md:p-8">
-        {heading === "h2" ? (
-          <h2 className={titleClass}>{category.name}</h2>
-        ) : (
-          <h3 className={titleClass}>{category.name}</h3>
-        )}
-        <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">
-          {category.summary}
-        </p>
-        <span className="mt-8 inline-flex min-h-12 w-fit items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-accent-foreground transition-colors duration-200 group-hover:bg-foreground group-hover:text-background">
-          View {category.name}
-          <ArrowRight
-            size={16}
-            strokeWidth={2}
-            aria-hidden="true"
-            className="transition-transform duration-200 group-hover:translate-x-0.5"
-          />
-        </span>
-      </div>
+      <span className="inline-flex min-h-14 w-full items-center justify-center gap-3 bg-accent px-5 text-sm font-medium text-accent-foreground transition-colors duration-200 group-hover:bg-foreground group-hover:text-background">
+        View {category.name}
+        <MousePointerClick
+          size={18}
+          strokeWidth={2}
+          aria-hidden="true"
+        />
+      </span>
     </Link>
   );
 }

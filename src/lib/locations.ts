@@ -12,12 +12,12 @@ export type ServiceLocation = {
 
 export const locations: ServiceLocation[] = [
   {
-    id: "san-diego",
-    city: "San Diego",
+    id: "california",
+    city: "California",
     region: "CA",
     country: "US",
-    label: "San Diego and surrounding areas",
-    shortLabel: "San Diego, CA",
+    label: "California",
+    shortLabel: "California",
     status: "active",
   },
   // Add future markets here, e.g. Los Angeles, without showing them until status is "active".
@@ -29,4 +29,4 @@ export const activeLocations = locations.filter(
 
 export const primaryLocation =
   activeLocations[0] ??
-  locations.find((location) => location.id === "san-diego")!;
+  locations.find((location) => location.id === "california")!;

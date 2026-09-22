@@ -4,7 +4,7 @@ import { buttonSecondaryClass } from "@/lib/forms";
 import { ctas, site } from "@/lib/site";
 
 export function Contact({
-  heading = "Get a free quote",
+  heading = "Get Quote",
   formId = "general-quote",
   defaultService,
 }: {
@@ -16,17 +16,12 @@ export function Contact({
     <section id="contact" aria-labelledby="contact-heading">
       <div className="container-page grid gap-12 py-20 md:grid-cols-12 md:py-28">
         <div className="md:col-span-5">
-          <p className="eyebrow">Contact</p>
           <h2
             id="contact-heading"
-            className="mt-4 text-4xl font-medium tracking-[-0.03em] md:text-5xl"
+            className="text-4xl font-medium tracking-[-0.03em] md:text-5xl"
           >
             {heading}
           </h2>
-          <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
-            The free quote form is the main path for electrical and handyman work. Include
-            photos so the project can be reviewed before a visit.
-          </p>
           <p className="mt-8">
             <a
               href={site.phoneHref}

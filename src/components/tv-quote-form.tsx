@@ -32,8 +32,6 @@ type FieldErrors = {
   mountType?: string;
   concealment?: string;
   photos?: string;
-  smsConsent?: string;
-  emailConsent?: string;
 };
 
 export function TvQuoteForm({
@@ -48,16 +46,12 @@ export function TvQuoteForm({
     photos: useId(),
     name: useId(),
     phone: useId(),
-    sms: useId(),
-    email: useId(),
     error: useId(),
   };
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [photoName, setPhotoName] = useState("");
-  const [smsConsent, setSmsConsent] = useState(false);
-  const [emailConsent, setEmailConsent] = useState(false);
-  const canSubmit = smsConsent && emailConsent && status !== "loading";
+  const canSubmit = status !== "loading";
 
   function validate(data: FormData): FieldErrors {
     const next: FieldErrors = {};
@@ -80,8 +74,6 @@ export function TvQuoteForm({
     if (photos.length === 0) next.photos = "Upload a photo of the wall.";
     if (name.trim().length < 2) next.name = "Enter your name.";
     if (!phonePattern.test(phone.trim())) next.phone = "Enter a phone number.";
-    if (data.get("smsConsent") !== "on") next.smsConsent = "Check this box to continue.";
-    if (data.get("emailConsent") !== "on") next.emailConsent = "Check this box to continue.";
     return next;
   }
 
@@ -112,16 +104,14 @@ export function TvQuoteForm({
         concealment: String(data.get("concealment") ?? ""),
       },
       photos: filesFromFormData(data, "wallPhoto"),
-      smsConsent: data.get("smsConsent") === "on",
-      emailConsent: data.get("emailConsent") === "on",
+      smsConsent: true,
+      emailConsent: false,
     });
 
     await submitLead(payload);
     setStatus("success");
     form.reset();
     setPhotoName("");
-    setSmsConsent(false);
-    setEmailConsent(false);
     onSuccess?.();
   }
 
@@ -145,7 +135,7 @@ export function TvQuoteForm({
           role="alert"
           className="rounded-sm border border-destructive/30 bg-card px-4 py-3 text-sm text-destructive"
         >
-          Check the TV mounting details below and both consent boxes before sending.
+          Check the TV mounting details below before sending.
         </p>
       ) : null}
 
@@ -287,16 +277,7 @@ export function TvQuoteForm({
         </div>
       </div>
 
-      <ConsentFields
-        smsId={ids.sms}
-        emailId={ids.email}
-        smsChecked={smsConsent}
-        emailChecked={emailConsent}
-        onSmsChange={setSmsConsent}
-        onEmailChange={setEmailConsent}
-        smsError={errors.smsConsent}
-        emailError={errors.emailConsent}
-      />
+      <ConsentFields />
 
       <button
         type="submit"
@@ -305,9 +286,6 @@ export function TvQuoteForm({
       >
         {status === "loading" ? "Sending…" : ctas.quote}
       </button>
-      <p className="text-xs leading-5 text-muted-foreground">
-        Check both boxes to send your quote. Fields are still checked before the request is sent.
-      </p>
     </form>
   );
 }

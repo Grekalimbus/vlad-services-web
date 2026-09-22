@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const dynamic = "force-static";
-export const alt = "PrimeFix — TV mounting, electrical, and handyman services in San Diego";
+export const alt = "PrimeFix — TV mounting, electrical, and handyman services in California";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -31,7 +31,7 @@ export default function OpenGraphImage() {
           }}
         >
           <span>PrimeFix</span>
-          <span>San Diego, CA</span>
+          <span>California</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div

@@ -15,21 +15,12 @@ export function Plan() {
       className="border-b border-border bg-card"
     >
       <div className="container-page py-20 md:py-28">
-        <div className="grid gap-6 md:grid-cols-12 md:items-end md:gap-10">
-          <div className="md:col-span-7">
-            <p className="eyebrow">TV mounting</p>
-            <h2
-              id="plan-heading"
-              className="mt-4 max-w-[14ch] text-4xl font-medium tracking-[-0.03em] md:text-5xl md:leading-[1.06]"
-            >
-              How many TVs do you need mounted?
-            </h2>
-          </div>
-          <p className="max-w-sm text-base leading-7 text-muted-foreground md:col-span-5 md:pb-1">
-            Choose a count, then send the wall details. Photos help us quote from the visit
-            details rather than a fixed price list.
-          </p>
-        </div>
+        <h2
+          id="plan-heading"
+          className="text-4xl font-medium tracking-[-0.03em] md:text-5xl md:leading-[1.06]"
+        >
+          How many TVs do you need mounted?
+        </h2>
 
         <fieldset className="plan-field relative mt-14 min-w-0">
           <legend className="sr-only">Number of televisions to mount</legend>
@@ -89,13 +80,8 @@ export function Plan() {
         {current ? (
           <div className="mt-12 grid gap-10 border-t border-border pt-10 md:grid-cols-12 md:gap-12">
             <div className="md:col-span-5">
-              <p className="eyebrow">TV quote</p>
-              <p className="mt-4 text-3xl font-medium leading-snug tracking-[-0.03em] md:text-4xl">
+              <p className="text-3xl font-medium leading-snug tracking-[-0.03em] md:text-4xl">
                 {current.title}
-              </p>
-              <p className="mt-3 text-[0.75rem] font-medium text-accent">{current.duration}</p>
-              <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-                {current.follow}
               </p>
             </div>
             <div className="border-t border-border pt-8 md:col-span-7 md:border-t-0 md:border-l md:pt-0 md:pl-12">

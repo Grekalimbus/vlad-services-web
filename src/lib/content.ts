@@ -18,7 +18,7 @@ export const trustItems = [
   },
   {
     id: "area",
-    title: "San Diego service area",
+    title: "California service area",
     text: site.areaServed,
   },
 ] as const;
@@ -50,6 +50,6 @@ export const faqs = [
   },
   {
     q: "Where do you work?",
-    a: "San Diego and surrounding areas, California.",
+    a: "We serve customers across Southern California.",
   },
 ] as const;
