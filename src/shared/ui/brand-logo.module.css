@@ -6,8 +6,14 @@
   background: #fff;
 }
 
+.plain {
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+}
+
 .header {
-  width: 12.5rem;
+  width: 10.25rem;
   height: 2.75rem;
 }
 
@@ -17,8 +23,9 @@
 }
 
 .image {
-  object-fit: cover;
-  object-position: center;
+  object-fit: contain;
+  object-position: center 58%;
+  padding: 0.15rem 0.4rem 0.25rem;
 }
 
 @media (min-width: 768px) {

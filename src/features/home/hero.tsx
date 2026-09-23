@@ -32,14 +32,14 @@ export function Hero() {
               id="hero-heading"
               className={styles.heading}
             >
-              <span className={styles.line}>Take a brief quiz</span>
+              <span className={styles.line}>Tell Us About Your Project</span>
               <span className={styles.line}>
-                and get <strong className={styles.discount}>$30</strong> off your quote
+                & Get <strong className={styles.discount}>$30</strong> OFF Your Service
               </span>
             </h1>
 
             <p className={styles.tagline}>
-              1 Hour On Your Site – Serving SoCal Swiftly!
+              Fast Response • Same-Day Availability • High Quality Service
             </p>
 
             <div className={styles.actions}>

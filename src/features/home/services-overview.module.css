@@ -1,13 +1,17 @@
 .section {
   composes: section from "../../styles/shared.module.css";
+  border-bottom: 0;
 }
 
 .container {
   composes: sectionInner from "../../styles/shared.module.css";
+  padding-bottom: 0;
 }
 
 .heading {
   composes: heading from "../../styles/shared.module.css";
+  width: 100%;
+  letter-spacing: 0.04em;
 }
 
 .grid {

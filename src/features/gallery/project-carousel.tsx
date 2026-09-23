@@ -14,12 +14,14 @@ export function ProjectCarousel() {
   const slides = useMemo(() => {
     const available = galleryItems.flatMap((item) => {
       const images = [
-        item.src ? { src: item.src, alt: item.alt, title: item.title } : null,
+        item.src
+          ? { src: item.src, alt: item.alt, title: item.title, summary: item.summary }
+          : null,
         item.beforeSrc
-          ? { src: item.beforeSrc, alt: `Before: ${item.title}`, title: item.title }
+          ? { src: item.beforeSrc, alt: `Before: ${item.title}`, title: item.title, summary: item.summary }
           : null,
         item.afterSrc
-          ? { src: item.afterSrc, alt: `After: ${item.title}`, title: item.title }
+          ? { src: item.afterSrc, alt: `After: ${item.title}`, title: item.title, summary: item.summary }
           : null,
       ];
       return images.filter((image): image is NonNullable<typeof image> => Boolean(image));
@@ -84,9 +86,14 @@ export function ProjectCarousel() {
           />
         </div>
         <div className={styles.captionOverlay}>
-          <p key={active} className={styles.caption}>
+          <p key={`title-${active}`} className={styles.caption}>
             {slide.title}
           </p>
+          {slide.summary ? (
+            <p key={`summary-${active}`} className={styles.captionSummary}>
+              {slide.summary}
+            </p>
+          ) : null}
         </div>
         <div className={styles.progressTrack} aria-hidden="true">
           <span

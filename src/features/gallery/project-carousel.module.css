@@ -49,6 +49,14 @@
   animation: captionEnter 700ms 180ms ease both;
 }
 
+.captionSummary {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgb(255 255 255 / 0.82);
+  animation: captionEnter 700ms 260ms ease both;
+}
+
 .progressTrack {
   position: absolute;
   inset-inline: 0;

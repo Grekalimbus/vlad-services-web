@@ -40,7 +40,7 @@ export function ServiceCategoryCard({
         </div>
       ) : null}
       <span className={styles.action}>
-        View {category.name}
+        {category.name}
         <MousePointerClick
           size={18}
           strokeWidth={2}

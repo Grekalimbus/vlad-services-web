@@ -2,24 +2,24 @@ import { site } from "@/lib/site";
 
 export const trustItems = [
   {
-    id: "insured",
-    title: site.insured,
-    text: "PrimeFix Home & Handyman Services LLC is an insured home service business.",
-  },
-  {
     id: "guarantee",
-    title: site.guarantee,
+    title: "2-Year Workmanship Guarantee",
     text: "If our workmanship fails within two years, we return and set it right.",
   },
   {
     id: "response",
-    title: "Fast response",
+    title: "Fast Response & Same-Day Availability",
     text: site.availability,
   },
   {
-    id: "area",
-    title: "California service area",
-    text: site.areaServed,
+    id: "tvs",
+    title: "15,000+ TVs Mounted",
+    text: "Wall mounts, concealment, and related setup across Southern California.",
+  },
+  {
+    id: "pricing",
+    title: "Upfront & Fair Pricing",
+    text: "Clear pricing from the project details, with a free estimate before the visit.",
   },
 ] as const;
 

@@ -7,7 +7,7 @@ export function ServicesOverview() {
     <section id="services" aria-labelledby="services-heading" className={styles.section}>
       <div className={styles.container}>
         <h2 id="services-heading" className={styles.heading}>
-          Three ways we help around the house
+          SERVICES
         </h2>
         <div className={styles.grid}>
           {featuredCategories.map((category) => (

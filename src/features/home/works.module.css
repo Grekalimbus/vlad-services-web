@@ -8,7 +8,13 @@
 
 .heading {
   composes: heading from "../../styles/shared.module.css";
-  letter-spacing: -0.035em;
+  width: 100%;
+  letter-spacing: 0.04em;
+}
+
+.intro {
+  margin: 1rem 0 0;
+  color: var(--muted-foreground);
 }
 
 .beforeAfter {

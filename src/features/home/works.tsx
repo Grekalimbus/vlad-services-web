@@ -11,11 +11,12 @@ export function Works() {
     <section id="works" aria-labelledby="works-heading" className={styles.section}>
       <div className={styles.container}>
         <h2 id="works-heading" className={styles.heading}>
-          WHY US?
+          OUR RECENT WORK
         </h2>
+        <p className={styles.intro}>Real projects. Real results.</p>
         <ProjectCarousel />
         <div className={styles.beforeAfter}>
-          <h3 className={styles.subheading}>Before &amp; After</h3>
+          <h3 className={styles.subheading}>Before &amp; After Projects</h3>
           <div className={styles.grid}>
             {beforeAfter.map((entry) => (
               <MediaPlaceholder

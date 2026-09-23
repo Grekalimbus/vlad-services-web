@@ -53,13 +53,13 @@ export function Header() {
 		>
 			<div className={styles.headerBar}>
 				<div className={styles.headerRow}>
-					<span className={styles.hours}>24 HOURS</span>
+					<span className={styles.hours}>24/7</span>
 					<Link
 						href="/"
 						className={styles.logoLink}
 						onClick={() => setOpen(false)}
 					>
-						<BrandLogo priority />
+						<BrandLogo priority plain />
 						<span className={shared.visuallyHidden}>{site.name}</span>
 					</Link>
 

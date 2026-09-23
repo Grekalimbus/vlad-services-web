@@ -32,7 +32,7 @@ export const site = {
 	phoneDisplay: "(619) 736-3016",
 	phoneHref: "tel:+16197363016",
 	email: "info@primefixhandyman.com",
-	logo: "/brand/logo.webp",
+	logo: "/brand/primefix-mark.webp",
 	availability: "Available 24 hours.",
 	guarantee: "2-Year Workmanship Guarantee",
 	insured: "Insured business",
