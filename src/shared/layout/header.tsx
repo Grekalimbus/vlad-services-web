@@ -19,7 +19,7 @@ export function Header() {
 			const secondSection = document.getElementById("services");
 			const threshold = secondSection
 				? secondSection.getBoundingClientRect().top + window.scrollY
-				: window.innerHeight;
+				: 0;
 			setScrolled(window.scrollY >= threshold - 1);
 		};
 		updateHeader();
@@ -53,15 +53,17 @@ export function Header() {
 		>
 			<div className={styles.headerBar}>
 				<div className={styles.headerRow}>
-					<span className={styles.hours}>24/7</span>
-					<Link
-						href="/"
-						className={styles.logoLink}
-						onClick={() => setOpen(false)}
-					>
-						<BrandLogo priority plain />
-						<span className={shared.visuallyHidden}>{site.name}</span>
-					</Link>
+					<div className={styles.brand}>
+						<span className={styles.hours}>24/7</span>
+						<Link
+							href="/"
+							className={styles.logoLink}
+							onClick={() => setOpen(false)}
+						>
+							<BrandLogo priority plain />
+							<span className={shared.visuallyHidden}>{site.name}</span>
+						</Link>
+					</div>
 
 					<nav
 						className={styles.desktopNav}

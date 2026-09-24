@@ -49,7 +49,7 @@
 }
 
 .reviewStars {
-  margin-top: 0.75rem;
+  justify-content: center;
 }
 
 .star {
@@ -83,7 +83,6 @@
 .carousel {
   position: relative;
   margin-top: 2.5rem;
-  padding-inline: 1.5rem;
 }
 
 .list {
@@ -96,23 +95,27 @@
 
 .card {
   display: flex;
-  min-height: 17rem;
+  height: 22rem;
   flex-direction: column;
+  align-items: center;
   border: 1px solid var(--border);
   border-radius: 1rem;
   background: var(--card);
   padding: 1.5rem;
+  text-align: center;
+}
+
+.cardHead {
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .cardHidden {
   display: none;
-}
-
-.author {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0.75rem;
 }
 
 .avatar {
@@ -129,12 +132,10 @@
   color: var(--foreground);
 }
 
-.authorCopy {
-  min-width: 0;
-}
-
 .authorName {
   margin: 0;
+  max-width: 100%;
+  padding-inline: 3.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -143,20 +144,27 @@
 }
 
 .date {
-  margin: 0.125rem 0 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
   font-size: 0.75rem;
   color: var(--muted-foreground);
 }
 
 .quote {
   flex: 1;
+  width: 100%;
+  min-height: 0;
   margin: 0.75rem 0 0;
+  overflow-y: auto;
   font-size: 0.875rem;
   line-height: 1.5rem;
   color: var(--muted-foreground);
 }
 
 .more {
+  flex-shrink: 0;
   align-self: center;
   margin-top: 0.75rem;
   border: 0;
@@ -171,15 +179,18 @@
   color: var(--foreground);
 }
 
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
 .previous,
 .next {
-  position: absolute;
-  top: 50%;
-  z-index: 10;
   display: inline-flex;
   width: 2.75rem;
   height: 2.75rem;
-  transform: translateY(-50%);
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border);
@@ -188,14 +199,6 @@
   color: var(--foreground);
   box-shadow: 0 8px 24px rgb(23 23 23 / 0.12);
   transition: color 200ms, background-color 200ms;
-}
-
-.previous {
-  left: 0.25rem;
-}
-
-.next {
-  right: 0.25rem;
 }
 
 .previous:hover,
@@ -229,6 +232,18 @@
 
   .cardHidden {
     display: flex;
+  }
+
+  .controls {
+    margin-top: 0;
+  }
+
+  .previous,
+  .next {
+    position: absolute;
+    top: 50%;
+    z-index: 10;
+    transform: translateY(-50%);
   }
 
   .previous {

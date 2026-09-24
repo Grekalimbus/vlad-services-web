@@ -1,16 +1,11 @@
 import Link from "next/link";
-import { BrandLogo } from "@/shared/ui";
 import { footerNav, legalNav, site } from "@/lib/site";
 import styles from "./footer.module.css";
 
 export function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={styles.grid}>
-        <div className={styles.brand}>
-          <BrandLogo size="footer" />
-          <p className={styles.area}>{site.areaServed}</p>
-        </div>
+      <div className={styles.inner}>
         <nav className={styles.nav} aria-label="Footer">
           <ul className={styles.list}>
             {footerNav.map((item) => (
@@ -29,8 +24,11 @@ export function Footer() {
           <a href={`mailto:${site.email}`} className={styles.email}>
             {site.email}
           </a>
-          <p className={styles.text}>{site.areaServed}</p>
-          <p className={styles.textSecondary}>{site.availability}</p>
+          <p className={styles.meta}>
+            {site.areaServed}
+            <span aria-hidden="true"> · </span>
+            {site.availability}
+          </p>
         </div>
       </div>
       <div className={styles.bottom}>

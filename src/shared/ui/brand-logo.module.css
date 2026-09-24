@@ -1,36 +1,38 @@
 .logo {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  border-radius: 9999px;
-  background: #fff;
+	position: relative;
+	display: block;
+	overflow: hidden;
+	border-radius: 9999px;
+	background: #fff;
 }
 
 .plain {
-  overflow: visible;
-  border-radius: 0;
-  background: transparent;
+	overflow: visible;
+	border-radius: 0;
+	background: transparent;
 }
 
 .header {
-  width: 10.25rem;
-  height: 2.75rem;
-}
-
-.footer {
-  width: 15.5rem;
-  height: 4.5rem;
-}
-
-.image {
-  object-fit: contain;
-  object-position: center 58%;
-  padding: 0.15rem 0.4rem 0.25rem;
+	width: 7.5rem;
+	height: 2.125rem;
 }
 
 @media (min-width: 768px) {
-  .footer {
-    width: 18rem;
-    height: 5rem;
-  }
+	.header {
+		width: 9rem;
+		height: 2.5rem;
+	}
+}
+
+@media (min-width: 1024px) {
+	.header {
+		width: 10.25rem;
+		height: 2.75rem;
+	}
+}
+
+.image {
+	object-fit: contain;
+	object-position: center 58%;
+	padding: 0.15rem 0.4rem 0.25rem 0;
 }

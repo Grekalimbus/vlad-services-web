@@ -13,7 +13,7 @@ export function Reviews() {
   const headingId = "reviews-heading";
   const statusId = useId();
   const [start, setStart] = useState(0);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [expanded, setExpanded] = useState(false);
   const visible = Array.from({ length: DESKTOP_PAGE_SIZE }, (_, index) => {
     return googleReviews[(start + index) % googleReviews.length];
   });
@@ -69,9 +69,8 @@ export function Reviews() {
           <ul className={styles.list}>
             {visible.map((review, index) => {
               const isLong = review.quote.length > PREVIEW_LENGTH;
-              const isOpen = Boolean(expanded[review.id]);
               const text =
-                isLong && !isOpen
+                isLong && !expanded
                   ? `${review.quote.slice(0, PREVIEW_LENGTH).trimEnd()}…`
                   : review.quote;
 
@@ -80,75 +79,59 @@ export function Reviews() {
                   key={`${review.id}-${start}`}
                   className={`${styles.card} ${index === 0 ? "" : styles.cardHidden}`}
                 >
-                  <div className={styles.author}>
+                  <div className={styles.cardHead}>
                     <span
                       aria-hidden="true"
                       className={styles.avatar}
                     >
                       {initials(review.author)}
                     </span>
-                    <div className={styles.authorCopy}>
-                      <p className={styles.authorName}>{review.author}</p>
-                      <p className={styles.date}>{review.dateLabel}</p>
-                    </div>
+                    <p className={styles.authorName}>{review.author}</p>
+                    <p className={styles.reviewStars} aria-label={`${review.rating} out of 5 stars`}>
+                      {Array.from({ length: review.rating }, (_, index) => (
+                        <Star
+                          key={index}
+                          size={14}
+                          className={styles.star}
+                          aria-hidden="true"
+                        />
+                      ))}
+                    </p>
+                    <p className={styles.date}>{review.dateLabel}</p>
                   </div>
-                  <p className={styles.reviewStars} aria-label={`${review.rating} out of 5 stars`}>
-                    {Array.from({ length: review.rating }, (_, index) => (
-                      <Star
-                        key={index}
-                        size={14}
-                        className={styles.star}
-                        aria-hidden="true"
-                      />
-                    ))}
-                  </p>
-                  <p className={styles.quote}>{text}</p>
-                  {isLong ? (
-                    <button
-                      type="button"
-                      className={styles.more}
-                      onClick={() =>
-                        setExpanded((current) => ({
-                          ...current,
-                          [review.id]: !current[review.id],
-                        }))
-                      }
-                    >
-                      {isOpen ? "Show less" : "Read more"}
-                    </button>
-                  ) : (
-                    <a
-                      href={googleListing.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.more}
-                    >
-                      Read more
-                    </a>
-                  )}
+                  <div className={styles.quote}>{text}</div>
+                  <button
+                    type="button"
+                    className={styles.more}
+                    onClick={() => setExpanded((current) => !current)}
+                  >
+                    {expanded ? "Show less" : "Read more"}
+                  </button>
                 </li>
               );
             })}
           </ul>
 
-          <button
-            type="button"
-            onClick={() => shift(-1)}
-            aria-controls={statusId}
-            className={styles.previous}
-          >
-            <ChevronLeft size={18} aria-hidden="true" />
-            <span className={shared.visuallyHidden}>Previous reviews</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => shift(1)}
-            aria-controls={statusId}
-            className={styles.next}
-          >
-            <ChevronRight size={18} aria-hidden="true" />
-            <span className={shared.visuallyHidden}>Next reviews</span>
-          </button>
+          <div className={styles.controls}>
+            <button
+              type="button"
+              onClick={() => shift(-1)}
+              aria-controls={statusId}
+              className={styles.previous}
+            >
+              <ChevronLeft size={18} aria-hidden="true" />
+              <span className={shared.visuallyHidden}>Previous reviews</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => shift(1)}
+              aria-controls={statusId}
+              className={styles.next}
+            >
+              <ChevronRight size={18} aria-hidden="true" />
+              <span className={shared.visuallyHidden}>Next reviews</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
