@@ -1,9 +1,17 @@
 .section {
   composes: section from "../../styles/shared.module.css";
+  position: relative;
+  z-index: 1;
+  border-bottom: 0;
+  background: transparent;
 }
 
 .container {
   composes: sectionInner from "../../styles/shared.module.css";
+}
+
+.headingAccent {
+  color: #2580cd;
 }
 
 .heading {
@@ -35,8 +43,8 @@
   justify-content: center;
   gap: 1rem;
   text-align: center;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
 .summary::-webkit-details-marker {
@@ -56,7 +64,8 @@
 .answer {
   max-width: 42rem;
   margin: 0.75rem auto 0;
-  font-size: 0.875rem;
-  line-height: 1.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.7;
   color: var(--muted-foreground);
 }

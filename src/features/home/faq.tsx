@@ -7,7 +7,7 @@ export function Faq() {
     <section id="faq" aria-labelledby="faq-heading" className={styles.section}>
       <div className={styles.container}>
         <h2 id="faq-heading" className={styles.heading}>
-          QUESTIONS &amp; ANSWERS
+          QUESTIONS &amp; <span className={styles.headingAccent}>ANSWERS</span>
         </h2>
         <div className={styles.list}>
           {faqs.map((item) => (

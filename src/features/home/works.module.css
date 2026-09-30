@@ -1,33 +1,180 @@
 .section {
-  composes: sectionCard from "../../styles/shared.module.css";
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 0;
+  background: #0c121c;
+}
+
+.backdrop {
+  object-fit: cover;
+  object-position: center 62%;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 80% at 50% 42%, rgb(7 12 20 / 0.42), rgb(5 8 14 / 0.78) 72%),
+    linear-gradient(180deg, rgb(6 10 16 / 0.62), rgb(6 10 16 / 0.74));
 }
 
 .container {
   composes: sectionInner from "../../styles/shared.module.css";
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .heading {
   composes: heading from "../../styles/shared.module.css";
   width: 100%;
-  letter-spacing: 0.04em;
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.headingAccent {
+  color: #2580cd;
+}
+
+.grid {
+  display: grid;
+  width: 100%;
+  gap: 0.9rem;
+  margin: 2.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9.2;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 1.15rem;
+  background: #121820;
+  color: #fff;
+}
+
+.card:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.cardImage {
+  object-fit: cover;
+  transition: transform 500ms ease;
+}
+
+.card:hover .cardImage {
+  transform: scale(1.04);
+}
+
+.cardShade {
+  position: absolute;
+  inset: auto 0 0;
+  height: 58%;
+  background: linear-gradient(to top, rgb(6 10 16 / 0.88) 0%, rgb(6 10 16 / 0.28) 62%, transparent 100%);
+}
+
+.cardBar {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  left: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cardLabel {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.line {
+  display: block;
+}
+
+.icon {
+  display: inline-flex;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.7rem;
+  background: rgb(255 255 255 / 0.94);
+  color: #2580cd;
+}
+
+.arrow {
+  display: inline-flex;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.92);
+  color: #2580cd;
 }
 
 .projectsButton {
   display: inline-flex;
   min-height: 3rem;
-  margin-top: 2.5rem;
+  margin-top: 2.25rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: var(--accent);
-  padding-inline: 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--accent-foreground);
-  transition: color 200ms, background-color 200ms;
+  background: #2580cd;
+  padding-inline: 1.65rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  transition: background-color 200ms;
 }
 
 .projectsButton:hover {
-  background: var(--foreground);
-  color: var(--background);
+  background: #1d6aab;
+}
+
+.projectsButton:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardImage {
+    transition: none;
+  }
+
+  .card:hover .cardImage {
+    transform: none;
+  }
 }

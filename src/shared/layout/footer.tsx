@@ -5,6 +5,13 @@ import styles from "./footer.module.css";
 export function Footer() {
   return (
     <footer className={styles.footer}>
+      <div className={styles.atmosphere} aria-hidden="true">
+        <span className={styles.dots} />
+        <span className={`${styles.arc} ${styles.arcLeft}`} />
+        <span className={`${styles.arc} ${styles.arcLeftInner}`} />
+        <span className={`${styles.arc} ${styles.arcRight}`} />
+        <span className={`${styles.arc} ${styles.arcRightInner}`} />
+      </div>
       <div className={styles.inner}>
         <nav className={styles.nav} aria-label="Footer">
           <ul className={styles.list}>

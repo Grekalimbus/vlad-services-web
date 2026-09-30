@@ -66,7 +66,7 @@ export function Header() {
 								href={item.href}
 								className={styles.navLink}
 							>
-								{item.label}
+								<span className={styles.navLabel}>{item.label}</span>
 							</Link>
 						))}
 					</nav>

@@ -235,6 +235,16 @@
       "id": "homepage-services-strip",
       "choice": "Homepage SERVICES is one wide photo strip with diagonal seams",
       "rationale": "Client reference: a bold light SERVICES word behind three large photo cards that read as a single rounded block. Numbers, names, and arrow buttons sit on the photos. The services catalog page keeps the existing cards."
+    },
+    {
+      "id": "footer-navy-atmosphere",
+      "choice": "Footer keeps its content and uses a deep navy gradient with edge glow",
+      "rationale": "Solid black becomes a charcoal-navy field with a soft #2580cd glow, thin arcs, and a dotted pattern only at the edges. Links, type, spacing, and the divider stay as they were."
+    },
+    {
+      "id": "homepage-faq-deals-transition",
+      "choice": "Deals signup sits inside the FAQ blue band as a darkened interior panel",
+      "rationale": "FAQ keeps its centered list and blue atmosphere. The signup form continues that band inside a 28px-radius photo block, inset from the container, with Deals in #2580cd."
     }
   ],
   "evidence": [
