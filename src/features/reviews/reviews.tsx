@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { googleListing, googleReviews } from "@/lib/google-reviews";
 import shared from "@/styles/shared.module.css";
 import styles from "./reviews.module.css";
@@ -27,12 +27,23 @@ export function Reviews() {
 
   return (
     <section id="reviews" aria-labelledby={headingId} className={styles.section}>
+      <div className={styles.atmosphere} aria-hidden="true">
+        <span className={styles.wash} />
+        <span className={`${styles.arc} ${styles.arcTl}`} />
+        <span className={`${styles.arc} ${styles.arcTlInner}`} />
+        <span className={`${styles.arc} ${styles.arcBl}`} />
+        <span className={styles.washRight} />
+        <span className={`${styles.arc} ${styles.arcTr}`} />
+        <span className={`${styles.arc} ${styles.arcRight}`} />
+        <span className={`${styles.arc} ${styles.arcBr}`} />
+        <span className={styles.texture} />
+      </div>
       <div className={styles.container}>
         <h2
           id={headingId}
           className={styles.heading}
         >
-          Client&apos;s Feedback
+          Client&apos;s <span className={styles.headingAccent}>Feedback</span>
         </h2>
 
         <div className={styles.summary}>
@@ -59,6 +70,7 @@ export function Reviews() {
             className={styles.reviewLink}
           >
             Review us on Google
+            <ArrowRight size={16} aria-hidden="true" />
           </a>
         </div>
 
@@ -131,6 +143,18 @@ export function Reviews() {
               <ChevronRight size={18} aria-hidden="true" />
               <span className={shared.visuallyHidden}>Next reviews</span>
             </button>
+          </div>
+          <div className={styles.dots}>
+            {googleReviews.map((review, index) => (
+              <button
+                key={review.id}
+                type="button"
+                className={index === start ? styles.dotActive : styles.dot}
+                aria-label={`Show reviews starting with ${review.author}`}
+                aria-current={index === start ? "true" : undefined}
+                onClick={() => setStart(index)}
+              />
+            ))}
           </div>
         </div>
       </div>
