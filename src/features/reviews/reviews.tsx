@@ -32,7 +32,7 @@ export function Reviews() {
           id={headingId}
           className={styles.heading}
         >
-          What clients say
+          Client&apos;s Feedback
         </h2>
 
         <div className={styles.summary}>

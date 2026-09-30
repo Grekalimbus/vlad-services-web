@@ -13,21 +13,21 @@
 }
 
 .header {
-	width: 7.5rem;
-	height: 2.125rem;
+	width: 8.25rem;
+	height: 2.35rem;
 }
 
 @media (min-width: 768px) {
 	.header {
-		width: 9rem;
-		height: 2.5rem;
+		width: 9.9rem;
+		height: 2.75rem;
 	}
 }
 
 @media (min-width: 1024px) {
 	.header {
-		width: 10.25rem;
-		height: 2.75rem;
+		width: 11.275rem;
+		height: 3.025rem;
 	}
 }
 

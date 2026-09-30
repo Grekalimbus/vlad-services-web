@@ -20,7 +20,7 @@ export function BrandLogo({
         alt={site.shortName}
         fill
         priority={priority}
-        sizes="184px"
+        sizes="200px"
         className={styles.image}
       />
     </span>

@@ -13,8 +13,8 @@ export default function Home() {
         <main id="content">
           <ServicesOverview />
           <Trust />
-          <Works />
           <Reviews />
+          <Works />
           <Faq />
           <DealsSignup />
         </main>

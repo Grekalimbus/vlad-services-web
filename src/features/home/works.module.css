@@ -12,28 +12,6 @@
   letter-spacing: 0.04em;
 }
 
-.intro {
-  margin: 1rem 0 0;
-  color: var(--muted-foreground);
-}
-
-.beforeAfter {
-  margin-top: 4rem;
-}
-
-.subheading {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-
-.grid {
-  display: grid;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
 .projectsButton {
   display: inline-flex;
   min-height: 3rem;
@@ -52,10 +30,4 @@
 .projectsButton:hover {
   background: var(--foreground);
   color: var(--background);
-}
-
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }

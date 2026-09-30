@@ -1,34 +1,100 @@
-import { BadgeCheck, BadgeDollarSign, Clock, Tv } from "lucide-react";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { trustItems } from "@/lib/content";
 import styles from "./trust.module.css";
 
-const icons = {
-  guarantee: BadgeCheck,
-  response: Clock,
-  tvs: Tv,
-  pricing: BadgeDollarSign,
-} as const;
+function useCountUp(target: number, active: boolean) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!active) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setValue(target);
+      return;
+    }
+
+    const duration = 1400;
+    const start = performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - (1 - progress) ** 3;
+      setValue(Math.round(target * eased));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [active, target]);
+
+  return value;
+}
+
+function TrustStat({
+  value,
+  suffix,
+  label,
+  active,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  active: boolean;
+}) {
+  const current = useCountUp(value, active);
+  return (
+    <li className={styles.item}>
+      <p className={styles.value}>
+        {current.toLocaleString("en-US")}
+        {suffix}
+      </p>
+      <h3 className={styles.cardHeading}>{label}</h3>
+    </li>
+  );
+}
 
 export function Trust() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setActive(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="trust" aria-labelledby="trust-heading" className={styles.section}>
+    <section
+      id="trust"
+      ref={sectionRef}
+      aria-labelledby="trust-heading"
+      className={styles.section}
+    >
       <div className={styles.container}>
         <h2 id="trust-heading" className={styles.heading}>
-          WHY CHOOSE PRIMEFIX?
+          WHY US?
         </h2>
-        <p className={styles.intro}>
-          Professional home services you can count on — from small fixes to bigger projects.
-        </p>
         <ul className={styles.grid}>
-          {trustItems.map((item) => {
-            const Icon = icons[item.id];
-            return (
-              <li key={item.id} className={styles.item}>
-                <Icon className={styles.icon} size={22} strokeWidth={1.5} aria-hidden="true" />
-                <h3 className={styles.cardHeading}>{item.title}</h3>
-              </li>
-            );
-          })}
+          {trustItems.map((item) => (
+            <TrustStat
+              key={item.id}
+              value={item.value}
+              suffix={item.suffix}
+              label={item.label}
+              active={active}
+            />
+          ))}
         </ul>
       </div>
     </section>

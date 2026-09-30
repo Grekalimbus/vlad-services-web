@@ -1,26 +1,8 @@
-import { site } from "@/lib/site";
-
 export const trustItems = [
-  {
-    id: "guarantee",
-    title: "2-Year Workmanship Guarantee",
-    text: "If our workmanship fails within two years, we return and set it right.",
-  },
-  {
-    id: "response",
-    title: "Fast Response & Same-Day Availability",
-    text: site.availability,
-  },
-  {
-    id: "tvs",
-    title: "15,000+ TVs Mounted",
-    text: "Wall mounts, concealment, and related setup across Southern California.",
-  },
-  {
-    id: "pricing",
-    title: "Upfront & Fair Pricing",
-    text: "Clear pricing from the project details, with a free estimate before the visit.",
-  },
+  { id: "warranty", value: 3, suffix: "", label: "Warranty" },
+  { id: "clients", value: 10000, suffix: "+", label: "Happy Clients/Businesses" },
+  { id: "projects", value: 20000, suffix: "+", label: "Completed Projects" },
+  { id: "days", value: 7, suffix: "", label: "Days a Week" },
 ] as const;
 
 export const faqs = [

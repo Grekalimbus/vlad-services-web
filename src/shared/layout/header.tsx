@@ -16,19 +16,11 @@ export function Header() {
 
 	useEffect(() => {
 		const updateHeader = () => {
-			const secondSection = document.getElementById("services");
-			const threshold = secondSection
-				? secondSection.getBoundingClientRect().top + window.scrollY
-				: 0;
-			setScrolled(window.scrollY >= threshold - 1);
+			setScrolled(window.scrollY >= 25);
 		};
 		updateHeader();
 		window.addEventListener("scroll", updateHeader, { passive: true });
-		window.addEventListener("resize", updateHeader);
-		return () => {
-			window.removeEventListener("scroll", updateHeader);
-			window.removeEventListener("resize", updateHeader);
-		};
+		return () => window.removeEventListener("scroll", updateHeader);
 	}, []);
 
 	useEffect(() => {
@@ -54,7 +46,6 @@ export function Header() {
 			<div className={styles.headerBar}>
 				<div className={styles.headerRow}>
 					<div className={styles.brand}>
-						<span className={styles.hours}>24/7</span>
 						<Link
 							href="/"
 							className={styles.logoLink}
@@ -80,34 +71,36 @@ export function Header() {
 						))}
 					</nav>
 
-					<a
-						href={site.phoneHref}
-						className={styles.phone}
-					>
-						<Phone size={14} aria-hidden="true" />
-						<span className={styles.phoneLabel}>
-							{site.phoneDisplay}
-						</span>
-					</a>
+					<div className={styles.actions}>
+						<a
+							href={site.phoneHref}
+							className={styles.phone}
+						>
+							<Phone size={14} aria-hidden="true" />
+							<span className={styles.phoneLabel}>
+								{site.phoneDisplay}
+							</span>
+						</a>
 
-					<QuoteCta className={styles.headerQuote}>
-						GET QUOTE
-					</QuoteCta>
+						<QuoteCta className={styles.headerQuote}>
+							BOOK NOW
+						</QuoteCta>
 
-					<button
-						type="button"
-						className={styles.menuButton}
-						aria-expanded={open}
-						aria-controls={panelId}
-						onClick={() => setOpen(value => !value)}
-					>
-						{open ? (
-							<X size={18} aria-hidden="true" />
-						) : (
-							<Menu size={18} aria-hidden="true" />
-						)}
-						<span className={shared.visuallyHidden}>{open ? "Close menu" : "Open menu"}</span>
-					</button>
+						<button
+							type="button"
+							className={styles.menuButton}
+							aria-expanded={open}
+							aria-controls={panelId}
+							onClick={() => setOpen(value => !value)}
+						>
+							{open ? (
+								<X size={18} aria-hidden="true" />
+							) : (
+								<Menu size={18} aria-hidden="true" />
+							)}
+							<span className={shared.visuallyHidden}>{open ? "Close menu" : "Open menu"}</span>
+						</button>
+					</div>
 				</div>
 			</div>
 
@@ -136,7 +129,7 @@ export function Header() {
 						<span>{site.phoneDisplay}</span>
 					</a>
 					<QuoteCta className={styles.mobileQuote}>
-						GET QUOTE
+						BOOK NOW
 					</QuoteCta>
 				</nav>
 			) : null}
