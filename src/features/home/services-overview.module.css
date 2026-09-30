@@ -1,31 +1,217 @@
 .section {
-  composes: section from "../../styles/shared.module.css";
-  border-bottom: 0;
+	composes: section from "../../styles/shared.module.css";
+	overflow: hidden;
+	border-bottom: 0;
+	background: #cbcbcb33;
 }
 
 .container {
-  composes: sectionInner from "../../styles/shared.module.css";
-  padding-bottom: 0;
+	position: relative;
+	width: min(100% - 3rem, 74rem);
+	margin-inline: auto;
+	padding-block: calc(5rem + 63px) calc(5rem + 80px);
 }
 
 .heading {
-  composes: heading from "../../styles/shared.module.css";
-  width: 100%;
-  letter-spacing: 0.04em;
+	margin: 0;
+	text-align: center;
+	font-size: clamp(2.23125rem, 8.1375vw, 6.5625rem);
+	font-weight: 800;
+	line-height: 0.78;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--accent);
+	pointer-events: none;
+	user-select: none;
 }
 
-.grid {
-  display: grid;
-  gap: 1px;
-  margin-top: 3rem;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--border);
+.strip {
+	--cut: 3.25rem;
+	--gap: 0.45rem;
+	position: relative;
+	z-index: 1;
+	display: flex;
+	height: clamp(15.5rem, 22vw, 20rem);
+	margin: 2.25rem 0 0;
+	padding: 0;
+	list-style: none;
+	overflow: visible;
 }
 
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.item {
+	position: relative;
+	width: calc((100% + 2 * var(--cut) - 2 * var(--gap)) / 3);
+	flex: none;
+	min-width: 0;
+	pointer-events: none;
+	filter: drop-shadow(0 0 10px rgb(0 0 0 / 0.18));
+}
+
+.item + .item {
+	margin-left: calc(var(--gap) - var(--cut));
+}
+
+.card {
+	position: absolute;
+	inset: 0;
+	display: block;
+	color: #fff;
+	text-decoration: none;
+	pointer-events: auto;
+	clip-path: polygon(
+		0 0,
+		calc(100% - var(--cut)) 0,
+		100% 100%,
+		var(--cut) 100%
+	);
+}
+
+.item:first-child .card {
+	clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% 100%, 0 100%);
+}
+
+.item:last-child .card {
+	clip-path: polygon(0 0, 100% 0, 100% 100%, var(--cut) 100%);
+}
+
+.card:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: -6px;
+}
+
+.image {
+	object-fit: cover;
+	transition: transform 500ms ease;
+}
+
+.card:hover .image {
+	transform: scale(1.05);
+}
+
+.shade {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to top,
+		rgb(0 0 0 / 0.78) 0%,
+		rgb(0 0 0 / 0.34) 34%,
+		transparent 58%
+	);
+}
+
+.index {
+	position: absolute;
+	top: 1.15rem;
+	left: 1.35rem;
+	font-size: 0.95rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	line-height: 1;
+}
+
+.item:not(:first-child) .footer {
+	left: calc(var(--cut) + 1.1rem);
+}
+
+.footer {
+	position: absolute;
+	right: 1.15rem;
+	bottom: 1.15rem;
+	left: 1.35rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.item:first-child .index {
+	left: 1.35rem;
+}
+
+.title {
+	font-size: clamp(1.45rem, 2.1vw, 2.15rem);
+	font-weight: 600;
+	letter-spacing: -0.03em;
+	line-height: 1;
+}
+
+.arrow {
+	display: inline-flex;
+	width: 2.75rem;
+	height: 2.75rem;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid rgb(255 255 255 / 0.45);
+	border-radius: 9999px;
+	background: rgb(255 255 255 / 0.16);
+	backdrop-filter: blur(8px);
+	transition:
+		background-color 200ms,
+		color 200ms;
+}
+
+.card:hover .arrow {
+	background: #fff;
+	color: #111;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.image,
+	.arrow {
+		transition: none;
+	}
+
+	.card:hover .image {
+		transform: none;
+	}
+}
+
+@media (max-width: 899px) {
+	.container {
+		width: min(100% - 1.5rem, 74rem);
+		padding-block: calc(4rem + 68px) calc(4rem + 80px);
+	}
+
+	.heading {
+		font-size: clamp(1.70625rem, 9.45vw, 3.15rem);
+	}
+
+	.strip {
+		--cut: 0px;
+		--gap: 0px;
+		flex-direction: column;
+		height: auto;
+		margin-top: 1.5rem;
+		border-radius: 0;
+		background: transparent;
+		overflow: visible;
+		gap: 0.4rem;
+	}
+
+	.item,
+	.item + .item {
+		width: 100%;
+		height: 15.5rem;
+		margin-left: 0;
+		overflow: hidden;
+		border-radius: 0.7rem;
+	}
+
+	.card,
+	.item:first-child .card,
+	.item:last-child .card {
+		clip-path: none;
+	}
+
+	.index,
+	.item:first-child .index {
+		left: 1.15rem;
+	}
+
+	.footer,
+	.item:not(:first-child) .footer {
+		right: 1rem;
+		left: 1.15rem;
+	}
 }

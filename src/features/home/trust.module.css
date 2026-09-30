@@ -11,6 +11,7 @@
   composes: heading from "../../styles/shared.module.css";
   width: 100%;
   letter-spacing: 0.04em;
+  font-weight: 800;
 }
 
 .grid {
@@ -38,7 +39,7 @@
   margin: 0;
   color: var(--accent);
   font-size: 2.25rem;
-  font-weight: 600;
+  font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -47,7 +48,7 @@
 .cardHeading {
   margin: 0;
   font-size: 1.125rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.02em;
   text-align: center;
 }

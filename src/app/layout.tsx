@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Archivo_Black, Inter } from "next/font/google";
 import { Header, Providers } from "@/shared/layout";
 import { site } from "@/lib/site";
 import styles from "./layout.module.css";
@@ -8,6 +8,13 @@ import "./globals.css";
 const sans = Inter({
   subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const display = Archivo_Black({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -61,7 +68,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={sans.variable}>
+    <html lang="en" className={`${sans.variable} ${display.variable}`}>
       <body className={styles.body}>
         <a
           href="#content"

@@ -116,3 +116,14 @@
 		scroll-margin-top: 0;
 	}
 }
+
+#services-heading,
+#trust-heading,
+#reviews-heading,
+#works-heading,
+#faq-heading,
+#deals-heading {
+	font-family: var(--font-display), var(--font-sans), sans-serif;
+	font-weight: 400;
+	font-synthesis: none;
+}

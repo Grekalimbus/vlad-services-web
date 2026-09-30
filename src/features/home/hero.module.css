@@ -81,9 +81,9 @@
   border: 0;
   border-radius: 9999px;
   background: var(--accent);
-  padding-inline: 1.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding-inline: calc(1.75rem + 12px);
+  font-size: calc(0.875rem + 4px);
+  font-weight: 700;
   letter-spacing: 0.025em;
   color: var(--accent-foreground);
   transition: color 200ms, background-color 200ms;

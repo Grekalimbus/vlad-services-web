@@ -230,6 +230,11 @@
       "id": "homepage-fullscreen-hero",
       "choice": "Fullscreen photo hero with split floating nav and bottom-left copy",
       "rationale": "Centered circular wordmark plus a compact pill for sections. Copy stays in a narrow left column so the install photography remains the visual. Inter for Cyrillic-capable product type; amber accent from the existing brand, not a blue SaaS palette. Floating surfaces are off-white, not glass."
+    },
+    {
+      "id": "homepage-services-strip",
+      "choice": "Homepage SERVICES is one wide photo strip with diagonal seams",
+      "rationale": "Client reference: a bold light SERVICES word behind three large photo cards that read as a single rounded block. Numbers, names, and arrow buttons sit on the photos. The services catalog page keeps the existing cards."
     }
   ],
   "evidence": [

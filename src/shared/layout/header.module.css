@@ -148,7 +148,7 @@
 	border: 0;
 	border-radius: 9999px;
 	background: var(--accent);
-	padding-inline: calc(1rem + 6px);
+	padding-inline: calc(1rem + 12px);
 	font-size: calc(0.75rem + 2px);
 	font-weight: 600;
 	letter-spacing: 0.025em;
@@ -240,7 +240,7 @@
 	justify-content: center;
 	border-radius: 9999px;
 	background: var(--foreground);
-	padding-inline: calc(1rem + 6px);
+	padding-inline: calc(1rem + 12px);
 	font-size: calc(0.875rem + 2px);
 	font-weight: 600;
 	color: var(--background);

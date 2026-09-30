@@ -1,6 +1,6 @@
 export const trustItems = [
   { id: "warranty", value: 3, suffix: "", label: "Warranty" },
-  { id: "clients", value: 10000, suffix: "+", label: "Happy Clients/Businesses" },
+  { id: "clients", value: 10000, suffix: "+", label: "Happy Clients" },
   { id: "projects", value: 20000, suffix: "+", label: "Completed Projects" },
   { id: "days", value: 7, suffix: "", label: "Days a Week" },
 ] as const;

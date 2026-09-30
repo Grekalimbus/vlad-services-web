@@ -46,7 +46,7 @@ function TrustStat({
   return (
     <li className={styles.item}>
       <p className={styles.value}>
-        {current.toLocaleString("en-US")}
+        {current.toLocaleString("de-DE")}
         {suffix}
       </p>
       <h3 className={styles.cardHeading}>{label}</h3>
