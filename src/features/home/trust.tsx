@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Calendar, ClipboardList, Shield, Users } from "lucide-react";
 import { trustItems } from "@/lib/content";
 import styles from "./trust.module.css";
+
+const icons = {
+  warranty: Shield,
+  clients: Users,
+  projects: ClipboardList,
+  days: Calendar,
+} as const;
 
 function useCountUp(target: number, active: boolean) {
   const [value, setValue] = useState(0);
@@ -32,24 +40,32 @@ function useCountUp(target: number, active: boolean) {
 }
 
 function TrustStat({
+  id,
   value,
   suffix,
   label,
   active,
 }: {
-  value: number;
-  suffix: string;
-  label: string;
-  active: boolean;
+  readonly id: keyof typeof icons;
+  readonly value: number;
+  readonly suffix: string;
+  readonly label: string;
+  readonly active: boolean;
 }) {
   const current = useCountUp(value, active);
+  const Icon = icons[id];
   return (
     <li className={styles.item}>
-      <p className={styles.value}>
-        {current.toLocaleString("de-DE")}
-        {suffix}
-      </p>
-      <h3 className={styles.cardHeading}>{label}</h3>
+      <span className={styles.icon} aria-hidden="true">
+        <Icon size={20} strokeWidth={1.75} />
+      </span>
+      <div className={styles.copy}>
+        <p className={styles.value}>
+          {current.toLocaleString("de-DE")}
+          {suffix}
+        </p>
+        <h3 className={styles.cardHeading}>{label}</h3>
+      </div>
     </li>
   );
 }
@@ -89,6 +105,7 @@ export function Trust() {
           {trustItems.map((item) => (
             <TrustStat
               key={item.id}
+              id={item.id}
               value={item.value}
               suffix={item.suffix}
               label={item.label}

@@ -11,8 +11,10 @@ export default function Home() {
       <Hero />
       <div className={styles.homeContent}>
         <main id="content">
-          <ServicesOverview />
-          <Trust />
+          <div className={styles.introBand}>
+            <ServicesOverview />
+            <Trust />
+          </div>
           <Reviews />
           <Works />
           <Faq />

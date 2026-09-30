@@ -2,14 +2,14 @@
 	composes: section from "../../styles/shared.module.css";
 	overflow: hidden;
 	border-bottom: 0;
-	background: #cbcbcb33;
+	background: transparent;
 }
 
 .container {
 	position: relative;
 	width: min(100% - 3rem, 74rem);
 	margin-inline: auto;
-	padding-block: calc(5rem + 63px) calc(5rem + 80px);
+	padding-block: calc(5rem + 63px) 2rem;
 }
 
 .heading {
@@ -32,7 +32,7 @@
 	z-index: 1;
 	display: flex;
 	height: clamp(15.5rem, 22vw, 20rem);
-	margin: 2.25rem 0 0;
+	margin: 4.25rem 0 0;
 	padding: 0;
 	list-style: none;
 	overflow: visible;
@@ -170,7 +170,7 @@
 @media (max-width: 899px) {
 	.container {
 		width: min(100% - 1.5rem, 74rem);
-		padding-block: calc(4rem + 68px) calc(4rem + 80px);
+		padding-block: calc(4rem + 68px) 1.5rem;
 	}
 
 	.heading {
@@ -182,7 +182,7 @@
 		--gap: 0px;
 		flex-direction: column;
 		height: auto;
-		margin-top: 1.5rem;
+		margin-top: 2.75rem;
 		border-radius: 0;
 		background: transparent;
 		overflow: visible;
