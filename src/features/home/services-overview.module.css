@@ -1,5 +1,7 @@
 .section {
 	composes: section from "../../styles/shared.module.css";
+	position: relative;
+	z-index: 1;
 	overflow: hidden;
 	border-bottom: 0;
 	background: transparent;
@@ -9,7 +11,7 @@
 	position: relative;
 	width: min(100% - 3rem, 74rem);
 	margin-inline: auto;
-	padding-block: calc(5rem + 63px) 2rem;
+	padding-block: calc((5rem + 63px) * 0.72) 5.5rem;
 }
 
 .heading {
@@ -170,7 +172,7 @@
 @media (max-width: 899px) {
 	.container {
 		width: min(100% - 1.5rem, 74rem);
-		padding-block: calc(4rem + 68px) 1.5rem;
+		padding-block: calc((4rem + 68px) * 0.72) 4.25rem;
 	}
 
 	.heading {

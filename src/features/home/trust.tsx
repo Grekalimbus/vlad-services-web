@@ -18,18 +18,17 @@ function useCountUp(target: number, active: boolean) {
   useEffect(() => {
     if (!active) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let frame = 0;
     if (reduce) {
-      setValue(target);
-      return;
+      frame = requestAnimationFrame(() => setValue(target));
+      return () => cancelAnimationFrame(frame);
     }
 
-    const duration = 1400;
+    const duration = 2000;
     const start = performance.now();
-    let frame = 0;
     const tick = (now: number) => {
       const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - (1 - progress) ** 3;
-      setValue(Math.round(target * eased));
+      setValue(Math.round(target * progress));
       if (progress < 1) frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);

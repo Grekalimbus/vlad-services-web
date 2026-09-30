@@ -12,6 +12,16 @@ export default function Home() {
       <div className={styles.homeContent}>
         <main id="content">
           <div className={styles.introBand}>
+            <div className={styles.atmosphere} aria-hidden="true">
+              <span className={styles.wash} />
+              <span className={`${styles.arc} ${styles.arcTl}`} />
+              <span className={`${styles.arc} ${styles.arcTlInner}`} />
+              <span className={`${styles.arc} ${styles.arcTr}`} />
+              <span className={`${styles.arc} ${styles.arcTrInner}`} />
+              <span className={`${styles.arc} ${styles.arcBl}`} />
+              <span className={`${styles.arc} ${styles.arcBr}`} />
+              <span className={`${styles.arc} ${styles.arcBrInner}`} />
+            </div>
             <ServicesOverview />
             <Trust />
           </div>

@@ -1,6 +1,7 @@
 .section {
   composes: section from "../../styles/shared.module.css";
   position: relative;
+  z-index: 1;
   overflow: hidden;
   border-bottom: 0;
   background: transparent;
