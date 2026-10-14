@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { ctas, site } from "@/lib/site";
 import { buttonPrimaryClass, buttonSecondaryClass } from "@/lib/forms";
 import { useQuote } from "./quote-provider";
@@ -40,9 +39,11 @@ export function CallNow({ className = buttonSecondaryClass, children }: CtaProps
 }
 
 export function BookService({ className = buttonSecondaryClass, children }: CtaProps) {
+  const { openQuote } = useQuote();
+
   return (
-    <Link href="/contact" className={className}>
+    <button type="button" className={className} onClick={() => openQuote("quote")}>
       {children ?? ctas.book}
-    </Link>
+    </button>
   );
 }

@@ -13,7 +13,7 @@ const covers: Record<string, { src: string; position: string }> = {
 
 export function ServicesOverview() {
   return (
-    <section id="services" aria-labelledby="services-heading" className={styles.section}>
+    <section id="services" tabIndex={-1} aria-labelledby="services-heading" className={styles.section}>
       <div className={styles.container}>
         <h2 id="services-heading" className={styles.heading}>
           SERVICES

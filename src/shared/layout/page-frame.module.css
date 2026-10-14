@@ -5,6 +5,21 @@
   padding-top: max(5.75rem, calc(env(safe-area-inset-top) + 4.5rem));
 }
 
+.pageFlush {
+  padding-top: calc(max(0.75rem, env(safe-area-inset-top)) + 3.25rem + 1px);
+}
+
+@media (min-width: 768px) {
+  .pageFlush {
+    padding-top: calc(2.5rem + 2.75rem + 1px);
+  }
+}
+
+.headerFlush {
+  border: 0;
+  background: #07111a;
+}
+
 .header {
   border-bottom: 1px solid var(--border);
 }

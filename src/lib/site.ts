@@ -3,11 +3,11 @@ export const assetPath = (path: string) =>
 
 export const routes = {
 	home: "/",
-	services: "/services",
+	services: "/#services",
 	service: (slug: string) => `/services/${slug}`,
 	portfolio: "/portfolio",
 	portfolioCategory: (slug: string) => `/portfolio/${slug}`,
-	contact: "/contact",
+	contact: "/#footer",
 	privacy: "/privacy-policy",
 	messagingTerms: "/messaging-terms",
 	terms: "/terms",

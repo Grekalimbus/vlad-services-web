@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPaths = ["/", "/services", "/portfolio", "/contact"];
+  const staticPaths = ["/", "/portfolio"];
   const servicePaths = serviceRouteSlugs.map((slug) => `/services/${slug}`);
   const portfolioPaths = galleryCategories.map(
     (category) => `/portfolio/${category.slug}`,

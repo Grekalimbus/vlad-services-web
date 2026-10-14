@@ -270,9 +270,6 @@ export const tvCounts = [
     screens: 1,
     title: "One television",
     note: "A single wall",
-    duration: "About an hour for a straightforward living-room mount",
-    follow:
-      "Most visits are one screen. Height, studs, and cables are checked before the bracket goes in.",
   },
   {
     id: "2",
@@ -280,8 +277,6 @@ export const tvCounts = [
     screens: 2,
     title: "A pair",
     note: "Two rooms",
-    duration: "A morning",
-    follow: "Two mounts in one visit, finished to the same standard.",
   },
   {
     id: "3",
@@ -289,8 +284,6 @@ export const tvCounts = [
     screens: 3,
     title: "Three screens",
     note: "A coordinated pass",
-    duration: "A half day",
-    follow: "Three mounts sequenced so tools and dust stay contained.",
   },
   {
     id: "4plus",
@@ -298,13 +291,8 @@ export const tvCounts = [
     screens: 4,
     title: "Four or more",
     note: "The whole house",
-    duration: "Planned on site",
-    follow:
-      "Larger homes need a short walkthrough so walls, power, and order are confirmed first.",
   },
 ] as const;
-
-export type TvCountId = (typeof tvCounts)[number]["id"];
 
 export const tvSizes = [
   '32" or smaller',

@@ -1,0 +1,115 @@
+.marquee {
+	position: relative;
+	overflow: hidden;
+	max-width: 100%;
+	background: #07111a;
+}
+
+.viewport {
+	position: relative;
+	overflow: hidden;
+	padding-top: 1.8rem;
+	padding-bottom: 0.4rem;
+}
+
+.track {
+	display: flex;
+	width: max-content;
+	animation: marquee linear infinite;
+	will-change: transform;
+}
+
+.group {
+	display: flex;
+	gap: 0.5625rem;
+	margin: 0;
+	padding: 0;
+	padding-inline-end: 0.5625rem;
+	list-style: none;
+}
+
+.item {
+	position: relative;
+	flex: none;
+	width: calc(10.875rem * 1.3);
+	height: 10.75rem;
+	overflow: hidden;
+	border-radius: 0.45rem;
+	background: #101820;
+}
+
+.image {
+	object-fit: cover;
+}
+
+.previous,
+.next {
+	position: absolute;
+	top: calc(1.8rem + 5.375rem);
+	z-index: 2;
+	display: inline-flex;
+	width: 2.125rem;
+	height: 2.125rem;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid rgb(255 255 255 / 0.16);
+	border-radius: 9999px;
+	background: rgb(10 16 24 / 0.62);
+	color: #fff;
+	cursor: pointer;
+	transform: translateY(-50%);
+	backdrop-filter: blur(6px);
+}
+
+.previous {
+	left: 0.7rem;
+}
+
+.next {
+	right: 0.7rem;
+}
+
+.previous:hover,
+.next:hover {
+	background: rgb(10 16 24 / 0.82);
+}
+
+.previous:focus-visible,
+.next:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
+
+@keyframes marquee {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
+
+	to {
+		transform: translate3d(-50%, 0, 0);
+	}
+}
+
+@media (max-width: 639px) {
+	.item {
+		width: calc(12.5rem * 1.3);
+		height: 9.35rem;
+	}
+
+	.previous,
+	.next {
+		top: calc(1.8rem + 4.675rem);
+		width: 2.25rem;
+		height: 2.25rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.track {
+		animation: none !important;
+	}
+
+	.viewport {
+		overflow-x: auto;
+	}
+}

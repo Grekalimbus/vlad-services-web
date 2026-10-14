@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { footerNav, legalNav, site } from "@/lib/site";
+import { HashLink } from "./hash-link";
 import styles from "./footer.module.css";
 
 export function Footer() {
   return (
-    <footer className={styles.footer}>
+    <footer id="footer" tabIndex={-1} className={styles.footer}>
       <div className={styles.atmosphere} aria-hidden="true">
         <span className={styles.dots} />
         <span className={`${styles.arc} ${styles.arcLeft}`} />
@@ -17,9 +18,9 @@ export function Footer() {
           <ul className={styles.list}>
             {footerNav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className={styles.link}>
+                <HashLink href={item.href} className={styles.link}>
                   {item.label}
-                </Link>
+                </HashLink>
               </li>
             ))}
           </ul>

@@ -9,7 +9,7 @@ import shared from "@/styles/shared.module.css";
 import styles from "@/styles/forms.module.css";
 
 export function QuoteDialog() {
-  const { open, form, closeQuote } = useQuote();
+  const { open, form, tvCount, closeQuote } = useQuote();
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +63,7 @@ export function QuoteDialog() {
         </div>
         <div className={styles.dialogBody}>
           {form === "tv" ? (
-            <TvQuoteForm formId="quote-dialog" compact />
+            <TvQuoteForm formId="quote-dialog" compact tvCount={tvCount ?? undefined} />
           ) : (
             <QuoteForm formId="quote-dialog" compact />
           )}

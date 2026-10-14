@@ -1,0 +1,130 @@
+.section {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+.wave {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: var(--wave-h);
+  pointer-events: none;
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  margin-inline: auto;
+  width: min(100%, 72rem);
+  padding: 1.35rem 1.25rem 3.5rem;
+  text-align: center;
+}
+
+.heading {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding-bottom: 0.85rem;
+  font-size: clamp(1.85rem, 2.5vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: #121417;
+}
+
+.heading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 2.4rem;
+  height: 3px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #0076fe;
+}
+
+.accent {
+  color: #0076fe;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 1.85rem 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border-radius: 1.15rem;
+  background: #fff;
+  padding: 0.7rem 0.7rem 1.2rem;
+  box-shadow:
+    0 1px 2px rgb(24 60 100 / 0.04),
+    0 12px 32px rgb(28 70 120 / 0.08);
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 16 / 10.2;
+  overflow: hidden;
+  border-radius: 0.8rem;
+  background: #e7eef4;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.title {
+  margin: 0.95rem 0 0;
+  padding-inline: 0.45rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: #121417;
+}
+
+.text {
+  margin: 0.4rem 0 0;
+  padding-inline: 0.45rem;
+  font-size: 0.92rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #6d7580;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.05rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    padding: 1.15rem 1.5rem 3.75rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.15rem;
+    margin-top: 2.15rem;
+  }
+}
+

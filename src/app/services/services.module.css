@@ -11,8 +11,7 @@
   composes: sectionInner from "../../styles/shared.module.css";
 }
 
-.compactContainer,
-.page {
+.compactContainer {
   composes: pageContent from "../../styles/shared.module.css";
 }
 
@@ -45,7 +44,6 @@
   color: var(--muted-foreground);
 }
 
-.sizeGrid,
 .offeringGrid,
 .fourGrid,
 .threeGrid,
@@ -53,24 +51,6 @@
   display: grid;
   gap: 1rem;
   margin-top: 2.5rem;
-}
-
-.sizeGrid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--border);
-}
-
-.size {
-  background: var(--background);
-  padding: 2rem 1rem;
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: -0.03em;
 }
 
 .card {
@@ -128,20 +108,7 @@
   color: var(--muted-foreground);
 }
 
-.categoryGrid {
-  display: grid;
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--border);
-}
-
 @media (min-width: 640px) {
-  .sizeGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
   .fourGrid,
   .offeringGrid,
   .photoGrid {
@@ -156,8 +123,7 @@
     font-size: 2.25rem;
   }
 
-  .threeGrid,
-  .categoryGrid {
+  .threeGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -170,10 +136,6 @@
 }
 
 @media (min-width: 1024px) {
-  .sizeGrid {
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-  }
-
   .fourGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }

@@ -5,14 +5,18 @@ import { QuoteCta } from "@/features/quote";
 import { nav, site } from "@/lib/site";
 import { Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import shared from "@/styles/shared.module.css";
+import { HashLink, HashScroll } from "./hash-link";
 import styles from "./header.module.css";
 
 export function Header() {
 	const [open, setOpen] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
 	const panelId = useId();
+	const pathname = usePathname();
+	const solid = pathname.replace(/\/$/, "") === "/services/tv-mounting";
 
 	useEffect(() => {
 		const updateHeader = () => {
@@ -41,8 +45,9 @@ export function Header() {
 
 	return (
 		<header
-			className={`${styles.header} ${scrolled ? styles.headerScrolled : styles.headerTop}`}
+			className={`${styles.header} ${solid || scrolled ? styles.headerScrolled : styles.headerTop}`}
 		>
+			<HashScroll />
 			<div className={styles.headerBar}>
 				<div className={styles.headerRow}>
 					<div className={styles.brand}>
@@ -61,13 +66,13 @@ export function Header() {
 						aria-label="Primary"
 					>
 						{nav.map(item => (
-							<Link
+							<HashLink
 								key={item.href}
 								href={item.href}
 								className={styles.navLink}
 							>
 								<span className={styles.navLabel}>{item.label}</span>
-							</Link>
+							</HashLink>
 						))}
 					</nav>
 
@@ -111,14 +116,14 @@ export function Header() {
 					className={styles.mobileNav}
 				>
 					{nav.map(item => (
-						<Link
+						<HashLink
 							key={item.href}
 							href={item.href}
 							className={styles.mobileNavLink}
 							onClick={() => setOpen(false)}
 						>
 							{item.label}
-						</Link>
+						</HashLink>
 					))}
 					<a
 						href={site.phoneHref}

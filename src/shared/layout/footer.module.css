@@ -1,4 +1,5 @@
 .footer {
+  scroll-margin-top: 5.25rem;
   position: relative;
   isolation: isolate;
   overflow: hidden;

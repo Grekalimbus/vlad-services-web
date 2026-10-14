@@ -1,0 +1,127 @@
+.band {
+  --wave-h: 4.25rem;
+  --wave-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 90' preserveAspectRatio='none'%3E%3Cpath fill='white' d='M0,34 C280,40 460,74 720,76 C1000,78 1220,26 1440,18 L1440,90 L0,90 Z'/%3E%3C/svg%3E");
+  position: relative;
+  z-index: 2;
+  margin-top: -3.4rem;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: #f7fafc;
+  -webkit-mask-image: var(--wave-mask), linear-gradient(#000, #000);
+  -webkit-mask-position: top, bottom;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% var(--wave-h), 100% calc(100% - var(--wave-h) + 2px);
+  mask-image: var(--wave-mask), linear-gradient(#000, #000);
+  mask-position: top, bottom;
+  mask-repeat: no-repeat;
+  mask-size: 100% var(--wave-h), 100% calc(100% - var(--wave-h) + 2px);
+  mask-composite: add;
+}
+
+.wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 46rem 36rem at -8rem 15rem,
+      rgb(112 192 236 / 0.95) 0%,
+      rgb(168 214 242 / 0.55) 40%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40rem 34rem at calc(100% + 6rem) 8rem,
+      rgb(102 186 232 / 0.9) 0%,
+      rgb(174 216 242 / 0.5) 38%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 44rem 34rem at calc(100% + 5rem) calc(100% - 10rem),
+      rgb(90 178 228 / 0.82) 0%,
+      rgb(170 214 240 / 0.46) 40%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 38rem 32rem at -7rem calc(100% - 8rem),
+      rgb(124 200 238 / 0.9) 0%,
+      rgb(184 220 244 / 0.48) 40%,
+      transparent 68%
+    );
+  filter: blur(20px);
+}
+
+.arc {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.35px solid rgb(92 170 220 / 0.62);
+  filter: blur(0.8px);
+}
+
+.arcTl {
+  width: 48vw;
+  height: 48vw;
+  top: -20vw;
+  left: -18vw;
+}
+
+.arcTlInner {
+  width: 32vw;
+  height: 32vw;
+  top: -8vw;
+  left: -14vw;
+  border-width: 1px;
+  border-color: rgb(140 198 232 / 0.55);
+  filter: blur(1px);
+}
+
+.arcTr {
+  width: 54vw;
+  height: 54vw;
+  top: -24vw;
+  right: -20vw;
+}
+
+.arcTrInner {
+  width: 28vw;
+  height: 28vw;
+  top: -4vw;
+  right: -10vw;
+  border-width: 1px;
+  border-color: rgb(120 188 228 / 0.5);
+}
+
+.arcBl {
+  width: 42vw;
+  height: 42vw;
+  bottom: -16vw;
+  left: -14vw;
+}
+
+.arcBr {
+  width: 46vw;
+  height: 46vw;
+  right: -18vw;
+  bottom: -20vw;
+}
+
+.arcBrInner {
+  width: 26vw;
+  height: 26vw;
+  right: -6vw;
+  bottom: -8vw;
+  border-width: 1px;
+  border-color: rgb(130 196 232 / 0.48);
+  filter: blur(1.1px);
+}
+
+@media (min-width: 1024px) {
+  .band {
+    --wave-h: 5.6rem;
+    margin-top: -4.6rem;
+  }
+}

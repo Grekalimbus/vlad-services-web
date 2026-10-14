@@ -234,7 +234,12 @@
     {
       "id": "homepage-services-strip",
       "choice": "Homepage SERVICES is one wide photo strip with diagonal seams",
-      "rationale": "Client reference: a bold light SERVICES word behind three large photo cards that read as a single rounded block. Numbers, names, and arrow buttons sit on the photos. The services catalog page keeps the existing cards."
+      "rationale": "Client reference: a bold SERVICES word behind three large photo cards that read as a single rounded block. The word is 32px. Numbers, names, and arrow buttons sit on the photos. Services and Contact in the nav scroll to the homepage section and the footer."
+    },
+    {
+      "id": "tv-mounting-photo-marquee",
+      "choice": "TV Mounting uses the shared header in its white scrolled state from the start",
+      "rationale": "Other pages keep the transparent header over the hero. On TV Mounting the same header is white immediately, and the photo reel starts below it."
     },
     {
       "id": "footer-navy-atmosphere",
