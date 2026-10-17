@@ -49,7 +49,7 @@ export function QuoteDialog() {
         <div className={styles.dialogHeader}>
           <div className={styles.dialogTitleWrap}>
             <h2 id={titleId} className={styles.dialogTitle}>
-              {form === "tv" ? "TV Mounting Quote" : "Get Quote"}
+              {form === "tv" ? "TV Mounting Quote" : "BOOK NOW"}
             </h2>
           </div>
           <button

@@ -16,7 +16,11 @@ export function Header() {
 	const [scrolled, setScrolled] = useState(false);
 	const panelId = useId();
 	const pathname = usePathname();
-	const solid = pathname.replace(/\/$/, "") === "/services/tv-mounting";
+	const path = pathname.replace(/\/$/, "");
+	const solid =
+		path === "/services/tv-mounting" ||
+		path === "/services/electrical" ||
+		path === "/services/handyman";
 
 	useEffect(() => {
 		const updateHeader = () => {

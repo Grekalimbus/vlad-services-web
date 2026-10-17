@@ -5,7 +5,7 @@ import { ctas, site } from "@/lib/site";
 import styles from "./contact.module.css";
 
 export function Contact({
-  heading = "Get Quote",
+  heading = "BOOK NOW",
   formId = "general-quote",
   defaultService,
 }: {

@@ -19,7 +19,15 @@ function loopPhotos(photos: Photo[]) {
 	return Array.from({ length: copies }, () => photos).flat();
 }
 
-export function TvPhotoMarquee({ photos }: { photos: Photo[] }) {
+export function TvPhotoMarquee({
+	photos,
+	label = "TV Mounting",
+	roomy = false,
+}: {
+	photos: Photo[];
+	label?: string;
+	roomy?: boolean;
+}) {
 	const trackRef = useRef<HTMLDivElement>(null);
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const loop = loopPhotos(photos);
@@ -47,9 +55,9 @@ export function TvPhotoMarquee({ photos }: { photos: Photo[] }) {
 	}
 
 	return (
-		<div className={styles.marquee}>
-			<h1 className={shared.visuallyHidden}>TV Mounting</h1>
-			<div className={styles.viewport} ref={viewportRef}>
+		<div className={roomy ? `${styles.marquee} ${styles.marqueeRoom}` : styles.marquee}>
+			{roomy ? null : <h1 className={shared.visuallyHidden}>{label}</h1>}
+			<div className={roomy ? `${styles.viewport} ${styles.viewportRoom}` : styles.viewport} ref={viewportRef}>
 				<div
 					ref={trackRef}
 					className={styles.track}

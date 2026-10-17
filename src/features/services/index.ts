@@ -6,3 +6,4 @@ export { TvMounting } from "./tv-mounting";
 export { TvPhotoMarquee } from "./tv-photo-marquee";
 export { TvGallery } from "./tv-gallery";
 export { TvBand } from "./tv-band";
+export { CategoryLanding } from "./category-landing";

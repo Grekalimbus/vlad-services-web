@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import styles from "./tv-band.module.css";
 
-export function TvBand({ children }: { children: ReactNode }) {
+export function TvBand({ children, blend = false }: { children: ReactNode; blend?: boolean }) {
   return (
-    <div className={styles.band}>
+    <div className={blend ? `${styles.band} ${styles.bandBlend}` : styles.band}>
       <div className={styles.backdrop} aria-hidden="true">
         <span className={styles.wash} />
         <span className={`${styles.arc} ${styles.arcTl}`} />

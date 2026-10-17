@@ -119,6 +119,34 @@
   filter: blur(1.1px);
 }
 
+.bandBlend .backdrop {
+  background-color: transparent;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.14) 2.25rem,
+    rgb(0 0 0 / 0.42) 5rem,
+    rgb(0 0 0 / 0.78) 8rem,
+    #000 11.5rem
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.14) 2.25rem,
+    rgb(0 0 0 / 0.42) 5rem,
+    rgb(0 0 0 / 0.78) 8rem,
+    #000 11.5rem
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: top;
+  mask-position: top;
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
+}
+
 @media (min-width: 1024px) {
   .band {
     --wave-h: 5.6rem;

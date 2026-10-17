@@ -9,6 +9,7 @@ type PageFrameProps = {
   hero?: ReactNode;
   children: ReactNode;
   flush?: boolean;
+  light?: boolean;
 };
 
 export function PageFrame({
@@ -16,10 +17,16 @@ export function PageFrame({
   hero,
   children,
   flush = false,
+  light = false,
 }: PageFrameProps) {
+  const pageClass = [styles.page, flush ? styles.pageFlush : "", light ? styles.pageLight : ""]
+    .filter(Boolean)
+    .join(" ");
+  const headerClass = light ? styles.headerLight : flush ? styles.headerFlush : styles.header;
+
   return (
-    <div className={flush ? `${styles.page} ${styles.pageFlush}` : styles.page}>
-      <header className={flush ? styles.headerFlush : styles.header}>
+    <div className={pageClass}>
+      <header className={headerClass}>
         {hero ?? (
           <div className={styles.headerInner}>
             <h1 className={styles.title}>{title}</h1>

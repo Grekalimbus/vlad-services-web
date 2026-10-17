@@ -20,6 +20,12 @@
   background: #07111a;
 }
 
+.pageLight,
+.headerLight {
+  border: 0;
+  background: #f7fafc;
+}
+
 .header {
   border-bottom: 1px solid var(--border);
 }

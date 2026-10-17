@@ -41,7 +41,7 @@ export const site = {
 } as const;
 
 export const ctas = {
-	quote: "Get Quote",
+	quote: "BOOK NOW",
 	call: site.phoneDisplay,
 	book: "BOOK A SERVICE",
 } as const;
@@ -60,7 +60,7 @@ export const footerNav = [
 	{ href: routes.service("electrical"), label: "Electrical" },
 	{ href: routes.service("handyman"), label: "Handyman" },
 	{ href: routes.portfolio, label: "Projects" },
-	{ href: routes.contact, label: "Get Quote" },
+	{ href: routes.contact, label: "BOOK NOW" },
 ] as const;
 
 export const legalNav = [

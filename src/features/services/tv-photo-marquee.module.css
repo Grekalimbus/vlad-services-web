@@ -12,6 +12,18 @@
 	padding-bottom: 0.4rem;
 }
 
+.viewportRoom {
+	padding-bottom: calc(0.4rem + 150px);
+}
+
+.marqueeRoom {
+	background: transparent;
+}
+
+.marqueeRoom .item {
+	background: #e7eef4;
+}
+
 .track {
 	display: flex;
 	width: max-content;
