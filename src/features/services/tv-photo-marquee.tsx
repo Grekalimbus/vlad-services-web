@@ -23,10 +23,12 @@ export function TvPhotoMarquee({
 	photos,
 	label = "TV Mounting",
 	roomy = false,
+	heading = true,
 }: {
 	photos: Photo[];
 	label?: string;
 	roomy?: boolean;
+	heading?: boolean;
 }) {
 	const trackRef = useRef<HTMLDivElement>(null);
 	const viewportRef = useRef<HTMLDivElement>(null);
@@ -56,7 +58,7 @@ export function TvPhotoMarquee({
 
 	return (
 		<div className={roomy ? `${styles.marquee} ${styles.marqueeRoom}` : styles.marquee}>
-			{roomy ? null : <h1 className={shared.visuallyHidden}>{label}</h1>}
+			{roomy || !heading ? null : <h1 className={shared.visuallyHidden}>{label}</h1>}
 			<div className={roomy ? `${styles.viewport} ${styles.viewportRoom}` : styles.viewport} ref={viewportRef}>
 				<div
 					ref={trackRef}

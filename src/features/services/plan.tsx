@@ -2,18 +2,14 @@
 
 import { useId, useState } from "react";
 import { useQuote } from "@/features/quote";
+import { useCms } from "@/lib/cms/use-cms";
 import { tvCounts } from "@/lib/services";
 import shared from "@/styles/shared.module.css";
 import styles from "./plan.module.css";
 
-const labels: Record<string, string> = {
-	"1": "1 TV",
-	"2": "2 TVs",
-	"3": "3 TVs",
-	"4plus": "4+ TVs",
-};
-
 export function Plan() {
+	const copy = useCms().copy.plan;
+	const labels = copy.labels as Record<string, string>;
 	const [selected, setSelected] = useState<string | null>(null);
 	const { openQuote } = useQuote();
 
@@ -30,7 +26,8 @@ export function Plan() {
 			</div>
 			<div className={styles.inner}>
 				<h2 id="plan-heading" className={styles.heading}>
-					Choose <span className={styles.accent}>Your Deal</span>
+					<span data-cms="copy.plan.headingLead">{copy.headingLead}</span>{" "}
+					<span className={styles.accent} data-cms="copy.plan.headingAccent">{copy.headingAccent}</span>
 				</h2>
 				<ul className={styles.options} role="radiogroup" aria-labelledby="plan-heading">
 					{tvCounts.map((item) => {
@@ -48,7 +45,7 @@ export function Plan() {
 									/>
 									<span className={styles.radio} aria-hidden="true" />
 									<TvStack screens={item.screens} />
-									<span className={styles.label}>{labels[item.id] ?? item.count}</span>
+									<span className={styles.label} data-cms={`copy.plan.labels.${item.id}`}>{labels[item.id] ?? item.count}</span>
 								</label>
 							</li>
 						);
@@ -60,7 +57,7 @@ export function Plan() {
 					disabled={selected === null}
 					onClick={() => openQuote("quote")}
 				>
-					BOOK NOW
+					<span data-cms="copy.plan.book">{copy.book}</span>
 				</button>
 			</div>
 		</section>

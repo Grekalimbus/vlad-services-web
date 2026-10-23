@@ -3,16 +3,55 @@
   z-index: 1;
 }
 
+.intro {
+  position: relative;
+  z-index: 1;
+  margin-inline: auto;
+  width: min(100%, 46rem);
+  padding: 1.35rem 1.25rem 0.35rem;
+  text-align: center;
+}
+
 .pageTitle {
   position: relative;
   z-index: 1;
   margin: 0;
-  padding: 0.15rem 1.25rem 0;
+  padding: 0;
   text-align: center;
   font-size: clamp(2.15rem, 3.2vw, 2.75rem);
   font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.08;
+  color: #0076fe;
+}
+
+.place {
+  font-weight: 800;
+}
+
+.lede {
+  margin: 0.85rem auto 0;
+  max-width: 38rem;
+  color: #3c4248;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.related {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.9rem;
+  margin: 0.95rem 0 0;
+  color: #3d4650;
+  font-size: 0.95rem;
+}
+
+.related a {
+  padding: 0.35rem 0.1rem;
+}
+
+.related a:hover {
   color: #0076fe;
 }
 

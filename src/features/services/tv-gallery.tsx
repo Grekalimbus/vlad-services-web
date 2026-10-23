@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { QuoteCta } from "@/features/quote";
+import { PhotoLightbox } from "@/features/gallery/photo-lightbox";
+import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { assetPath } from "@/lib/site";
 import styles from "./tv-gallery.module.css";
 
@@ -13,122 +15,52 @@ type Slide = {
   position: string;
 };
 
-const cards: { title: string; slides: Slide[] }[] = [
-  {
-    title: "Fireplace TV Mount",
-    slides: [
-      {
-        image: "/works/hero.jpg",
-        alt: "Television mounted above a fireplace",
-        position: "center 42%",
-      },
-      {
-        image: "/works/tv-wood-wall.jpg",
-        alt: "Television mounted on a wood feature wall",
-        position: "72% 18%",
-      },
-    ],
-  },
-  {
-    title: "Living Room TV Mount",
-    slides: [
-      {
-        image: "/works/tv-living-blue.jpg",
-        alt: "Television and soundbar mounted in a living room",
-        position: "center 36%",
-      },
-      {
-        image: "/works/tv-living-cream.jpg",
-        alt: "Television mounted on a marble living room wall",
-        position: "68% 42%",
-      },
-    ],
-  },
-  {
-    title: "Bedroom TV Mount",
-    slides: [
-      {
-        image: "/works/pexels-kitchen-tv.jpg",
-        alt: "Bedroom interior prepared for a wall-mounted television",
-        position: "center 48%",
-      },
-      {
-        image: "/works/pexels-tv-black.jpg",
-        alt: "Television in a relaxed seating area",
-        position: "center 45%",
-      },
-    ],
-  },
-  {
-    title: "Outdoor TV Mount",
-    slides: [
-      {
-        image: "/works/gallery-wall.jpg",
-        alt: "Wall-mounted television beside a view to the outdoors",
-        position: "16% 40%",
-      },
-      {
-        image: "/works/pexels-living2.jpg",
-        alt: "Television beside tall windows opening outdoors",
-        position: "32% 42%",
-      },
-    ],
-  },
-  {
-    title: "Office TV Mount",
-    slides: [
-      {
-        image: "/works/tv-office-wall.jpg",
-        alt: "Television mounted on an office wall",
-        position: "center 32%",
-      },
-      {
-        image: "/works/interior-styled.jpg",
-        alt: "Television at the edge of a finished interior",
-        position: "88% 40%",
-      },
-    ],
-  },
-  {
-    title: "Commercial TV Mount",
-    slides: [
-      {
-        image: "/works/ceiling-fan-2.jpg",
-        alt: "Television mounted in a dining and hospitality space",
-        position: "12% 42%",
-      },
-      {
-        image: "/works/tv-pexels.jpg",
-        alt: "Television mounted on a brick wall for a group viewing",
-        position: "center 40%",
-      },
-    ],
-  },
-];
-
 export function TvGallery() {
+  const copy = useCms().copy.tvGallery;
   return (
     <section className={styles.section} aria-labelledby="tvs-gallery-heading">
       <div className={styles.inner}>
         <h2 id="tvs-gallery-heading" className={styles.heading}>
-          TVs <span className={styles.accent}>Gallery</span>
+          <span data-cms="copy.tvGallery.headingLead">{copy.headingLead}</span>{" "}
+          <span className={styles.accent} data-cms="copy.tvGallery.headingAccent">{copy.headingAccent}</span>
         </h2>
         <ul className={styles.grid}>
-          {cards.map((card) => (
-            <GalleryCard key={card.title} title={card.title} slides={card.slides} />
+          {copy.cards.map((card, index) => (
+            <GalleryCard
+              key={`${card.title}-${index}`}
+              title={card.title}
+              titlePath={`copy.tvGallery.cards.${index}.title`}
+              galleryPath={`slides:copy.tvGallery.cards.${index}.slides`}
+              slides={card.slides}
+            />
           ))}
         </ul>
-        <QuoteCta className={styles.book}>BOOK NOW</QuoteCta>
+        <QuoteCta className={styles.book}>
+          <span data-cms="copy.tvGallery.book">{copy.book}</span>
+        </QuoteCta>
       </div>
     </section>
   );
 }
 
-function GalleryCard({ title, slides }: { title: string; slides: Slide[] }) {
+function GalleryCard({
+  title,
+  titlePath,
+  galleryPath,
+  slides,
+}: {
+  title: string;
+  titlePath: string;
+  galleryPath: string;
+  slides: Slide[];
+}) {
   const [index, setIndex] = useState(0);
   const [frame, setFrame] = useState<{ leaving: number; direction: -1 | 1 } | null>(null);
+  const [zoom, setZoom] = useState(false);
+  const editing = useEditing();
   const count = slides.length;
-  const slide = slides[index];
+  const safeIndex = count === 0 ? 0 : Math.min(index, count - 1);
+  const slide = slides[safeIndex];
   const leaving = frame ? slides[frame.leaving] : null;
 
   function go(next: number, direction: -1 | 1) {
@@ -139,7 +71,9 @@ function GalleryCard({ title, slides }: { title: string; slides: Slide[] }) {
   }
 
   return (
-    <li className={styles.card}>
+    <li className={styles.card} data-cms-gallery={galleryPath} data-empty={slide ? undefined : ""}>
+      {slide ? (
+        <>
       {leaving ? (
         <Image
           key={`${leaving.image}-out`}
@@ -160,12 +94,17 @@ function GalleryCard({ title, slides }: { title: string; slides: Slide[] }) {
         className={
           frame ? (frame.direction === 1 ? styles.enterRight : styles.enterLeft) : styles.image
         }
-        style={{ objectPosition: slide.position }}
+        style={{ objectPosition: slide.position, cursor: editing ? undefined : "pointer" }}
+        onClick={() => {
+          if (!editing) setZoom(true);
+        }}
         onAnimationEnd={(event) => {
           if (event.target === event.currentTarget) setFrame(null);
         }}
       />
       <span className={styles.shade} aria-hidden="true" />
+      {count > 1 ? (
+        <>
       <button
         type="button"
         className={`${styles.arrow} ${styles.arrowPrev}`}
@@ -182,8 +121,10 @@ function GalleryCard({ title, slides }: { title: string; slides: Slide[] }) {
       >
         <ChevronRight size={18} strokeWidth={2.25} />
       </button>
+        </>
+      ) : null}
       <span className={styles.bar}>
-        <span className={styles.title}>{title}</span>
+        <span className={styles.title} data-cms={titlePath}>{title}</span>
         <span className={styles.pager}>
           {slides.map((item, dotIndex) => (
             <button
@@ -197,6 +138,11 @@ function GalleryCard({ title, slides }: { title: string; slides: Slide[] }) {
           ))}
         </span>
       </span>
+        </>
+      ) : null}
+      {zoom ? (
+        <PhotoLightbox photos={slides} index={safeIndex} onIndex={setIndex} onClose={() => setZoom(false)} />
+      ) : null}
     </li>
   );
 }

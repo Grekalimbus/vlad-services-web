@@ -1,19 +1,20 @@
-import type { Metadata } from "next";
-import { LegalDocument } from "@/features/legal";
-import { PageFrame } from "@/shared/layout";
-import { getLegalPage } from "@/lib/legal";
+import { LegalPageView } from "@/features/legal";
+import { CmsPage } from "@/lib/cms/cms-page";
+import { bindCms } from "@/lib/cms/load";
+import { pageMeta } from "@/lib/seo";
+import { metadataFor } from "@/lib/seo-metadata";
+import { JsonLd } from "@/shared/seo";
 
-const page = getLegalPage("messaging-terms")!;
+export function generateMetadata() {
+  return metadataFor("/messaging-terms");
+}
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: "Messaging Terms & Conditions for PrimeFix Home & Handyman Services LLC.",
-};
-
-export default function MessagingTermsPage() {
+export default async function MessagingTermsPage() {
+  const cms = await bindCms();
   return (
-    <PageFrame eyebrow="Legal" title={page.title}>
-      <LegalDocument page={page} />
-    </PageFrame>
+    <CmsPage>
+      <JsonLd data={pageMeta("/messaging-terms", cms).jsonLd} />
+      <LegalPageView slug="messaging-terms" />
+    </CmsPage>
   );
 }

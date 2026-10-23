@@ -1,24 +1,48 @@
+"use client";
+
 import Link from "next/link";
+import { EMAIL_CONSENT_TEXT, SMS_CONSENT_TEXT } from "@/lib/consent";
 import { routes } from "@/lib/site";
+import { Checkbox } from "@/shared/ui";
 import styles from "@/styles/forms.module.css";
 
-export function ConsentFields() {
+const SMS_LINK_LEAD = "See ";
+
+export function ConsentFields({
+  email = true,
+  tone = "default",
+  invalidSms = false,
+  invalidEmail = false,
+}: {
+  email?: boolean;
+  tone?: "default" | "inverse";
+  invalidSms?: boolean;
+  invalidEmail?: boolean;
+}) {
+  const linkAt = SMS_CONSENT_TEXT.lastIndexOf(SMS_LINK_LEAD);
+  const smsBefore = SMS_CONSENT_TEXT.slice(0, linkAt);
+  const choice = tone === "inverse" ? styles.consentOnDark : styles.consentChoice;
+
   return (
-    <p className={styles.consent}>
-      By submitting this form, you agree to receive recurring marketing and follow-up
-      text messages from PrimeFix Home &amp; Handyman Services LLC, including messages
-      sent using automated technology. Message frequency varies. Message and data rates
-      may apply. Consent is not a condition of purchase. Reply STOP to opt out or HELP
-      for help. If you provide an email address, you also agree to receive email
-      messages. See our{" "}
-      <Link href={routes.privacy} className={styles.consentLink}>
-        Privacy Policy
-      </Link>{" "}
-      and{" "}
-      <Link href={routes.messagingTerms} className={styles.consentLink}>
-        Messaging Terms &amp; Conditions
-      </Link>
-      .
-    </p>
+    <fieldset className={styles.consentFields}>
+      <legend className={styles.srOnly}>Message preferences</legend>
+      <Checkbox name="smsConsent" value="yes" className={choice} invalid={invalidSms}>
+        {smsBefore}
+        {SMS_LINK_LEAD}
+        <Link href={routes.privacy} className={styles.consentLink}>
+          Privacy Policy
+        </Link>{" "}
+        and{" "}
+        <Link href={routes.messagingTerms} className={styles.consentLink}>
+          Messaging Terms & Conditions
+        </Link>
+        .
+      </Checkbox>
+      {email ? (
+        <Checkbox name="emailConsent" value="yes" className={choice} invalid={invalidEmail}>
+          {EMAIL_CONSENT_TEXT}
+        </Checkbox>
+      ) : null}
+    </fieldset>
   );
 }

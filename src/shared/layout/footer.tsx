@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
-import { footerNav, legalNav, site } from "@/lib/site";
+import { useCms } from "@/lib/cms/use-cms";
+import { phoneHref } from "@/lib/site";
 import { HashLink } from "./hash-link";
 import styles from "./footer.module.css";
 
 export function Footer() {
+  const cms = useCms();
   return (
     <footer id="footer" tabIndex={-1} className={styles.footer}>
       <div className={styles.atmosphere} aria-hidden="true">
@@ -16,37 +20,37 @@ export function Footer() {
       <div className={styles.inner}>
         <nav className={styles.nav} aria-label="Footer">
           <ul className={styles.list}>
-            {footerNav.map((item) => (
+            {cms.footerNav.map((item, index) => (
               <li key={item.href}>
                 <HashLink href={item.href} className={styles.link}>
-                  {item.label}
+                  <span data-cms={`footerNav.${index}.label`}>{item.label}</span>
                 </HashLink>
               </li>
             ))}
           </ul>
         </nav>
         <div className={styles.contact}>
-          <a href={site.phoneHref} className={styles.phone}>
-            {site.phoneDisplay}
+          <a href={phoneHref(cms.site.phoneDisplay)} className={styles.phone}>
+            <span data-cms="site.phoneDisplay">{cms.site.phoneDisplay}</span>
           </a>
-          <a href={`mailto:${site.email}`} className={styles.email}>
-            {site.email}
+          <a href={`mailto:${cms.site.email}`} className={styles.email}>
+            <span data-cms="site.email">{cms.site.email}</span>
           </a>
           <p className={styles.meta}>
-            {site.areaServed}
+            <span data-cms="site.areaServed">{cms.site.areaServed}</span>
             <span aria-hidden="true"> · </span>
-            {site.availability}
+            <span data-cms="site.availability">{cms.site.availability}</span>
           </p>
         </div>
       </div>
       <div className={styles.bottom}>
         <p>
-          © {new Date().getFullYear()} {site.name}
+          © {new Date().getFullYear()} <span data-cms="site.name">{cms.site.name}</span>
         </p>
         <nav className={styles.legalNav} aria-label="Legal">
-          {legalNav.map((item) => (
+          {cms.legalNav.map((item, index) => (
             <Link key={item.href} href={item.href} className={styles.legalLink}>
-              {item.label}
+              <span data-cms={`legalNav.${index}.label`}>{item.label}</span>
             </Link>
           ))}
         </nav>

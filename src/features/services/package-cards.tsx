@@ -1,5 +1,6 @@
 import { QuoteCta, TvQuoteCta } from "@/features/quote";
 import { buttonPrimaryClass } from "@/lib/forms";
+import { readCms } from "@/lib/cms/read";
 import { formatStartingAt, type ServicePackage } from "@/lib/services";
 import styles from "./package-cards.module.css";
 
@@ -20,10 +21,11 @@ export function PackageCards({
           <p className={styles.summary}>{item.summary}</p>
           {item.startingAt != null ? (
             <p className={styles.price}>
-              Starting at {formatStartingAt(item.startingAt, item.currency)}
+              <span data-cms="copy.startingAtLabel">{readCms().copy.startingAtLabel}</span>{" "}
+              {formatStartingAt(item.startingAt, item.currency)}
             </p>
           ) : (
-            <p className={styles.priceMuted}>Pricing quoted from the project details.</p>
+            <p className={styles.priceMuted} data-cms="copy.packagePriceNote">{readCms().copy.packagePriceNote}</p>
           )}
           <div className={styles.action}>
             {form === "tv" ? (

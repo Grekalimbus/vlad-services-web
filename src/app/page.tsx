@@ -1,13 +1,23 @@
 import { DealsSignup, Faq, Hero, ServicesOverview, Trust, Works } from "@/features/home";
 import { Reviews } from "@/features/reviews";
+import { CmsPage } from "@/lib/cms/cms-page";
+import { bindCms } from "@/lib/cms/load";
+import { metadataFor } from "@/lib/seo-metadata";
+import { pageMeta } from "@/lib/seo";
 import { Footer } from "@/shared/layout";
 import { JsonLd } from "@/shared/seo";
 import styles from "./page.module.css";
 
-export default function Home() {
+export function generateMetadata() {
+  return metadataFor("/");
+}
+
+export default async function Home() {
+  const cms = await bindCms();
   return (
+    <CmsPage>
     <>
-      <JsonLd />
+      <JsonLd data={pageMeta("/", cms).jsonLd} />
       <Hero />
       <div className={styles.homeContent}>
         <main id="content">
@@ -45,5 +55,6 @@ export default function Home() {
         <Footer />
       </div>
     </>
+    </CmsPage>
   );
 }

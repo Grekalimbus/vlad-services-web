@@ -6,11 +6,23 @@
   background: var(--foreground);
 }
 
+.slides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .background {
   object-fit: cover;
   object-position: 36% 42%;
   transform: scale(1.02);
   filter: blur(2px);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.visible {
+  opacity: 1;
 }
 
 .overlay {

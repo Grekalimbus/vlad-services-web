@@ -1,19 +1,20 @@
-import type { Metadata } from "next";
-import { LegalDocument } from "@/features/legal";
-import { PageFrame } from "@/shared/layout";
-import { getLegalPage } from "@/lib/legal";
+import { LegalPageView } from "@/features/legal";
+import { CmsPage } from "@/lib/cms/cms-page";
+import { bindCms } from "@/lib/cms/load";
+import { pageMeta } from "@/lib/seo";
+import { metadataFor } from "@/lib/seo-metadata";
+import { JsonLd } from "@/shared/seo";
 
-const page = getLegalPage("privacy-policy")!;
+export function generateMetadata() {
+  return metadataFor("/privacy-policy");
+}
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: "Privacy Policy for PrimeFix Home & Handyman Services LLC.",
-};
-
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const cms = await bindCms();
   return (
-    <PageFrame eyebrow="Legal" title={page.title}>
-      <LegalDocument page={page} />
-    </PageFrame>
+    <CmsPage>
+      <JsonLd data={pageMeta("/privacy-policy", cms).jsonLd} />
+      <LegalPageView slug="privacy-policy" />
+    </CmsPage>
   );
 }

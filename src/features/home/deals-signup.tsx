@@ -1,5 +1,6 @@
 "use client";
 
+import { useCms } from "@/lib/cms/use-cms";
 import { ConsentFields } from "@/features/quote";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
@@ -16,6 +17,7 @@ export function DealsSignup() {
 		email: useId(),
 		error: useId(),
 	};
+	const copy = useCms().copy.home.deals;
 	const [status, setStatus] = useState<Status>("idle");
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -31,9 +33,11 @@ export function DealsSignup() {
 
 		if (name.length < 2) nextErrors.name = "Enter your name.";
 		if (!phonePattern.test(phone)) nextErrors.phone = "Enter a phone number.";
-		if (!zipPattern.test(zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
+		if (zip && !zipPattern.test(zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
 		if (email && !emailPattern.test(email))
 			nextErrors.email = "Enter a valid email.";
+		if (data.get("smsConsent") !== "yes") nextErrors.sms = "Required";
+		if (data.get("emailConsent") !== "yes") nextErrors.emailConsent = "Required";
 
 		setErrors(nextErrors);
 		if (Object.keys(nextErrors).length > 0) {
@@ -49,8 +53,8 @@ export function DealsSignup() {
 				formId: "deals-signup",
 				fields: { name, phone, zip, email },
 				photos: [],
-				smsConsent: true,
-				emailConsent: Boolean(email),
+				smsConsent: data.get("smsConsent") === "yes",
+				emailConsent: data.get("emailConsent") === "yes",
 			}),
 		);
 		form.reset();
@@ -68,70 +72,89 @@ export function DealsSignup() {
 					<div className={styles.photo} aria-hidden="true" />
 					<div className={styles.content}>
 						<h2 id="deals-heading" className={styles.heading}>
-							Sign Up for <span className={styles.accent}>Deals</span>
+							<span data-cms="copy.home.deals.headingLead">{copy.headingLead}</span>{" "}
+							<span className={styles.accent} data-cms="copy.home.deals.headingAccent">{copy.headingAccent}</span>
 						</h2>
 						{status === "success" ? (
 							<p role="status" className={styles.success}>
-								Thank you! You&apos;re signed up for PrimeFix deals.
+								<span data-cms="copy.home.deals.success">{copy.success}</span>
 							</p>
 						) : (
-							<form onSubmit={onSubmit} noValidate className={styles.form}>
-								{status === "error" ? (
+							<form
+								onSubmit={onSubmit}
+								noValidate
+								className={styles.form}
+								onChange={(event) => {
+									const data = new FormData(event.currentTarget);
+									setErrors((current) => clearFixedErrors(current, data));
+								}}
+							>
+								{status === "error" && Object.keys(errors).length > 0 ? (
 									<p
 										id={ids.error}
 										tabIndex={-1}
 										role="alert"
 										className={styles.formError}
 									>
-										Check the fields below before sending.
+										<span data-cms="copy.home.deals.error">{copy.error}</span>
 									</p>
 								) : null}
 								<div className={styles.grid}>
 									<DealField
 										id={ids.name}
 										name="name"
-										label="Name"
+										label={copy.nameLabel}
+										cms="copy.home.deals.nameLabel"
 										autoComplete="name"
-										placeholder="Enter your name."
+										placeholder={copy.namePlaceholder}
 										error={errors.name}
 									/>
 									<DealField
 										id={ids.phone}
 										name="phone"
-										label="Phone Number"
+										label={copy.phoneLabel}
+										cms="copy.home.deals.phoneLabel"
 										type="tel"
 										autoComplete="tel"
-										placeholder="Enter a phone number."
+										placeholder={copy.phonePlaceholder}
 										error={errors.phone}
 									/>
 									<DealField
 										id={ids.zip}
 										name="zip"
-										label="ZIP Code"
+										label={copy.zipLabel}
+										cms="copy.home.deals.zipLabel"
 										inputMode="numeric"
 										autoComplete="postal-code"
-										placeholder="Enter a 5-digit ZIP code."
+										placeholder={copy.zipPlaceholder}
 										error={errors.zip}
 									/>
 									<DealField
 										id={ids.email}
 										name="email"
-										label="Email (Optional)"
+										label={copy.emailLabel}
+										cms="copy.home.deals.emailLabel"
 										type="email"
 										autoComplete="email"
-										placeholder="Enter your email"
+										placeholder={copy.emailPlaceholder}
 										error={errors.email}
 									/>
 								</div>
 								<div className={styles.consentWrap}>
-									<ConsentFields />
+									<ConsentFields
+										tone="inverse"
+										invalidSms={Boolean(errors.sms)}
+										invalidEmail={Boolean(errors.emailConsent)}
+									/>
 								</div>
 								<button
 									type="submit"
 									disabled={status === "loading"}
 									className={styles.submit}
 								>
-									{status === "loading" ? "Sending…" : "Sign Up"}
+									<span data-cms={status === "loading" ? "copy.home.deals.sending" : "copy.home.deals.submit"}>
+									{status === "loading" ? copy.sending : copy.submit}
+								</span>
 								</button>
 							</form>
 						)}
@@ -142,10 +165,27 @@ export function DealsSignup() {
 	);
 }
 
+function clearFixedErrors(current: Record<string, string>, data: FormData) {
+	if (Object.keys(current).length === 0) return current;
+	const next = { ...current };
+	const name = String(data.get("name") ?? "").trim();
+	const phone = String(data.get("phone") ?? "").trim();
+	const zip = String(data.get("zip") ?? "").trim();
+	const email = String(data.get("email") ?? "").trim();
+	if (name.length >= 2) delete next.name;
+	if (phonePattern.test(phone)) delete next.phone;
+	if (!zip || zipPattern.test(zip)) delete next.zip;
+	if (!email || emailPattern.test(email)) delete next.email;
+	if (data.get("smsConsent") === "yes") delete next.sms;
+	if (data.get("emailConsent") === "yes") delete next.emailConsent;
+	return next;
+}
+
 function DealField({
 	id,
 	name,
 	label,
+	cms,
 	type = "text",
 	autoComplete,
 	inputMode,
@@ -155,6 +195,7 @@ function DealField({
 	id: string;
 	name: string;
 	label: string;
+	cms: string;
 	type?: string;
 	autoComplete?: string;
 	inputMode?: "numeric";
@@ -164,7 +205,7 @@ function DealField({
 	return (
 		<div className={styles.field}>
 			<label htmlFor={id} className={styles.label}>
-				{label}
+				<span data-cms={cms}>{label}</span>
 			</label>
 			<input
 				id={id}
@@ -175,7 +216,7 @@ function DealField({
 				placeholder={placeholder}
 				aria-invalid={Boolean(error)}
 				aria-describedby={error ? `${id}-error` : undefined}
-				className={styles.input}
+				className={error ? `${styles.input} ${styles.inputInvalid}` : styles.input}
 			/>
 			{error ? (
 				<p id={`${id}-error`} className={styles.error}>

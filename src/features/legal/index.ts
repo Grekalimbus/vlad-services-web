@@ -1,1 +1,1 @@
-export { LegalDocument } from "./legal-document";
+export { LegalPageView } from "./legal-document";

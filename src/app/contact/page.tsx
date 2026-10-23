@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
 import { RedirectHash } from "@/shared/layout/redirect-hash";
+import { metadataFor } from "@/lib/seo-metadata";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  robots: { index: false, follow: true },
-};
+export function generateMetadata() {
+  return metadataFor("/contact");
+}
 
 export default function ContactPage() {
   return <RedirectHash hash="footer" label="Contact" />;

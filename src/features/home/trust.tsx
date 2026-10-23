@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Calendar, ClipboardList, Shield, Users } from "lucide-react";
-import { trustItems } from "@/lib/content";
+import { useCms } from "@/lib/cms/use-cms";
 import styles from "./trust.module.css";
 
 const icons = {
@@ -13,7 +13,7 @@ const icons = {
 } as const;
 
 function useCountUp(target: number, active: boolean) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(target);
 
   useEffect(() => {
     if (!active) return;
@@ -39,37 +39,40 @@ function useCountUp(target: number, active: boolean) {
 }
 
 function TrustStat({
+  index,
   id,
   value,
   suffix,
   label,
   active,
 }: {
-  readonly id: keyof typeof icons;
+  readonly index: number;
+  readonly id: string;
   readonly value: number;
   readonly suffix: string;
   readonly label: string;
   readonly active: boolean;
 }) {
   const current = useCountUp(value, active);
-  const Icon = icons[id];
+  const Icon = icons[id as keyof typeof icons] ?? icons.warranty;
   return (
-    <li className={styles.item}>
+    <li className={styles.item} data-cms-card={`trust:${id}`}>
       <span className={styles.icon} aria-hidden="true">
         <Icon size={20} strokeWidth={1.75} />
       </span>
       <div className={styles.copy}>
         <p className={styles.value}>
-          {current.toLocaleString("de-DE")}
+          {current.toLocaleString("en-US")}
           {suffix}
         </p>
-        <h3 className={styles.cardHeading}>{label}</h3>
+        <h3 className={styles.cardHeading} data-cms={`trustItems.${index}.label`}>{label}</h3>
       </div>
     </li>
   );
 }
 
 export function Trust() {
+  const cms = useCms();
   const sectionRef = useRef<HTMLElement>(null);
   const [active, setActive] = useState(false);
 
@@ -98,12 +101,13 @@ export function Trust() {
     >
       <div className={styles.container}>
         <h2 id="trust-heading" className={styles.heading}>
-          WHY US?
+          <span data-cms="copy.home.trustHeading">{cms.copy.home.trustHeading}</span>
         </h2>
         <ul className={styles.grid}>
-          {trustItems.map((item) => (
+          {cms.trustItems.map((item, index) => (
             <TrustStat
               key={item.id}
+              index={index}
               id={item.id}
               value={item.value}
               suffix={item.suffix}

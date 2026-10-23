@@ -252,6 +252,11 @@
       "rationale": "FAQ keeps its centered list and blue atmosphere. The signup form continues that band inside a 28px-radius photo block, inset from the container, with Deals in #2580cd."
     },
     {
+      "id": "admin-applications-table",
+      "choice": "Compact applications table with status and delete",
+      "rationale": "Admin applications stay a light table in the existing off-white and blue palette. Date range and paging remain. Status, copy, and delete are inline. No search, filters by status, or details drawer."
+    },
+    {
       "id": "electrical-handyman-landing",
       "choice": "Electrical and Handyman reuse the TV Mounting photo reel, light band, and gallery cards",
       "rationale": "Both pages open with the same header reel and white header. The first section is three white cards with a photo carousel, a visible title, and a Show more control for the description. The photos block is one large carousel with BOOK NOW underneath. Get Quote copy on buttons and the footer is BOOK NOW."

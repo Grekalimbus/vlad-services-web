@@ -1,0 +1,277 @@
+{
+  "privacy-policy": {
+    "title": "Privacy Policy",
+    "effective": "October 23, 2026",
+    "email": "info@primefixpros.com",
+    "phone": "(619) 736-3016",
+    "intro": "This Privacy Policy explains how PrimeFix Home & Handyman Services LLC (“PrimeFix,” “we,” “us”) collects, uses, and shares personal information when you visit primefixpros.com, request a quote, book a service, or communicate with us. It applies to customers and prospective customers in our service area: San Diego and surrounding areas, California.",
+    "sections": [
+      {
+        "id": "who",
+        "heading": "Who we are",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "PrimeFix Home & Handyman Services LLC provides home services under the names PrimeFix and PrimeFix Home & Handyman."
+          },
+          {
+            "type": "list",
+            "items": [
+              "Website: primefixpros.com",
+              "Mailing address: 2108 N St, Ste N, Sacramento, CA 95816, United States",
+              "Service area: San Diego and surrounding areas, California",
+              "Email: info@primefixpros.com",
+              "Phone: (619) 736-3016"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "information",
+        "heading": "Information we collect",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We collect information you give us through Book Now, Get a Free Quote, and other forms on this website, and information you share when you communicate with us about a job."
+          },
+          {
+            "type": "list",
+            "items": [
+              "Name, phone number, and email address",
+              "Service or property address and ZIP code",
+              "The service you request and your description of the project",
+              "Photos you upload",
+              "Preferred appointment date, appointment history, and service history",
+              "Estimates, invoices, and related business records",
+              "Messages and other communications with us",
+              "Marketing preferences and consent records, including the phone number or email address, the date and time, the form or page, and the version of the consent text you saw",
+              "Limited payment information processed by our payment providers",
+              "Technical and usage information the website or our service providers may receive, such as browser type, device, and pages visited, where that information is available to us"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "use",
+        "heading": "How we use information",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We use personal information to respond to inquiries, prepare estimates, schedule and perform services, send appointment confirmations, reminders, scheduling messages, and service updates, process payments, keep records, and provide customer support."
+          },
+          {
+            "type": "p",
+            "text": "We send marketing messages only when you have opted in. We also keep information as needed for legal, accounting, and recordkeeping obligations."
+          }
+        ]
+      },
+      {
+        "id": "access",
+        "heading": "Who can access it",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Authorized PrimeFix personnel and service providers can access personal information only as needed to do their work for PrimeFix."
+          }
+        ]
+      },
+      {
+        "id": "sharing",
+        "heading": "Service providers and sharing",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We may share information with companies that help us operate, including website hosting, email delivery, text-message delivery, email lists such as Mailchimp, payment processing, analytics, scheduling or customer-record tools, and other vendors we engage. Those providers process information on our behalf and only for the services they provide to PrimeFix."
+          },
+          {
+            "type": "p",
+            "text": "We do not sell personal information. We do not give mobile phone numbers or text-message opt-in consent to third parties for their own marketing."
+          }
+        ]
+      },
+      {
+        "id": "messages",
+        "heading": "Text messages and email",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Our Messaging Terms & Conditions describe the texts and emails we send. Marketing text messages are optional. You can request a quote or purchase a service without agreeing to them. Reply STOP to unsubscribe from marketing text messages, and reply HELP for help. You can unsubscribe from marketing email at any time."
+          }
+        ]
+      },
+      {
+        "id": "retention",
+        "heading": "How long we keep information",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We keep personal information for as long as reasonably necessary to provide services, keep business and transaction records, handle disputes, and meet legal and accounting obligations."
+          }
+        ]
+      },
+      {
+        "id": "requests",
+        "heading": "Privacy requests",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "To ask for access to, correction of, or deletion of your personal information, email info@primefixpros.com. You can also call (619) 736-3016."
+          }
+        ]
+      },
+      {
+        "id": "cookies",
+        "heading": "Cookies and advertising tools",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "This website does not use the Meta Pixel, Google Ads tags, or other advertising pixels, and it does not use those tools to follow you across other websites. The public pages do not set analytics or advertising cookies. A session cookie is used only for the private admin sign-in and is not used to track customers."
+          }
+        ]
+      },
+      {
+        "id": "updates",
+        "heading": "Updates",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We may update this policy by posting a new version on this page. The effective date at the top of the page will change when we do."
+          }
+        ]
+      }
+    ]
+  },
+  "messaging-terms": {
+    "title": "Messaging Terms & Conditions",
+    "effective": "October 23, 2026",
+    "email": "info@primefixpros.com",
+    "phone": "(619) 736-3016",
+    "intro": "These terms describe text messages and emails from PrimeFix Home & Handyman Services LLC (“PrimeFix”). They apply to messages from (619) 736-3016 and info@primefixpros.com.",
+    "sections": [
+      {
+        "id": "who",
+        "heading": "Who messages you",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Messages come from PrimeFix Home & Handyman Services LLC, also called PrimeFix or PrimeFix Home & Handyman."
+          },
+          {
+            "type": "list",
+            "items": [
+              "Website: primefixpros.com",
+              "Mailing address: 2108 N St, Ste N, Sacramento, CA 95816, United States",
+              "Service area: San Diego and surrounding areas, California",
+              "Email: info@primefixpros.com",
+              "Phone: (619) 736-3016"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "types",
+        "heading": "Types of messages",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We send transactional messages and, if you opt in, marketing messages."
+          },
+          {
+            "type": "p",
+            "text": "Transactional messages include quote follow-ups, appointment confirmations, appointment reminders, scheduling messages, and service updates."
+          },
+          {
+            "type": "p",
+            "text": "Marketing messages include promotions, discounts, special offers, announcements, and occasional follow-up about our services."
+          }
+        ]
+      },
+      {
+        "id": "channels",
+        "heading": "How we send them",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We send messages by text message (SMS) and by email. Text messages are delivered by a messaging provider that sends them for PrimeFix. That provider is used only to deliver PrimeFix messages."
+          }
+        ]
+      },
+      {
+        "id": "frequency",
+        "heading": "Frequency",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Message frequency varies. Marketing messages are sent from time to time. There is no fixed schedule."
+          }
+        ]
+      },
+      {
+        "id": "consent",
+        "heading": "Consent",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Marketing text messages are optional. Agreeing to them is not required to request a quote or purchase a service. The marketing text checkbox on our forms is unchecked until you check it."
+          },
+          {
+            "type": "p",
+            "text": "The text-message checkbox says: “I agree to receive recurring marketing and follow-up text messages from PrimeFix Home & Handyman Services LLC at the phone number provided, including messages sent using automated technology. Message frequency varies. Message and data rates may apply. Consent is not a condition of purchase. Reply STOP to opt out or HELP for help. See Privacy Policy and Messaging Terms & Conditions.”"
+          },
+          {
+            "type": "p",
+            "text": "The email checkbox says: “I'd like to receive occasional PrimeFix offers, service updates, and promotions by email. I can unsubscribe at any time.”"
+          },
+          {
+            "type": "p",
+            "text": "When you opt in, we keep a record of that consent: the phone number or email address, the date and time, the form or page, and the version of the consent text."
+          }
+        ]
+      },
+      {
+        "id": "opt-out",
+        "heading": "STOP and HELP",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Reply STOP to unsubscribe from marketing text messages. Reply HELP and we will reply with assistance and how to reach us. You can also call (619) 736-3016 or email info@primefixpros.com."
+          },
+          {
+            "type": "p",
+            "text": "To stop marketing email, use the unsubscribe option in the email or write to info@primefixpros.com."
+          }
+        ]
+      },
+      {
+        "id": "rates",
+        "heading": "Message and data rates",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Message and data rates may apply. Your mobile carrier can tell you about charges for text messages."
+          }
+        ]
+      },
+      {
+        "id": "sharing",
+        "heading": "Sharing",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "We do not sell personal information. We do not share your mobile number or text-message opt-in with third parties for their own marketing. A messaging, email, or list provider may process that information only to send messages for PrimeFix."
+          }
+        ]
+      },
+      {
+        "id": "privacy",
+        "heading": "Privacy",
+        "blocks": [
+          {
+            "type": "p",
+            "text": "Our Privacy Policy explains the personal information we collect and how we use it."
+          }
+        ]
+      }
+    ]
+  }
+}

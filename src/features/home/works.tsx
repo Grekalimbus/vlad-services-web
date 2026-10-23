@@ -1,75 +1,29 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Cog, Frame, PaintRoller, Tv, Wrench, Zap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useCms } from "@/lib/cms/use-cms";
 import { assetPath, routes } from "@/lib/site";
 import styles from "./works.module.css";
 
-const cards: {
-  title: string;
-  lines?: string[];
-  href: string;
-  src: string;
-  alt: string;
-  position: string;
-  icon: LucideIcon;
-}[] = [
-  {
-    title: "TV Mount",
-    href: routes.portfolioCategory("tv-mounting"),
-    src: "/works/hero.jpg",
-    alt: "Wall-mounted television in a finished living room",
-    position: "center 38%",
-    icon: Tv,
-  },
-  {
-    title: "Painting",
-    lines: ["Painting", "Interior & Exterior"],
-    href: routes.portfolioCategory("handyman"),
-    src: "/works/painting-pexels.jpg",
-    alt: "Paint roller applying a fresh coat to an interior wall",
-    position: "center 42%",
-    icon: PaintRoller,
-  },
-  {
-    title: "Electrical",
-    href: routes.portfolioCategory("electrical"),
-    src: "/works/wiring.jpg",
-    alt: "Electrician working inside a wired breaker panel",
-    position: "center 40%",
-    icon: Zap,
-  },
-  {
-    title: "Assembling",
-    href: routes.portfolioCategory("handyman"),
-    src: "/works/furniture.jpg",
-    alt: "Assembled sofa set in a finished room",
-    position: "center 48%",
-    icon: Wrench,
-  },
-  {
-    title: "Hanging",
-    href: routes.portfolioCategory("handyman"),
-    src: "/works/gallery-wall.jpg",
-    alt: "Framed artwork hung on a living room wall",
-    position: "28% 42%",
-    icon: Frame,
-  },
-  {
-    title: "Fix / Repair",
-    href: routes.portfolioCategory("handyman"),
-    src: "/works/pexels-drywall.jpg",
-    alt: "Wall repair and finishing in progress",
-    position: "center 35%",
-    icon: Cog,
-  },
-];
+const icons: Record<string, LucideIcon> = {
+  tv: Tv,
+  paint: PaintRoller,
+  zap: Zap,
+  wrench: Wrench,
+  frame: Frame,
+  cog: Cog,
+};
 
 export function Works() {
+  const works = useCms().copy.home.works;
   return (
-    <section id="works" aria-labelledby="works-heading" className={styles.section}>
+    <section id="works" aria-labelledby="works-heading" className={styles.section} data-cms-photo="copy.home.works.backdrop">
       <Image
-        src={assetPath("/works/modern-interior.jpg")}
+        src={assetPath(works.backdrop)}
+        data-cms-src="copy.home.works.backdrop"
         alt=""
         fill
         sizes="100vw"
@@ -80,18 +34,22 @@ export function Works() {
 
       <div className={styles.container}>
         <h2 id="works-heading" className={styles.heading}>
-          Projects <span className={styles.headingAccent}>Completed</span>
+          <span data-cms="copy.home.works.headingLead">{works.headingLead}</span>{" "}
+          <span className={styles.headingAccent} data-cms="copy.home.works.headingAccent">{works.headingAccent}</span>
         </h2>
 
         <ul className={styles.grid}>
-          {cards.map((card) => {
-            const Icon = card.icon;
+          {works.cards.map((card, index) => {
+            const Icon = icons[card.icon] ?? Wrench;
+            const lines = card.lines.filter(Boolean);
             return (
-              <li key={card.title}>
-                <Link href={card.href} className={styles.card}>
+              <li key={`${card.title}-${index}`}>
+                <Link href={card.href} className={styles.card} data-cms-card={`works:${index}`}>
                   <Image
                     src={assetPath(card.src)}
                     alt={card.alt}
+                    data-cms-src={`copy.home.works.cards.${index}.src`}
+                    data-cms-alt={`copy.home.works.cards.${index}.alt`}
                     fill
                     sizes="(min-width: 1024px) 22rem, (min-width: 720px) 45vw, 92vw"
                     className={styles.cardImage}
@@ -104,13 +62,13 @@ export function Works() {
                         <Icon size={18} strokeWidth={1.75} />
                       </span>
                       <span>
-                        {card.lines
-                          ? card.lines.map((line) => (
-                              <span key={line} className={styles.line}>
+                        {lines.length > 0
+                          ? lines.map((line, lineIndex) => (
+                              <span key={`${line}-${lineIndex}`} className={styles.line} data-cms={`copy.home.works.cards.${index}.lines.${lineIndex}`}>
                                 {line}
                               </span>
                             ))
-                          : card.title}
+                          : <span data-cms={`copy.home.works.cards.${index}.title`}>{card.title}</span>}
                       </span>
                     </span>
                     <span className={styles.arrow} aria-hidden="true">
@@ -123,8 +81,8 @@ export function Works() {
           })}
         </ul>
 
-        <Link href={routes.portfolio} className={styles.projectsButton}>
-          Explore more projects
+        <Link href={routes.portfolio} className={styles.projectsButton} data-cms="copy.home.works.explore">
+          {works.explore}
         </Link>
       </div>
     </section>

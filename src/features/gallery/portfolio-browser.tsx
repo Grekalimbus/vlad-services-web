@@ -1,15 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { MediaPlaceholder } from "./media-placeholder";
-import {
-  galleryCategories,
-  itemsInCategory,
-  subcategoriesIn,
-  type GalleryCategory,
-} from "@/lib/gallery";
-import { routes } from "@/lib/site";
+import { useCms } from "@/lib/cms/use-cms";
+import type { GalleryCategory } from "@/lib/gallery";
 import styles from "./portfolio-browser.module.css";
 
 export function PortfolioBrowser({
@@ -17,6 +11,8 @@ export function PortfolioBrowser({
 }: {
   initialCategory?: GalleryCategory;
 }) {
+  const cms = useCms();
+  const galleryCategories = cms.galleryCategories;
   const [categoryId, setCategoryId] = useState(
     initialCategory?.id ?? galleryCategories[0]?.id ?? "",
   );
@@ -27,31 +23,31 @@ export function PortfolioBrowser({
 
   if (!category) return null;
 
-  const subcategories = subcategoriesIn(category.id);
-  const items = itemsInCategory(
-    category.id,
-    subcategoryId === "all" ? undefined : subcategoryId,
-  );
+  const subcategories = cms.gallerySubcategories.filter((item) => item.categoryId === category.id);
+  const items = cms.galleryItems.filter((entry) => {
+    if (entry.categoryId !== category.id) return false;
+    if (subcategoryId === "all") return true;
+    return entry.subcategoryId === subcategoryId;
+  });
 
   return (
     <div>
       <div className={styles.tabs}>
         {galleryCategories.map((item) => {
           const selected = item.id === category.id;
+          const index = cms.galleryCategories.findIndex((entry) => entry.id === item.id);
           return (
-            <Link
+            <button
               key={item.id}
-              href={routes.portfolioCategory(item.slug)}
-              onClick={(event) => {
-                if (initialCategory) return;
-                event.preventDefault();
+              type="button"
+              onClick={() => {
                 setCategoryId(item.id);
                 setSubcategoryId("all");
               }}
               className={`${styles.tab} ${selected ? styles.selected : styles.unselected}`}
             >
-              {item.name}
-            </Link>
+              <span data-cms={`galleryCategories.${index}.name`}>{item.name}</span>
+            </button>
           );
         })}
       </div>
@@ -67,7 +63,9 @@ export function PortfolioBrowser({
           >
             All
           </button>
-          {subcategories.map((item) => (
+          {subcategories.map((item) => {
+            const index = cms.gallerySubcategories.findIndex((entry) => entry.id === item.id);
+            return (
             <button
               key={item.id}
               type="button"
@@ -76,13 +74,14 @@ export function PortfolioBrowser({
                 subcategoryId === item.id ? styles.selected : styles.unselected
               }`}
             >
-              {item.name}
+              <span data-cms={`gallerySubcategories.${index}.name`}>{item.name}</span>
             </button>
-          ))}
+            );
+          })}
         </div>
       ) : null}
 
-      <div className={styles.grid}>
+      <div className={styles.grid} data-cms-gallery={`items:${category.id}`}>
         {items.map((entry) => (
           <MediaPlaceholder
             key={entry.id}

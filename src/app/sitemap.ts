@@ -1,25 +1,29 @@
 import type { MetadataRoute } from "next";
-import { galleryCategories } from "@/lib/gallery";
 import { legalPages } from "@/lib/legal";
+import { publicUrl } from "@/lib/seo";
 import { serviceRouteSlugs } from "@/lib/services";
-import { site } from "@/lib/site";
 
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPaths = ["/", "/portfolio"];
-  const servicePaths = serviceRouteSlugs.map((slug) => `/services/${slug}`);
-  const portfolioPaths = galleryCategories.map(
-    (category) => `/portfolio/${category.slug}`,
-  );
-  const legalPaths = legalPages.map((page) => page.href);
+  const entries: { path: string; changeFrequency: "weekly" | "monthly" | "yearly"; priority: number }[] = [
+    { path: "/", changeFrequency: "weekly", priority: 1 },
+    ...serviceRouteSlugs.map((slug) => ({
+      path: `/services/${slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
+    { path: "/portfolio", changeFrequency: "monthly", priority: 0.7 },
+    ...legalPages.map((page) => ({
+      path: page.href,
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    })),
+  ];
 
-  return [...staticPaths, ...servicePaths, ...portfolioPaths, ...legalPaths].map(
-    (path) => ({
-      url: `${site.url}${path}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: path === "/" ? 1 : 0.7,
-    }),
-  );
+  return entries.map((entry) => ({
+    url: publicUrl(entry.path),
+    changeFrequency: entry.changeFrequency,
+    priority: entry.priority,
+  }));
 }

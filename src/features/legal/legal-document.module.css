@@ -2,6 +2,7 @@
   composes: container from "../../styles/shared.module.css";
   max-width: 48rem;
   padding-block: 3rem;
+  text-align: left;
 }
 
 .muted,
@@ -38,6 +39,14 @@
 
 .body {
   margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.75rem;
+}
+
+.list {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--muted-foreground);
   font-size: 0.875rem;
   line-height: 1.75rem;
 }

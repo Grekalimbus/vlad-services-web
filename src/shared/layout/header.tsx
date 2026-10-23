@@ -2,7 +2,8 @@
 
 import { BrandLogo } from "@/shared/ui";
 import { QuoteCta } from "@/features/quote";
-import { nav, site } from "@/lib/site";
+import { phoneHref } from "@/lib/site";
+import { useCms } from "@/lib/cms/use-cms";
 import { Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,11 +13,13 @@ import { HashLink, HashScroll } from "./hash-link";
 import styles from "./header.module.css";
 
 export function Header() {
+	const cms = useCms();
 	const [open, setOpen] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
 	const panelId = useId();
 	const pathname = usePathname();
 	const path = pathname.replace(/\/$/, "");
+	const admin = path === "/admin" || path.startsWith("/admin/");
 	const solid =
 		path === "/services/tv-mounting" ||
 		path === "/services/electrical" ||
@@ -47,6 +50,8 @@ export function Header() {
 		return () => window.removeEventListener("keydown", onKey);
 	}, [open]);
 
+	if (admin) return null;
+
 	return (
 		<header
 			className={`${styles.header} ${solid || scrolled ? styles.headerScrolled : styles.headerTop}`}
@@ -61,7 +66,7 @@ export function Header() {
 							onClick={() => setOpen(false)}
 						>
 							<BrandLogo priority plain />
-							<span className={shared.visuallyHidden}>{site.name}</span>
+							<span className={shared.visuallyHidden}>{cms.site.name}</span>
 						</Link>
 					</div>
 
@@ -69,30 +74,30 @@ export function Header() {
 						className={styles.desktopNav}
 						aria-label="Primary"
 					>
-						{nav.map(item => (
+						{cms.nav.map((item, index) => (
 							<HashLink
 								key={item.href}
 								href={item.href}
 								className={styles.navLink}
 							>
-								<span className={styles.navLabel}>{item.label}</span>
+								<span className={styles.navLabel} data-cms={`nav.${index}.label`}>{item.label}</span>
 							</HashLink>
 						))}
 					</nav>
 
 					<div className={styles.actions}>
 						<a
-							href={site.phoneHref}
+							href={phoneHref(cms.site.phoneDisplay)}
 							className={styles.phone}
 						>
 							<Phone size={14} aria-hidden="true" />
-							<span className={styles.phoneLabel}>
-								{site.phoneDisplay}
+							<span className={styles.phoneLabel} data-cms="site.phoneDisplay">
+								{cms.site.phoneDisplay}
 							</span>
 						</a>
 
 						<QuoteCta className={styles.headerQuote}>
-							BOOK NOW
+							<span data-cms="ctas.quote">{cms.ctas.quote}</span>
 						</QuoteCta>
 
 						<button
@@ -119,26 +124,26 @@ export function Header() {
 					aria-label="Mobile"
 					className={styles.mobileNav}
 				>
-					{nav.map(item => (
+					{cms.nav.map((item, index) => (
 						<HashLink
 							key={item.href}
 							href={item.href}
 							className={styles.mobileNavLink}
 							onClick={() => setOpen(false)}
 						>
-							{item.label}
+							<span data-cms={`nav.${index}.label`}>{item.label}</span>
 						</HashLink>
 					))}
 					<a
-						href={site.phoneHref}
+						href={phoneHref(cms.site.phoneDisplay)}
 						className={styles.mobilePhone}
 						onClick={() => setOpen(false)}
 					>
 						<Phone size={15} aria-hidden="true" />
-						<span>{site.phoneDisplay}</span>
+						<span data-cms="site.phoneDisplay">{cms.site.phoneDisplay}</span>
 					</a>
 					<QuoteCta className={styles.mobileQuote}>
-						BOOK NOW
+						<span data-cms="ctas.quote">{cms.ctas.quote}</span>
 					</QuoteCta>
 				</nav>
 			) : null}

@@ -1,11 +1,11 @@
 export const SMS_CONSENT_VERSION = "sms-marketing-v1";
-export const EMAIL_CONSENT_VERSION = "email-marketing-v1";
+export const EMAIL_CONSENT_VERSION = "email-marketing-v2";
 
 export const SMS_CONSENT_TEXT =
   "I agree to receive recurring marketing and follow-up text messages from PrimeFix Home & Handyman Services LLC at the phone number provided, including messages sent using automated technology. Message frequency varies. Message and data rates may apply. Consent is not a condition of purchase. Reply STOP to opt out or HELP for help. See Privacy Policy and Messaging Terms & Conditions.";
 
 export const EMAIL_CONSENT_TEXT =
-  "I agree to receive email messages from PrimeFix Home & Handyman Services LLC at the email address provided, including follow-up and marketing messages. This is optional and separate from text message consent.";
+  "I'd like to receive occasional PrimeFix offers, service updates, and promotions by email. I can unsubscribe at any time.";
 
 export type ConsentChannel = "sms" | "email";
 

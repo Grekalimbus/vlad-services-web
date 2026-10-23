@@ -2,9 +2,9 @@
 
 import { FormEvent, useId, useState } from "react";
 import { ConsentFields } from "./consent-fields";
-import { ctas } from "@/lib/site";
+import { useCms } from "@/lib/cms/use-cms";
 import { fieldClass, phonePattern } from "@/lib/forms";
-import { concealmentOptions, mountTypeOptions, tvSizes, wallTypes } from "@/lib/services";
+import { tvSizes } from "@/lib/services";
 import {
   buildLeadPayload,
   filesFromFormData,
@@ -54,6 +54,7 @@ export function TvQuoteForm({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [photoName, setPhotoName] = useState("");
   const canSubmit = status !== "loading";
+  const cms = useCms();
 
   function validate(data: FormData): FieldErrors {
     const next: FieldErrors = {};
@@ -106,7 +107,7 @@ export function TvQuoteForm({
         concealment: String(data.get("concealment") ?? ""),
       },
       photos: filesFromFormData(data, "wallPhoto"),
-      smsConsent: true,
+      smsConsent: data.get("smsConsent") === "yes",
       emailConsent: false,
     });
 
@@ -190,13 +191,13 @@ export function TvQuoteForm({
           <span aria-hidden="true"> *</span>
         </legend>
         <div className={styles.choiceGrid}>
-          {wallTypes.map((item) => (
+          {cms.wallTypes.map((item, index) => (
             <label
               key={item.id}
               className={styles.choice}
             >
               <input type="radio" name="wallType" value={item.id} className={shared.visuallyHidden} />
-              {item.label}
+              <span data-cms={`wallTypes.${index}.label`}>{item.label}</span>
             </label>
           ))}
         </div>
@@ -218,14 +219,14 @@ export function TvQuoteForm({
       <ChoiceRow
         legend="Which mount type?"
         name="mountType"
-        options={mountTypeOptions.map((item) => ({ id: item.id, label: item.label }))}
+        options={cms.mountTypeOptions.map((item, index) => ({ id: item.id, label: item.label, path: `mountTypeOptions.${index}.label` }))}
         error={errors.mountType}
       />
 
       <ChoiceRow
         legend="Cable concealment"
         name="concealment"
-        options={concealmentOptions.map((item) => ({ id: item.id, label: item.label }))}
+        options={cms.concealmentOptions.map((item, index) => ({ id: item.id, label: item.label, path: `concealmentOptions.${index}.label` }))}
         error={errors.concealment}
       />
 
@@ -279,14 +280,14 @@ export function TvQuoteForm({
         </div>
       </div>
 
-      <ConsentFields />
+      <ConsentFields email={false} />
 
       <button
         type="submit"
         disabled={!canSubmit}
         className={styles.submit}
       >
-        {status === "loading" ? "Sending…" : ctas.quote}
+        {status === "loading" ? "Sending…" : <span data-cms="ctas.quote">{cms.ctas.quote}</span>}
       </button>
     </form>
   );
@@ -300,7 +301,7 @@ function ChoiceRow({
 }: {
   legend: string;
   name: string;
-  options: { id: string; label: string }[];
+  options: { id: string; label: string; path?: string }[];
   error?: string;
 }) {
   return (
@@ -316,7 +317,7 @@ function ChoiceRow({
             className={styles.choice}
           >
             <input type="radio" name={name} value={option.id} className={shared.visuallyHidden} />
-            {option.label}
+            {option.path ? <span data-cms={option.path}>{option.label}</span> : option.label}
           </label>
         ))}
       </div>

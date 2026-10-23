@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { useCms } from "@/lib/cms/use-cms";
 import { googleListing, googleReviews } from "@/lib/google-reviews";
 import shared from "@/styles/shared.module.css";
 import styles from "./reviews.module.css";
@@ -10,6 +11,7 @@ const PREVIEW_LENGTH = 168;
 const DESKTOP_PAGE_SIZE = 3;
 
 export function Reviews() {
+  const heading = useCms().copy.home.reviews;
   const headingId = "reviews-heading";
   const statusId = useId();
   const [start, setStart] = useState(0);
@@ -43,7 +45,8 @@ export function Reviews() {
           id={headingId}
           className={styles.heading}
         >
-          Client&apos;s <span className={styles.headingAccent}>Feedback</span>
+          <span data-cms="copy.home.reviews.headingLead">{heading.headingLead}</span>{" "}
+          <span className={styles.headingAccent} data-cms="copy.home.reviews.headingAccent">{heading.headingAccent}</span>
         </h2>
 
         <div className={styles.summary}>
@@ -59,7 +62,7 @@ export function Reviews() {
               ))}
             </span>
             <span className={styles.muted}>
-              {googleListing.reviewCount} Google Reviews
+              {googleListing.reviewCount} {heading.countSuffix}
             </span>
             <GoogleMark />
           </p>
@@ -69,7 +72,7 @@ export function Reviews() {
             rel="noopener noreferrer"
             className={styles.reviewLink}
           >
-            Review us on Google
+            {heading.writeReview}
             <ArrowRight size={16} aria-hidden="true" />
           </a>
         </div>
