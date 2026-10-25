@@ -17,6 +17,7 @@ export function ServicesOverview() {
   const editing = useEditing();
   const covers = Object.fromEntries(cms.copy.home.serviceCovers.map((cover) => [cover.id, cover]));
   const categories = cms.serviceCategories.filter((category) => category.featured && category.status === "active");
+  const rows = [categories.slice(0, 3), categories.slice(3, 7)].filter((row) => row.length > 0);
 
   return (
     <section id="services" tabIndex={-1} aria-labelledby="services-heading" className={styles.section}>
@@ -24,52 +25,63 @@ export function ServicesOverview() {
         <h2 id="services-heading" className={styles.heading}>
           <span data-cms="copy.home.servicesHeading">{cms.copy.home.servicesHeading}</span>
         </h2>
-        <ul
-          className={styles.strip}
-          style={{ "--count": Math.max(categories.length, 1) } as CSSProperties}
-        >
-          {categories.map((category, index) => {
-            const sourceIndex = cms.serviceCategories.findIndex((item) => item.id === category.id);
-            const coverIndex = cms.copy.home.serviceCovers.findIndex((item) => item.id === category.id);
-            const cover = covers[category.id];
-            const src = cover?.src ?? category.coverImage;
-            const href = PAGE_SLUGS.has(category.slug) ? categoryHref(category) : "/#footer";
+        <div className={styles.rows}>
+          {rows.map((row, rowIndex) => {
+            const startIndex = rows.slice(0, rowIndex).reduce((sum, item) => sum + item.length, 0);
+            const compact = row.length > 3;
+            const short = rowIndex > 0 && row.length < 4;
             return (
-              <li key={category.id} className={styles.item}>
-                <Link href={href} className={styles.card} data-cms-card={`service:${category.id}`}>
-                  {src ? (
-                    <Image
-                      src={assetPath(src)}
-                      alt={cover?.alt || category.coverAlt || ""}
-                      data-cms-alt={coverIndex >= 0 ? `copy.home.serviceCovers.${coverIndex}.alt` : undefined}
-                      fill
-                      sizes="(min-width: 900px) 36vw, 100vw"
-                      className={styles.image}
-                      style={{ objectPosition: cover?.position ?? "center" }}
-                      data-cms-src={
-                        coverIndex >= 0
-                          ? `copy.home.serviceCovers.${coverIndex}.src`
-                          : `serviceCategories.${sourceIndex}.coverImage`
-                      }
-                    />
-                  ) : null}
-                  <span className={styles.shade} aria-hidden="true" />
-                  <span className={styles.index} aria-hidden="true">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className={styles.footer}>
-                    <span className={styles.title} data-cms={`serviceCategories.${sourceIndex}.name`}>
-                      {category.name}
-                    </span>
-                    <span className={styles.arrow} aria-hidden="true">
-                      <ArrowRight size={18} strokeWidth={2.25} />
-                    </span>
-                  </span>
-                </Link>
-              </li>
+              <ul
+                key={row.map((category) => category.id).join("-")}
+                className={[styles.strip, compact ? styles.stripCompact : "", short ? styles.stripShort : ""].filter(Boolean).join(" ")}
+                style={{ "--count": compact ? 4 : 3 } as CSSProperties}
+              >
+                {row.map((category, index) => {
+                  const sourceIndex = cms.serviceCategories.findIndex((item) => item.id === category.id);
+                  const coverIndex = cms.copy.home.serviceCovers.findIndex((item) => item.id === category.id);
+                  const cover = covers[category.id];
+                  const src = cover?.src ?? category.coverImage;
+                  const href = PAGE_SLUGS.has(category.slug) ? categoryHref(category) : "/#footer";
+                  return (
+                    <li key={category.id} className={styles.item}>
+                      <Link href={href} className={styles.card} data-cms-card={`service:${category.id}`}>
+                        {src ? (
+                          <Image
+                            src={assetPath(src)}
+                            alt={cover?.alt || category.coverAlt || ""}
+                            data-cms-alt={coverIndex >= 0 ? `copy.home.serviceCovers.${coverIndex}.alt` : undefined}
+                            fill
+                            unoptimized={src.startsWith("/api/media/")}
+                            sizes={compact ? "(min-width: 900px) 24vw, 100vw" : "(min-width: 900px) 36vw, 100vw"}
+                            className={styles.image}
+                            style={{ objectPosition: cover?.position ?? "center" }}
+                            data-cms-src={
+                              coverIndex >= 0
+                                ? `copy.home.serviceCovers.${coverIndex}.src`
+                                : `serviceCategories.${sourceIndex}.coverImage`
+                            }
+                          />
+                        ) : null}
+                        <span className={styles.shade} aria-hidden="true" />
+                        <span className={styles.index} aria-hidden="true">
+                          {String(startIndex + index + 1).padStart(2, "0")}
+                        </span>
+                        <span className={styles.footer}>
+                          <span className={styles.title} data-cms={`serviceCategories.${sourceIndex}.name`}>
+                            {category.name}
+                          </span>
+                          <span className={styles.arrow} aria-hidden="true">
+                            <ArrowRight size={18} strokeWidth={2.25} />
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             );
           })}
-        </ul>
+        </div>
         {editing ? (
           <button type="button" className={styles.add} data-editor-ui onClick={addHomepageService}>
             Add a service

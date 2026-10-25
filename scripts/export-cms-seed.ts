@@ -80,6 +80,10 @@ const document = {
         imageAlt: "Finished living room with a wall-mounted television",
         imageNext: "/works/tv-living-blue.jpg",
         imageNextAlt: "Large wall-mounted television with a soundbar",
+        slides: [
+          { image: "/works/hero.jpg", alt: "Finished living room with a wall-mounted television" },
+          { image: "/works/tv-living-blue.jpg", alt: "Large wall-mounted television with a soundbar" },
+        ],
         line1: "Tell Us About Your Project",
         line2Lead: "& Get",
         discount: "$30",

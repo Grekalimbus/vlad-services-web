@@ -1,6 +1,6 @@
 import type { CmsDocument } from "./cms/types";
 
-const PRODUCTION_ORIGIN = "https://primefixpros.com";
+export const PRODUCTION_ORIGIN = "https://primefixpros.com";
 const GENERIC_AREA = /^(california|southern california|ca|socal|so cal)$/i;
 const OLD_HERO_TAGLINE = "Fast Response • Same-Day Availability • High Quality Service";
 const OLD_PORTFOLIO_TITLE = "Project gallery";
@@ -12,7 +12,8 @@ const PORTFOLIO_REDIRECTS: Record<string, string> = {
   "/portfolio/tv-mounting": "/services/tv-mounting",
   "/portfolio/electrical": "/services/electrical",
   "/portfolio/handyman": "/services/handyman",
-  "/portfolio/before-after": "/portfolio",
+  "/portfolio": "/",
+  "/portfolio/before-after": "/",
 };
 
 type Area = { short: string; full: string };

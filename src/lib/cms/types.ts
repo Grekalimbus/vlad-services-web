@@ -5,6 +5,7 @@ export type CmsDocument = typeof defaultDocument;
 export type CmsEnv = {
   CMS_DB?: D1Like;
   CMS_MEDIA?: R2Like;
+  CMS_MEDIA_KV?: MediaKv;
   ADMIN_PASSWORD?: string;
   ADMIN_SESSION_SECRET?: string;
   CF_ACCESS_TEAM_DOMAIN?: string;
@@ -27,6 +28,24 @@ type D1Like = {
       run: () => Promise<unknown>;
     };
   };
+};
+
+type MediaKv = {
+  getWithMetadata: (
+    key: string,
+    options: { type: "arrayBuffer" },
+  ) => Promise<{ value: ArrayBuffer | null; metadata: { contentType?: string } | null }>;
+  put: (
+    key: string,
+    value: ArrayBuffer | ArrayBufferView,
+    options?: { metadata?: { contentType?: string } },
+  ) => Promise<void>;
+  delete: (key: string) => Promise<void>;
+  list: (options?: { prefix?: string; cursor?: string }) => Promise<{
+    keys: { name: string }[];
+    list_complete: boolean;
+    cursor?: string;
+  }>;
 };
 
 type R2Like = {

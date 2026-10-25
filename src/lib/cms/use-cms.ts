@@ -10,10 +10,15 @@ function noOverride(): CmsDocument | null {
   return null;
 }
 
+function publishedSnapshot(): CmsDocument | null {
+  return typeof window === "undefined" ? null : (window.__CMS__ ?? null);
+}
+
 export function useCms(): CmsDocument {
   const provided = useContext(CmsContext);
   const override = useSyncExternalStore(subscribe, peekOverride, noOverride);
-  return override ?? provided ?? readPublished();
+  const published = useSyncExternalStore(subscribe, publishedSnapshot, noOverride);
+  return override ?? published ?? provided ?? readPublished();
 }
 
 export function useEditing() {

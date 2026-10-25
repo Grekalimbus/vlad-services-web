@@ -34,35 +34,62 @@ export async function saveDocument(env: CmsEnv, input: unknown) {
   return document;
 }
 
+export async function storeImage(env: CmsEnv, key: string, bytes: Uint8Array, type: string) {
+  if (env.CMS_MEDIA) {
+    await env.CMS_MEDIA.put(key, bytes, { httpMetadata: { contentType: type } });
+    return;
+  }
+  if (env.CMS_MEDIA_KV) {
+    await env.CMS_MEDIA_KV.put(key, bytes, { metadata: { contentType: type } });
+    return;
+  }
+  if (env.putMedia) {
+    await env.putMedia(key, bytes, type);
+    return;
+  }
+  throw new Error("Image storage is not configured.");
+}
+
+export async function loadImage(env: CmsEnv, key: string) {
+  if (env.CMS_MEDIA) {
+    const object = await env.CMS_MEDIA.get(key);
+    if (!object) return null;
+    const bytes = object.arrayBuffer ? new Uint8Array(await object.arrayBuffer()) : null;
+    const resolved = bytes ?? (object.body ? new Uint8Array(await new Response(object.body).arrayBuffer()) : null);
+    if (!resolved) return null;
+    return { bytes: resolved, type: object.httpMetadata?.contentType || "application/octet-stream" };
+  }
+  if (env.CMS_MEDIA_KV) {
+    const stored = await env.CMS_MEDIA_KV.getWithMetadata(key, { type: "arrayBuffer" });
+    if (!stored.value) return null;
+    return {
+      bytes: new Uint8Array(stored.value),
+      type: stored.metadata?.contentType || "application/octet-stream",
+    };
+  }
+  if (env.getMedia) return env.getMedia(key);
+  return null;
+}
+
+export async function discardImage(env: CmsEnv, key: string) {
+  if (env.CMS_MEDIA) await env.CMS_MEDIA.delete(key);
+  if (env.CMS_MEDIA_KV) await env.CMS_MEDIA_KV.delete(key);
+  if (env.deleteMedia) await env.deleteMedia(key);
+  if (!env.CMS_MEDIA && !env.CMS_MEDIA_KV && !env.deleteMedia) {
+    throw new Error("Image storage is not configured.");
+  }
+}
+
 export async function saveMedia(env: CmsEnv, file: File) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const image = inspectImage(bytes, file.type);
   const key = `uploads/${crypto.randomUUID()}.${image.extension}`;
-  if (env.CMS_MEDIA) {
-    await env.CMS_MEDIA.put(key, bytes, { httpMetadata: { contentType: image.type } });
-  } else if (env.putMedia) {
-    await env.putMedia(key, bytes, image.type);
-  } else {
-    throw new Error("Image storage is not configured.");
-  }
+  await storeImage(env, key, bytes, image.type);
   return { key, src: publicMediaPath(key), type: image.type };
 }
 
 export async function readMedia(env: CmsEnv, key: string) {
-  const safeKey = mediaKey(key);
-  if (env.CMS_MEDIA) {
-    const object = await env.CMS_MEDIA.get(safeKey);
-    if (!object) return null;
-    const bytes = object.arrayBuffer ? new Uint8Array(await object.arrayBuffer()) : null;
-    if (!bytes && object.body) {
-      const buffer = await new Response(object.body).arrayBuffer();
-      return { bytes: new Uint8Array(buffer), type: object.httpMetadata?.contentType || "application/octet-stream" };
-    }
-    if (!bytes) return null;
-    return { bytes, type: object.httpMetadata?.contentType || "application/octet-stream" };
-  }
-  if (env.getMedia) return env.getMedia(safeKey);
-  return null;
+  return loadImage(env, mediaKey(key));
 }
 
 export async function listMedia(env: CmsEnv) {
@@ -83,13 +110,27 @@ export async function listMedia(env: CmsEnv) {
     } while (cursor && items.length < 500);
     return items;
   }
+  if (env.CMS_MEDIA_KV) {
+    const items: { key: string; src: string }[] = [];
+    let cursor: string | undefined;
+    do {
+      const page = await env.CMS_MEDIA_KV.list({ prefix: "uploads/", cursor });
+      for (const object of page.keys ?? []) {
+        try {
+          const key = mediaKey(object.name);
+          items.push({ key, src: publicMediaPath(key) });
+        } catch {
+          // Skip objects that are not public image uploads.
+        }
+      }
+      cursor = page.list_complete ? undefined : page.cursor;
+    } while (cursor && items.length < 500);
+    return items;
+  }
   if (env.listMedia) return env.listMedia();
   return [];
 }
 
 export async function removeMedia(env: CmsEnv, key: string) {
-  const safeKey = mediaKey(key);
-  if (env.CMS_MEDIA) await env.CMS_MEDIA.delete(safeKey);
-  if (env.deleteMedia) await env.deleteMedia(safeKey);
-  if (!env.CMS_MEDIA && !env.deleteMedia) throw new Error("Image storage is not configured.");
+  await discardImage(env, mediaKey(key));
 }

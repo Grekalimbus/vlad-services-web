@@ -63,7 +63,7 @@ export function DealsSignup() {
 
 	return (
 		<section
-			id="contact"
+			id="deals"
 			aria-labelledby="deals-heading"
 			className={styles.section}
 		>

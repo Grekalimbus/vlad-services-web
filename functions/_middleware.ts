@@ -60,8 +60,8 @@ export async function onRequest(context: {
 
   const meta = pageMeta(response.status === 404 ? "/404" : path, document);
   const robots = response.status === 404 || !meta.index ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
-  const payload = JSON.stringify(document).replaceAll("<", "\\u003c");
-  const jsonLd = JSON.stringify(meta.jsonLd).replace(/</g, "\\u003c");
+  const payload = JSON.stringify(document).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
+  const jsonLd = JSON.stringify(meta.jsonLd).replace(/</g, "\\u003c").replace(/&/g, "\\u0026");
   const headers = new Headers(response.headers);
   headers.set("cache-control", "private, no-store");
   applySecurityHeaders(headers);

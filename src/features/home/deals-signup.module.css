@@ -1,10 +1,10 @@
 .section {
 	position: relative;
 	z-index: 1;
-	margin-top: -2.25rem;
+	margin-top: 0;
 	border: 0;
 	background: transparent;
-	padding-bottom: 3.5rem;
+	padding-block: 20px;
 }
 
 .container {
@@ -193,8 +193,8 @@
 
 @media (min-width: 768px) {
 	.section {
-		margin-top: -4rem;
-		padding-bottom: 4.5rem;
+		margin-top: 0;
+		padding-block: 20px;
 	}
 
 	.content {

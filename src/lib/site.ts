@@ -8,7 +8,6 @@ export const routes = {
   home: "/",
   services: "/#services",
   service: (slug: string) => `/services/${slug}`,
-  portfolio: "/portfolio",
   contact: "/#footer",
   privacy: "/privacy-policy",
   messagingTerms: "/messaging-terms",

@@ -74,15 +74,7 @@ export function Header() {
 						className={styles.desktopNav}
 						aria-label="Primary"
 					>
-						{cms.nav.map((item, index) => (
-							<HashLink
-								key={item.href}
-								href={item.href}
-								className={styles.navLink}
-							>
-								<span className={styles.navLabel} data-cms={`nav.${index}.label`}>{item.label}</span>
-							</HashLink>
-						))}
+						<HeaderLinks items={cms.nav} linkClass={styles.navLink} dealsClass={styles.dealsLink} />
 					</nav>
 
 					<div className={styles.actions}>
@@ -124,16 +116,12 @@ export function Header() {
 					aria-label="Mobile"
 					className={styles.mobileNav}
 				>
-					{cms.nav.map((item, index) => (
-						<HashLink
-							key={item.href}
-							href={item.href}
-							className={styles.mobileNavLink}
-							onClick={() => setOpen(false)}
-						>
-							<span data-cms={`nav.${index}.label`}>{item.label}</span>
-						</HashLink>
-					))}
+					<HeaderLinks
+						items={cms.nav}
+						linkClass={styles.mobileNavLink}
+						dealsClass={styles.mobileDeals}
+						onNavigate={() => setOpen(false)}
+					/>
 					<a
 						href={phoneHref(cms.site.phoneDisplay)}
 						className={styles.mobilePhone}
@@ -149,4 +137,74 @@ export function Header() {
 			) : null}
 		</header>
 	);
+}
+
+type HeaderNavItem = {
+	href: string;
+	label: string;
+};
+
+type HeaderLink = HeaderNavItem & {
+	cmsIndex?: number;
+	kind?: "deals";
+};
+
+function isServices(item: HeaderNavItem) {
+	return item.href.includes("#services") || item.label.trim().toLowerCase() === "services";
+}
+
+function isReviews(item: HeaderNavItem) {
+	return item.href.includes("#reviews") || item.label.trim().toLowerCase() === "reviews";
+}
+
+function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
+	const links: HeaderLink[] = [];
+	let deals = false;
+	let faq = false;
+	items.forEach((item, index) => {
+		if (isReviews(item) && !deals) {
+			links.push({ href: "/#deals", label: "Deals", kind: "deals" });
+			deals = true;
+		}
+		links.push({ ...item, cmsIndex: index });
+		if (isServices(item) && !deals && !items.some(isReviews)) {
+			links.push({ href: "/#deals", label: "Deals", kind: "deals" });
+			deals = true;
+		}
+		if (isReviews(item) && !faq) {
+			links.push({ href: "/#faq", label: "FAQ" });
+			faq = true;
+		}
+	});
+	if (!deals) links.push({ href: "/#deals", label: "Deals", kind: "deals" });
+	if (!faq) links.push({ href: "/#faq", label: "FAQ" });
+	return links;
+}
+
+function HeaderLinks({
+	items,
+	linkClass,
+	dealsClass,
+	onNavigate,
+}: {
+	items: HeaderNavItem[];
+	linkClass: string;
+	dealsClass: string;
+	onNavigate?: () => void;
+}) {
+	return headerLinks(items).map((item) => (
+		<HashLink
+			key={`${item.kind ?? "nav"}-${item.href}-${item.cmsIndex ?? "extra"}`}
+			href={item.href}
+			className={item.kind === "deals" ? dealsClass : linkClass}
+			onClick={onNavigate}
+		>
+			<span
+				className={styles.navLabel}
+				data-cms={item.cmsIndex != null ? `nav.${item.cmsIndex}.label` : undefined}
+			>
+				{item.label}
+			</span>
+		</HashLink>
+	));
 }

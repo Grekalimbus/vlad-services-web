@@ -121,6 +121,43 @@
 	transform: scaleX(1);
 }
 
+.dealsLink {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	height: 100%;
+	padding: 0 0.75rem;
+	background: transparent;
+	font-size: 18px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-decoration: none;
+	white-space: nowrap;
+	color: #49b4f0;
+	transition: color 200ms;
+}
+
+.dealsLink:hover,
+.dealsLink:focus-visible {
+	background: transparent;
+	color: #8ed9ff;
+}
+
+.headerScrolled .dealsLink,
+.headerScrolled .dealsLink:hover,
+.headerScrolled .dealsLink:focus-visible {
+	background: transparent;
+	color: #3aa8ea;
+}
+
+.dealsLink:hover .navLabel::after,
+.dealsLink:focus-visible .navLabel::after {
+	transform: scaleX(1);
+	background: currentColor;
+}
+
 .headerScrolled .navLink,
 .headerScrolled .navLink:hover {
 	color: #000;
@@ -237,6 +274,26 @@
 
 .mobileNavLink:hover {
 	color: var(--foreground);
+}
+
+.mobileDeals {
+	display: block;
+	border-radius: 1rem;
+	background: transparent;
+	padding: 0.75rem 1rem;
+	font-size: 18px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	line-height: 1;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #49b4f0;
+}
+
+.mobileDeals:hover,
+.mobileDeals:focus-visible {
+	background: transparent;
+	color: #1d8fd4;
 }
 
 .mobilePhone {

@@ -75,7 +75,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const cms = await bindCms();
-  const payload = JSON.stringify(cms).replaceAll("<", "\\u003c");
+  const payload = JSON.stringify(cms).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
   return (
     <html lang="en" className={`${sans.variable} ${display.variable}`}>
       <body className={styles.body}>

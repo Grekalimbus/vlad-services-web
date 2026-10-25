@@ -3,7 +3,6 @@
 import { TvBand } from "./tv-band";
 import { TvPhotoMarquee } from "./tv-photo-marquee";
 import { OfferGrid, PhotoFeature } from "./category-gallery";
-import { ServiceIntro } from "./service-intro";
 import { PageFrame } from "@/shared/layout";
 import { useCms } from "@/lib/cms/use-cms";
 import type { ServiceCategory } from "@/lib/services";
@@ -39,13 +38,9 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
     >
       <TvBand blend>
         <div className={styles.band}>
-          <ServiceIntro
-            slug={fresh.slug}
-            name={fresh.name}
-            namePath={index >= 0 ? `serviceCategories.${index}.name` : undefined}
-            summary={fresh.summary}
-            summaryPath={index >= 0 ? `serviceCategories.${index}.summary` : undefined}
-          />
+          <h1 className={styles.pageTitle} data-cms={index >= 0 ? `serviceCategories.${index}.name` : undefined}>
+            {fresh.name}
+          </h1>
           <OfferGrid categoryId={category.id} />
           <PhotoFeature
             name={fresh.name}

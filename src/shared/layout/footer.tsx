@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { useCms } from "@/lib/cms/use-cms";
+import { socialLinks } from "@/lib/social";
 import { phoneHref } from "@/lib/site";
+import { InstagramIcon, LinkedInIcon, YelpIcon } from "@/shared/brand-icons";
 import { HashLink } from "./hash-link";
+import shared from "@/styles/shared.module.css";
 import styles from "./footer.module.css";
+
+const social = [
+  { href: socialLinks.instagram, label: "Instagram", Icon: InstagramIcon },
+  { href: socialLinks.yelp, label: "Yelp", Icon: YelpIcon },
+  { href: socialLinks.linkedin, label: "LinkedIn", Icon: LinkedInIcon },
+] as const;
 
 export function Footer() {
   const cms = useCms();
@@ -20,13 +29,15 @@ export function Footer() {
       <div className={styles.inner}>
         <nav className={styles.nav} aria-label="Footer">
           <ul className={styles.list}>
-            {cms.footerNav.map((item, index) => (
-              <li key={item.href}>
-                <HashLink href={item.href} className={styles.link}>
-                  <span data-cms={`footerNav.${index}.label`}>{item.label}</span>
-                </HashLink>
-              </li>
-            ))}
+            {cms.footerNav.map((item, index) =>
+              /\bbook\b/i.test(item.label) ? null : (
+                <li key={`${item.href}-${index}`}>
+                  <HashLink href={item.href === "/portfolio" ? "/#works" : item.href} className={styles.link}>
+                    <span data-cms={`footerNav.${index}.label`}>{item.label}</span>
+                  </HashLink>
+                </li>
+              ),
+            )}
           </ul>
         </nav>
         <div className={styles.contact}>
@@ -41,6 +52,16 @@ export function Footer() {
             <span aria-hidden="true"> · </span>
             <span data-cms="site.availability">{cms.site.availability}</span>
           </p>
+          <ul className={styles.social}>
+            {social.map(({ href, label, Icon }) => (
+              <li key={label}>
+                <a href={href} className={styles.socialLink} target="_blank" rel="noopener noreferrer">
+                  <Icon className={styles.socialIcon} />
+                  <span className={shared.visuallyHidden}>{label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
       <div className={styles.bottom}>

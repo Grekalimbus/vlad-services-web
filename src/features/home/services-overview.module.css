@@ -11,7 +11,12 @@
 	position: relative;
 	width: min(100% - 3rem, 74rem);
 	margin-inline: auto;
-	padding-block: calc((5rem + 63px) * 0.72) 5.5rem;
+	padding-block: 20px;
+}
+
+.rows {
+	display: flex;
+	flex-direction: column;
 }
 
 .heading {
@@ -39,6 +44,28 @@
 	padding: 0;
 	list-style: none;
 	overflow: visible;
+}
+
+.strip + .strip {
+	margin-top: 0.7rem;
+}
+
+.stripShort {
+	justify-content: center;
+}
+
+.stripCompact {
+	--cut: 2.15rem;
+	height: clamp(13rem, 17vw, 16rem);
+}
+
+.stripCompact .title {
+	font-size: clamp(1rem, 1.45vw, 1.4rem);
+}
+
+.stripCompact .arrow {
+	width: 2.25rem;
+	height: 2.25rem;
 }
 
 .item {
@@ -189,14 +216,15 @@
 @media (max-width: 899px) {
 	.container {
 		width: min(100% - 1.5rem, 74rem);
-		padding-block: calc((4rem + 68px) * 0.72) 4.25rem;
+		padding-block: 20px;
 	}
 
 	.heading {
 		font-size: 32px;
 	}
 
-	.strip {
+	.strip,
+	.stripCompact {
 		--cut: 0px;
 		--gap: 0px;
 		flex-direction: column;
@@ -206,6 +234,10 @@
 		background: transparent;
 		overflow: visible;
 		gap: 0.4rem;
+	}
+
+	.strip + .strip {
+		margin-top: 0.4rem;
 	}
 
 	.item,

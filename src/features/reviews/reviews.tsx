@@ -4,26 +4,45 @@ import { useId, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { useCms } from "@/lib/cms/use-cms";
 import { googleListing, googleReviews } from "@/lib/google-reviews";
+import { yelpListing, yelpReviews } from "@/lib/yelp-reviews";
+import { YelpIcon } from "@/shared/brand-icons";
 import shared from "@/styles/shared.module.css";
 import styles from "./reviews.module.css";
 
 const PREVIEW_LENGTH = 168;
 const DESKTOP_PAGE_SIZE = 3;
 
+type SourceId = "google" | "yelp";
+
 export function Reviews() {
   const heading = useCms().copy.home.reviews;
   const headingId = "reviews-heading";
   const statusId = useId();
+  const [source, setSource] = useState<SourceId>("google");
   const [start, setStart] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const visible = Array.from({ length: DESKTOP_PAGE_SIZE }, (_, index) => {
-    return googleReviews[(start + index) % googleReviews.length];
-  });
+  const listing = source === "google" ? googleListing : yelpListing;
+  const reviews = source === "google" ? googleReviews : yelpReviews;
+  const countLabel = source === "google" ? heading.countSuffix : "Yelp Reviews";
+  const writeLabel = source === "google" ? heading.writeReview : "Review us on Yelp";
+  const visible =
+    reviews.length === 0
+      ? []
+      : Array.from({ length: Math.min(DESKTOP_PAGE_SIZE, reviews.length) }, (_, index) => {
+          return reviews[(start + index) % reviews.length];
+        });
+
+  function selectSource(next: SourceId) {
+    setSource(next);
+    setStart(0);
+    setExpanded(false);
+  }
 
   function shift(step: number) {
+    if (reviews.length === 0) return;
     setStart((current) => {
-      const next = (current + step) % googleReviews.length;
-      return next < 0 ? next + googleReviews.length : next;
+      const next = (current + step) % reviews.length;
+      return next < 0 ? next + reviews.length : next;
     });
   }
 
@@ -51,36 +70,69 @@ export function Reviews() {
 
         <div className={styles.summary}>
           <p className={styles.rating}>
-            <span className={styles.ratingValue}>{googleListing.rating.toFixed(1)}</span>
-            <span className={styles.stars} aria-hidden="true">
-              {Array.from({ length: 5 }, (_, index) => (
-                <Star
-                  key={index}
-                  size={16}
-                  className={styles.star}
-                />
-              ))}
-            </span>
+            {listing.rating != null ? (
+              <>
+                <span className={styles.ratingValue}>{listing.rating.toFixed(1)}</span>
+                <span className={styles.stars} aria-hidden="true">
+                  {Array.from({ length: 5 }, (_, index) => (
+                    <Star
+                      key={index}
+                      size={16}
+                      className={styles.star}
+                    />
+                  ))}
+                </span>
+              </>
+            ) : null}
             <span className={styles.muted}>
-              {googleListing.reviewCount} {heading.countSuffix}
+              {reviews.length > 0 ? `${listing.reviewCount} ${countLabel}` : "No Yelp reviews yet"}
             </span>
-            <GoogleMark />
+            <span className={styles.sources} role="group" aria-label="Review source">
+              <button
+                type="button"
+                className={source === "google" ? styles.sourceActive : styles.source}
+                aria-pressed={source === "google"}
+                onClick={() => selectSource("google")}
+              >
+                <GoogleMark />
+                <span className={shared.visuallyHidden}>Google reviews</span>
+              </button>
+              <button
+                type="button"
+                className={source === "yelp" ? styles.sourceActive : styles.source}
+                aria-pressed={source === "yelp"}
+                onClick={() => selectSource("yelp")}
+              >
+                <YelpIcon className={styles.yelpMark} />
+                <span className={shared.visuallyHidden}>Yelp reviews</span>
+              </button>
+            </span>
           </p>
           <a
-            href={googleListing.writeReviewUrl}
+            href={listing.writeReviewUrl}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.reviewLink}
           >
-            {heading.writeReview}
+            {writeLabel}
             <ArrowRight size={16} aria-hidden="true" />
           </a>
         </div>
 
         <div className={styles.carousel}>
           <p id={statusId} className={shared.visuallyHidden} aria-live="polite">
-            Showing Google reviews, starting with {visible[0].author}
+            {visible[0]
+              ? `Showing ${source === "google" ? "Google" : "Yelp"} reviews, starting with ${visible[0].author}`
+              : "No recommended Yelp reviews yet"}
           </p>
+          {visible.length === 0 ? (
+            <div className={styles.empty}>
+              <p>Yelp doesn&apos;t have recommended reviews for PrimeFix yet.</p>
+              <a href={yelpListing.profileUrl} target="_blank" rel="noopener noreferrer">
+                View the Yelp page
+              </a>
+            </div>
+          ) : (
           <ul className={styles.list}>
             {visible.map((review, index) => {
               const isLong = review.quote.length > PREVIEW_LENGTH;
@@ -126,8 +178,9 @@ export function Reviews() {
               );
             })}
           </ul>
+          )}
 
-          <div className={styles.controls}>
+          {reviews.length > 1 ? <div className={styles.controls}>
             <button
               type="button"
               onClick={() => shift(-1)}
@@ -146,9 +199,9 @@ export function Reviews() {
               <ChevronRight size={18} aria-hidden="true" />
               <span className={shared.visuallyHidden}>Next reviews</span>
             </button>
-          </div>
-          <div className={styles.dots}>
-            {googleReviews.map((review, index) => (
+          </div> : null}
+          {reviews.length > 1 ? <div className={styles.dots}>
+            {reviews.map((review, index) => (
               <button
                 key={review.id}
                 type="button"
@@ -158,7 +211,7 @@ export function Reviews() {
                 onClick={() => setStart(index)}
               />
             ))}
-          </div>
+          </div> : null}
         </div>
       </div>
     </section>

@@ -2,23 +2,38 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Cog, Frame, PaintRoller, Tv, Wrench, Zap } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { TvPhotoMarquee } from "@/features/services/tv-photo-marquee";
 import { useCms } from "@/lib/cms/use-cms";
-import { assetPath, routes } from "@/lib/site";
+import { LANDING_SLUGS } from "@/lib/seo";
+import { categoryHref } from "@/lib/services";
+import { assetPath } from "@/lib/site";
+import shared from "@/styles/shared.module.css";
 import styles from "./works.module.css";
 
-const icons: Record<string, LucideIcon> = {
-  tv: Tv,
-  paint: PaintRoller,
-  zap: Zap,
-  wrench: Wrench,
-  frame: Frame,
-  cog: Cog,
-};
+const pageSlugs = new Set<string>(LANDING_SLUGS);
 
 export function Works() {
-  const works = useCms().copy.home.works;
+  const cms = useCms();
+  const works = cms.copy.home.works;
+  const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const photos = cms.galleryItems.flatMap((entry) =>
+    entry.src ? [{ id: entry.id, src: entry.src, alt: entry.alt || entry.title }] : [],
+  );
+  const top = photos.filter((_, index) => index % 2 === 0);
+  const bottom = photos.filter((_, index) => index % 2 === 1);
+  const services = cms.serviceCategories.filter(
+    (category) => category.status === "active" && category.featured && pageSlugs.has(category.slug),
+  );
+
+  function closePicker() {
+    setOpen(false);
+    buttonRef.current?.focus();
+  }
+
   return (
     <section id="works" aria-labelledby="works-heading" className={styles.section} data-cms-photo="copy.home.works.backdrop">
       <Image
@@ -26,65 +41,110 @@ export function Works() {
         data-cms-src="copy.home.works.backdrop"
         alt=""
         fill
+        unoptimized={works.backdrop.startsWith("/api/media/")}
         sizes="100vw"
         quality={80}
         className={styles.backdrop}
       />
       <div className={styles.overlay} aria-hidden="true" />
 
-      <div className={styles.container}>
+      <div className={`${styles.container} ${styles.headingWrap}`}>
         <h2 id="works-heading" className={styles.heading}>
           <span data-cms="copy.home.works.headingLead">{works.headingLead}</span>{" "}
           <span className={styles.headingAccent} data-cms="copy.home.works.headingAccent">{works.headingAccent}</span>
         </h2>
-
-        <ul className={styles.grid}>
-          {works.cards.map((card, index) => {
-            const Icon = icons[card.icon] ?? Wrench;
-            const lines = card.lines.filter(Boolean);
-            return (
-              <li key={`${card.title}-${index}`}>
-                <Link href={card.href} className={styles.card} data-cms-card={`works:${index}`}>
-                  <Image
-                    src={assetPath(card.src)}
-                    alt={card.alt}
-                    data-cms-src={`copy.home.works.cards.${index}.src`}
-                    data-cms-alt={`copy.home.works.cards.${index}.alt`}
-                    fill
-                    sizes="(min-width: 1024px) 22rem, (min-width: 720px) 45vw, 92vw"
-                    className={styles.cardImage}
-                    style={{ objectPosition: card.position }}
-                  />
-                  <span className={styles.cardShade} aria-hidden="true" />
-                  <span className={styles.cardBar}>
-                    <span className={styles.cardLabel}>
-                      <span className={styles.icon} aria-hidden="true">
-                        <Icon size={18} strokeWidth={1.75} />
-                      </span>
-                      <span>
-                        {lines.length > 0
-                          ? lines.map((line, lineIndex) => (
-                              <span key={`${line}-${lineIndex}`} className={styles.line} data-cms={`copy.home.works.cards.${index}.lines.${lineIndex}`}>
-                                {line}
-                              </span>
-                            ))
-                          : <span data-cms={`copy.home.works.cards.${index}.title`}>{card.title}</span>}
-                      </span>
-                    </span>
-                    <span className={styles.arrow} aria-hidden="true">
-                      <ArrowRight size={16} strokeWidth={1.75} />
-                    </span>
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        <Link href={routes.portfolio} className={styles.projectsButton} data-cms="copy.home.works.explore">
-          {works.explore}
-        </Link>
       </div>
+
+      {photos.length > 0 ? (
+        <div className={styles.reels}>
+          <TvPhotoMarquee photos={top.length > 0 ? top : photos} direction="right" heading={false} paired label="Projects" />
+          <TvPhotoMarquee photos={bottom.length > 0 ? bottom : photos} direction="left" heading={false} paired label="Projects" />
+        </div>
+      ) : null}
+
+      <div className={`${styles.container} ${styles.actionWrap}`}>
+        <button
+          ref={buttonRef}
+          type="button"
+          className={styles.projectsButton}
+          onClick={() => setOpen(true)}
+        >
+          <span data-cms="copy.home.works.explore">{works.explore}</span>
+        </button>
+      </div>
+
+      {open ? createPortal(<ServicePicker services={services} onClose={closePicker} />, document.body) : null}
     </section>
+  );
+}
+
+function ServicePicker({
+  services,
+  onClose,
+}: {
+  services: { id: string; slug: string; name: string }[];
+  onClose: () => void;
+}) {
+  const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const root = dialogRef.current;
+    const focusable = () => Array.from(root?.querySelectorAll<HTMLElement>("a, button") ?? []);
+    focusable()[0]?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key !== "Tab" || !root) return;
+      const items = focusable();
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div className={styles.picker} data-editor-ui>
+      <button type="button" className={styles.dismiss} aria-label="Close" onClick={onClose} />
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={styles.dialog}
+      >
+        <div className={styles.dialogHead}>
+          <h2 id={titleId} className={styles.dialogTitle}>Choose a service</h2>
+          <button type="button" className={styles.close} onClick={onClose}>
+            <X size={16} aria-hidden="true" />
+            <span className={shared.visuallyHidden}>Close</span>
+          </button>
+        </div>
+        <ul className={styles.choices}>
+          {services.map((service) => (
+            <li key={service.id}>
+              <Link href={categoryHref(service)} className={styles.choice}>
+                <span>{service.name}</span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }

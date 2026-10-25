@@ -3,66 +3,62 @@
   height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
-  background: var(--foreground);
+  background: #000;
 }
 
-.slides {
-  position: absolute;
-  inset: 0;
+.backdrop {
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0.7;
   pointer-events: none;
 }
 
-.background {
-  object-fit: cover;
-  object-position: 36% 42%;
-  transform: scale(1.02);
-  filter: blur(2px);
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.visible {
-  opacity: 1;
-}
-
-.overlay {
+.glow {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.7);
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 78% 46% at 50% 78%,
+    rgb(18 96 184 / 0.92) 0%,
+    rgb(8 42 112 / 0.5) 42%,
+    transparent 72%
+  );
 }
 
-.content {
+.layout {
   position: relative;
-  z-index: 10;
+  z-index: 2;
   display: flex;
   height: 100%;
-  align-items: center;
-  justify-content: center;
-}
-
-.container {
-  composes: container from "../../styles/shared.module.css";
-  padding-block: 7rem;
-  text-align: center;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
 }
 
 .copy {
-  margin-inline: auto;
-  max-width: 56rem;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 0;
+  padding: 5.5rem 1.25rem 0.35rem;
+  text-align: center;
+  pointer-events: auto;
 }
 
 .heading {
   margin: 0;
-  font-size: clamp(1.45rem, 5.8vw, 3.6rem);
+  max-width: 22rem;
+  font-size: clamp(1.45rem, 6.4vw, 2.15rem);
   font-weight: 900;
-  line-height: 1.15;
+  line-height: 1.12;
   letter-spacing: -0.035em;
   color: #fff;
 }
 
 .line {
   display: block;
-  white-space: nowrap;
 }
 
 .discount {
@@ -71,8 +67,9 @@
 }
 
 .tagline {
-  margin: 1.5rem 0 0;
-  font-size: clamp(0.75rem, 2.4vw, 1.125rem);
+  margin: 0.85rem 0 0;
+  max-width: 22rem;
+  font-size: clamp(0.75rem, 3.2vw, 0.95rem);
   font-weight: 500;
   color: rgb(255 255 255 / 0.9);
 }
@@ -81,7 +78,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 2rem;
+  margin-top: 1.15rem;
+  pointer-events: auto;
 }
 
 .startButton {
@@ -90,6 +88,7 @@
   cursor: pointer;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
   border: 0;
   border-radius: 9999px;
   background: var(--accent);
@@ -106,38 +105,101 @@
   color: var(--foreground);
 }
 
-.scrollCue {
-  display: inline-flex;
-  width: 2.75rem;
-  height: 2.75rem;
-  margin-top: 2.5rem;
-  align-items: center;
+.figure {
+  display: flex;
+  flex: 0 0 auto;
+  height: 42%;
+  align-items: flex-end;
   justify-content: center;
-  border: 1px solid rgb(255 255 255 / 0.6);
-  border-radius: 9999px;
-  color: #fff;
-  transition: color 200ms, background-color 200ms, border-color 200ms;
-  animation: scrollCue 1.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
-.scrollCue:hover {
-  border-color: #fff;
-  background: #fff;
-  color: var(--foreground);
+.builder {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
 }
 
-@keyframes scrollCue {
-  0%,
-  100% {
-    transform: translateY(-4px);
+@media (min-width: 900px) {
+  .glow {
+    background: radial-gradient(
+      ellipse 42% 70% at 76% 56%,
+      rgb(20 104 196 / 0.95) 0%,
+      rgb(10 48 124 / 0.55) 40%,
+      transparent 70%
+    );
   }
-  50% {
-    transform: translateY(6px);
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr);
+    align-items: stretch;
+  }
+
+  .copy {
+    justify-content: center;
+    align-items: flex-start;
+    width: auto;
+    max-width: 40rem;
+    height: auto;
+    margin-left: max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem));
+    margin-right: 1.25rem;
+    padding: 5.5rem 0 2rem;
+    text-align: left;
+    transform: translateX(-50px);
+  }
+
+  .heading {
+    max-width: none;
+    font-size: clamp(1.85rem, 2.55vw, 3.15rem);
+  }
+
+  .line {
+    white-space: nowrap;
+  }
+
+  .tagline {
+    max-width: 34rem;
+    margin-top: 1.35rem;
+    font-size: clamp(0.85rem, 1.15vw, 1.125rem);
+  }
+
+  .actions {
+    align-items: flex-start;
+    margin-top: 1.75rem;
+  }
+
+  .figure {
+    position: relative;
+    height: 100%;
+    width: auto;
+    margin-bottom: 0;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  .builder {
+    object-position: right bottom;
+    transform: translateX(-120px);
   }
 }
 
-@media (min-width: 768px) {
-  .background {
-    object-position: 42% 40%;
+@media (max-width: 899px) and (max-height: 700px) {
+  .heading {
+    font-size: 1.35rem;
+  }
+
+  .tagline {
+    margin-top: 0.45rem;
+  }
+
+  .actions {
+    margin-top: 0.7rem;
+  }
+
+  .figure {
+    height: 38%;
   }
 }

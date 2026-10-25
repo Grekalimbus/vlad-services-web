@@ -14,7 +14,8 @@
 }
 
 .section .container {
-  padding-top: 1.25rem;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .heading {

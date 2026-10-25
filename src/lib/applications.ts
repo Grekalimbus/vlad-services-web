@@ -1,4 +1,5 @@
 import { isAuthorized } from "./cms/auth";
+import { discardImage, loadImage, storeImage } from "./cms/content-store";
 import { applySecurityHeaders, clientIp, plainText, rateLimit, sameOrigin } from "./form-guard";
 import type { CmsEnv } from "./cms/types";
 
@@ -161,13 +162,7 @@ async function createApplication(
     const photo = input.photos[index];
     const extension = photo.type === "image/png" ? "png" : "jpg";
     const key = `applications/${id}/${index}.${extension}`;
-    if (env.CMS_MEDIA) {
-      await env.CMS_MEDIA.put(key, photo.bytes, { httpMetadata: { contentType: photo.type } });
-    } else if (env.putMedia) {
-      await env.putMedia(key, photo.bytes, photo.type);
-    } else {
-      throw new Error("Image storage is not configured.");
-    }
+    await storeImage(env, key, photo.bytes, photo.type);
     photos.push({ key, name: photo.name, type: photo.type });
   }
   const row: StoredApplication = {
@@ -211,15 +206,9 @@ async function readApplications(env: CmsEnv): Promise<StoredApplication[]> {
 }
 
 async function readPhoto(env: CmsEnv, key: string) {
-  if (env.CMS_MEDIA) {
-    const object = await env.CMS_MEDIA.get(key);
-    if (!object) return null;
-    const bytes = object.arrayBuffer ? new Uint8Array(await object.arrayBuffer()) : null;
-    const resolved = bytes ?? (object.body ? new Uint8Array(await new Response(object.body).arrayBuffer()) : null);
-    if (!resolved) return null;
-    return { bytes: resolved, type: object.httpMetadata?.contentType || typeFor(key) };
-  }
-  return env.getMedia ? env.getMedia(key) : null;
+  const image = await loadImage(env, key);
+  if (!image) return null;
+  return { bytes: image.bytes, type: image.type === "application/octet-stream" ? typeFor(key) : image.type };
 }
 
 async function updateApplication(env: CmsEnv, id: string, status: ApplicationStatus) {
@@ -244,8 +233,7 @@ async function deleteApplication(env: CmsEnv, id: string) {
   for (const photo of item.photos) {
     if (!isPhotoKey(id, photo.key)) continue;
     try {
-      if (env.CMS_MEDIA) await env.CMS_MEDIA.delete(photo.key);
-      else if (env.deleteMedia) await env.deleteMedia(photo.key);
+      await discardImage(env, photo.key);
     } catch {
       /* The application row is still removed. */
     }

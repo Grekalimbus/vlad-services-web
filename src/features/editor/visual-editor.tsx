@@ -13,6 +13,7 @@ import {
   setEditing,
 } from "@/lib/cms/edit-store";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
+import { heroSlides } from "@/features/home/hero-slides";
 import { assetPath } from "@/lib/site";
 import { removeHomepageService } from "./service-actions";
 import "./visual-editor.css";
@@ -668,9 +669,7 @@ type Frame = { key: string; src: string; secondary?: string; captionPath?: strin
 function galleryFrames(gallery: string): Frame[] {
   const document = readCms();
   if (gallery.startsWith("slides:")) {
-    const slides = getPath(document, gallery.slice("slides:".length));
-    if (!Array.isArray(slides)) return [];
-    return slides.map((slide, index) => ({
+    return slideArray(gallery).slides.map((slide, index) => ({
       key: `${index}-${slide?.image ?? index}`,
       src: String(slide?.image ?? ""),
     }));
@@ -692,10 +691,34 @@ function itemCategory(gallery: string) {
   return gallery.replace(/^(?:items|photos):/, "");
 }
 
-function slideArray(gallery: string) {
+type SlideRecord = { image?: string; alt?: string; position?: string };
+
+function slideArray(gallery: string): { path: string; slides: SlideRecord[] } {
   const path = gallery.slice("slides:".length);
-  const slides = getPath(readCms(), path);
-  return { path, slides: Array.isArray(slides) ? [...slides] : [] };
+  const current = getPath(readCms(), path);
+  if (Array.isArray(current)) {
+    return {
+      path,
+      slides: current.flatMap((slide) =>
+        slide && typeof slide === "object" ? [{ ...(slide as SlideRecord) }] : [],
+      ),
+    };
+  }
+  if (path === "copy.home.hero.slides") {
+    return { path, slides: heroSlides(readCms().copy.home.hero).map((slide) => ({ ...slide })) };
+  }
+  return { path, slides: [] };
+}
+
+function commitSlides(path: string, slides: SlideRecord[]) {
+  setAt(path, slides);
+  if (path !== "copy.home.hero.slides") return;
+  const first = slides[0];
+  const second = slides[1];
+  setAt("copy.home.hero.image", first?.image ?? "");
+  setAt("copy.home.hero.imageAlt", first?.alt ?? "");
+  setAt("copy.home.hero.imageNext", second?.image ?? "");
+  setAt("copy.home.hero.imageNextAlt", second?.alt ?? "");
 }
 
 function categoryEntries(gallery: string) {
@@ -713,7 +736,7 @@ function reorderFrames(gallery: string, from: number, to: number) {
     const next = slides.slice();
     const [item] = next.splice(from, 1);
     next.splice(to, 0, item);
-    setAt(path, next);
+    commitSlides(path, next);
     return;
   }
   const { items, indexes } = categoryEntries(gallery);
@@ -732,7 +755,7 @@ function deleteFrame(gallery: string, index: number) {
   if (gallery.startsWith("slides:")) {
     const { path, slides } = slideArray(gallery);
     slides.splice(index, 1);
-    setAt(path, slides);
+    commitSlides(path, slides);
     return;
   }
   const { items, indexes } = categoryEntries(gallery);
@@ -744,7 +767,7 @@ function replaceFrame(gallery: string, index: number, src: string, secondary: bo
   if (gallery.startsWith("slides:")) {
     const { path, slides } = slideArray(gallery);
     slides[index] = { ...slides[index], image: src };
-    setAt(path, slides);
+    commitSlides(path, slides);
     return;
   }
   const { items, indexes } = categoryEntries(gallery);
@@ -764,7 +787,7 @@ function addFrame(gallery: string, src: string) {
   if (gallery.startsWith("slides:")) {
     const { path, slides } = slideArray(gallery);
     slides.push({ image: src, alt: "Photo", position: "center" });
-    setAt(path, slides);
+    commitSlides(path, slides);
     return;
   }
   const { items, categoryId } = categoryEntries(gallery);
