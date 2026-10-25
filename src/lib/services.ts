@@ -1,5 +1,5 @@
 import { live, readCms } from "@/lib/cms/read";
-import { LANDING_SLUGS } from "@/lib/seo";
+import { categoryForPageSlug, pageSlugForCategory, TEMPLATE_PAGE_SLUGS } from "@/lib/service-pages";
 import { routes } from "@/lib/site";
 
 export type CatalogStatus = "active" | "planned";
@@ -53,10 +53,6 @@ const activeServices = live(() => services.filter((service) => service.status ==
 const featuredCategories = live(() => activeCategories.filter((category) => category.featured));
 export const quoteServices = featuredCategories;
 
-function getCategory(slug: string) {
-  return activeCategories.find((category) => category.slug === slug);
-}
-
 function getCategoryById(id: string) {
   return serviceCategories.find((category) => category.id === id);
 }
@@ -69,16 +65,19 @@ export function categoryHref(category: Pick<ServiceCategory, "slug">) {
   return routes.service(category.slug);
 }
 
+export function servicePageHref(category: Pick<ServiceCategory, "id" | "slug">) {
+  const slug = pageSlugForCategory(category, serviceCategories);
+  return slug ? routes.service(slug) : "/#footer";
+}
+
 export function landingForSlug(slug: string) {
-  const category = getCategory(slug);
-  if (category?.featured) return category;
+  const mapped = categoryForPageSlug(slug, serviceCategories);
+  if (mapped?.status === "active" && mapped.featured) return mapped;
   const service = getService(slug);
   if (!service) return undefined;
   const parent = getCategoryById(service.categoryId);
-  if (parent?.status === "active") return parent;
+  if (parent?.status === "active" && parent.featured && pageSlugForCategory(parent, serviceCategories)) return parent;
   return undefined;
 }
 
-export const serviceRouteSlugs = featuredCategories
-  .map((category) => category.slug)
-  .filter((slug) => (LANDING_SLUGS as readonly string[]).includes(slug));
+export const serviceRouteSlugs = ["tv-mounting", "electrical", "handyman", ...TEMPLATE_PAGE_SLUGS];

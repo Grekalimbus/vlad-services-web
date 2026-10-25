@@ -23,9 +23,8 @@ type Offer = {
 };
 
 function offersFor(categoryId: string, offers: ReturnType<typeof useCms>["copy"]["offers"]): Offer[] {
-  if (categoryId === "electrical") return offers.electrical;
-  if (categoryId === "handyman") return offers.handyman;
-  return [];
+  const list = (offers as unknown as Record<string, Offer[] | undefined>)[categoryId];
+  return Array.isArray(list) ? list : [];
 }
 
 export function OfferGrid({ categoryId }: { categoryId: string }) {
@@ -50,28 +49,39 @@ export function OfferGrid({ categoryId }: { categoryId: string }) {
 
 function OfferCard({ offer, categoryId, index }: { offer: Offer; categoryId: string; index: number }) {
   const ui = useCms().copy.offers;
+  const editing = useEditing();
   const [open, setOpen] = useState(false);
   const detailId = useId();
   const galleryPath = `slides:copy.offers.${categoryId}.${index}.slides`;
+  const description = offer.description ?? "";
+  const missing = description.trim() === "";
+  const showDetail = open || (editing && missing);
 
   return (
     <li className={styles.card}>
       <SlideStage slides={offer.slides} label={offer.title} galleryPath={galleryPath} />
-      <h2 className={styles.cardTitle} data-cms={`copy.offers.${categoryId}.${index}.title`}>{offer.title}</h2>
-      <button
-        type="button"
-        className={styles.more}
-        aria-expanded={open}
-        aria-controls={detailId}
-        onClick={() => setOpen((value) => !value)}
-      >
-        <span data-cms={open ? "copy.offers.showLess" : "copy.offers.showMore"}>
-          {open ? ui.showLess : ui.showMore}
-        </span>
-      </button>
-      <p id={detailId} className={styles.detail} hidden={!open} data-cms={`copy.offers.${categoryId}.${index}.description`}>
-        {offer.description}
-      </p>
+      <div className={styles.cardCopy} data-cms-card={`offer:${categoryId}:${index}`}>
+        <h2 className={styles.cardTitle} data-cms={`copy.offers.${categoryId}.${index}.title`}>{offer.title}</h2>
+        <button
+          type="button"
+          className={styles.more}
+          aria-expanded={open}
+          aria-controls={detailId}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <span data-cms={open ? "copy.offers.showLess" : "copy.offers.showMore"}>
+            {open ? ui.showLess : ui.showMore}
+          </span>
+        </button>
+        <p
+          id={detailId}
+          className={missing ? `${styles.detail} ${styles.detailEmpty}` : styles.detail}
+          hidden={!showDetail}
+          data-cms={`copy.offers.${categoryId}.${index}.description`}
+        >
+          {description}
+        </p>
+      </div>
     </li>
   );
 }

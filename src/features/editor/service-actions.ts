@@ -1,4 +1,5 @@
 import { updateDraft } from "@/lib/cms/edit-store";
+import { CORE_SERVICE_IDS, fillElectricalTemplate } from "@/lib/service-pages";
 
 export function addHomepageService() {
   updateDraft((document) => {
@@ -16,6 +17,7 @@ export function addHomepageService() {
     });
     const covers = document.copy.home.serviceCovers as unknown as Array<Record<string, unknown>>;
     covers.push({ id, src: "/works/hero.jpg", position: "center" });
+    fillElectricalTemplate(document, id);
   });
 }
 
@@ -26,5 +28,9 @@ export function removeHomepageService(id: string) {
     document.services = document.services.filter(
       (item) => item.id !== id && item.categoryId !== id,
     ) as typeof document.services;
+    if (!(CORE_SERVICE_IDS as readonly string[]).includes(id)) {
+      document.galleryItems = document.galleryItems.filter((item) => item.categoryId !== id);
+      delete (document.copy.offers as unknown as Record<string, unknown>)[id];
+    }
   });
 }

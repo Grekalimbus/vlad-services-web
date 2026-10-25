@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { PRODUCTION_ORIGIN } from "@/lib/seo";
+import { ensureServiceTemplates } from "@/lib/service-pages";
 import { rememberCms } from "./store";
 import { fallbackDocument, readCms } from "./read";
 import type { CmsDocument } from "./types";
@@ -21,19 +22,19 @@ export async function bindCms(): Promise<CmsDocument> {
 
 async function readSavedDocument(): Promise<CmsDocument> {
   if (process.env.NEXT_PHASE === "phase-production-build" || process.env.STATIC_EXPORT === "true") {
-    return fallbackDocument;
+    return ensureServiceTemplates(fallbackDocument);
   }
   if (process.env.NODE_ENV === "development") {
     const remote = await readProductionDocument();
-    if (remote) return remote;
+    if (remote) return ensureServiceTemplates(remote);
   }
   try {
     const { readFile } = await import("node:fs/promises");
     const path = await import("node:path");
     const raw = await readFile(path.join(process.cwd(), ".cms", "content.json"), "utf8");
-    return validateDocument(JSON.parse(raw));
+    return ensureServiceTemplates(validateDocument(JSON.parse(raw)));
   } catch {
-    return readCms();
+    return ensureServiceTemplates(readCms());
   }
 }
 

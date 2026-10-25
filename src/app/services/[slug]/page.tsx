@@ -32,7 +32,7 @@ export default async function ServicePage({
   const cms = await bindCms();
   const landing = landingForSlug(slug);
   if (!landing) notFound();
-  const data = <JsonLd data={pageMeta(`/services/${landing.slug}`, cms).jsonLd} />;
+  const data = <JsonLd data={pageMeta(`/services/${slug}`, cms).jsonLd} />;
 
   if (landing.id === "tv-mounting") {
     return (
@@ -42,15 +42,12 @@ export default async function ServicePage({
       </CmsPage>
     );
   }
-  if (landing.id === "electrical" || landing.id === "handyman") {
-    return (
-      <CmsPage>
-        {data}
-        <CategoryLanding category={landing} />
-      </CmsPage>
-    );
-  }
 
-  notFound();
+  return (
+    <CmsPage>
+      {data}
+      <CategoryLanding category={landing} />
+    </CmsPage>
+  );
 }
 

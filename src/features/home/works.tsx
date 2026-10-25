@@ -8,13 +8,11 @@ import { createPortal } from "react-dom";
 import { projectReels } from "@/features/home/project-photos";
 import { TvPhotoMarquee } from "@/features/services/tv-photo-marquee";
 import { useCms } from "@/lib/cms/use-cms";
-import { LANDING_SLUGS } from "@/lib/seo";
+import { pageSlugForCategory } from "@/lib/service-pages";
 import { categoryHref } from "@/lib/services";
 import { assetPath } from "@/lib/site";
 import shared from "@/styles/shared.module.css";
 import styles from "./works.module.css";
-
-const pageSlugs = new Set<string>(LANDING_SLUGS);
 
 export function Works() {
   const cms = useCms();
@@ -26,9 +24,12 @@ export function Works() {
     { gallery: "reels:top", direction: "right" as const, photos: reels.top },
     { gallery: "reels:bottom", direction: "left" as const, photos: reels.bottom },
   ];
-  const services = cms.serviceCategories.filter(
-    (category) => category.status === "active" && category.featured && pageSlugs.has(category.slug),
-  );
+  const services = cms.serviceCategories.flatMap((category) => {
+    if (category.status !== "active" || !category.featured) return [];
+    const slug = pageSlugForCategory(category, cms.serviceCategories);
+    if (!slug) return [];
+    return [{ id: category.id, slug, name: category.name }];
+  });
 
   function closePicker() {
     setOpen(false);

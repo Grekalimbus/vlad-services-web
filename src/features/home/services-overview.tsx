@@ -6,11 +6,9 @@ import type { CSSProperties } from "react";
 import { ArrowRight } from "lucide-react";
 import { addHomepageService } from "@/features/editor/service-actions";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
-import { categoryHref } from "@/lib/services";
+import { servicePageHref } from "@/lib/services";
 import { assetPath } from "@/lib/site";
 import styles from "./services-overview.module.css";
-
-const PAGE_SLUGS = new Set(["tv-mounting", "electrical", "handyman"]);
 
 export function ServicesOverview() {
   const cms = useCms();
@@ -41,7 +39,7 @@ export function ServicesOverview() {
                   const coverIndex = cms.copy.home.serviceCovers.findIndex((item) => item.id === category.id);
                   const cover = covers[category.id];
                   const src = cover?.src ?? category.coverImage;
-                  const href = PAGE_SLUGS.has(category.slug) ? categoryHref(category) : "/#footer";
+                  const href = servicePageHref(category);
                   return (
                     <li key={category.id} className={styles.item}>
                       <Link href={href} className={styles.card} data-cms-card={`service:${category.id}`}>

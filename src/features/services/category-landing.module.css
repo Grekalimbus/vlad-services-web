@@ -255,6 +255,12 @@
   background: #0076fe;
 }
 
+.cardCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
 .cardTitle {
   margin: 0.95rem 0 0;
   padding-inline: 0.45rem;
@@ -293,6 +299,16 @@
 
 .detail[hidden] {
   display: none;
+}
+
+.detailEmpty {
+  min-height: 1.45em;
+}
+
+:global(html[data-editing]) .detailEmpty:empty::before {
+  content: "Add a description";
+  color: #98a2b3;
+  font-style: italic;
 }
 
 .book {

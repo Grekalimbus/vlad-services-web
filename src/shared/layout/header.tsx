@@ -2,6 +2,7 @@
 
 import { BrandLogo } from "@/shared/ui";
 import { QuoteCta } from "@/features/quote";
+import { isServicePageSlug } from "@/lib/service-pages";
 import { phoneHref } from "@/lib/site";
 import { useCms } from "@/lib/cms/use-cms";
 import { Menu, Phone, X } from "lucide-react";
@@ -20,10 +21,7 @@ export function Header() {
 	const pathname = usePathname();
 	const path = pathname.replace(/\/$/, "");
 	const admin = path === "/admin" || path.startsWith("/admin/");
-	const solid =
-		path === "/services/tv-mounting" ||
-		path === "/services/electrical" ||
-		path === "/services/handyman";
+	const solid = isServicePageSlug(path.startsWith("/services/") ? path.slice("/services/".length) : "");
 
 	useEffect(() => {
 		const updateHeader = () => {

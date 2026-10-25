@@ -16,6 +16,7 @@ import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { heroSlides } from "@/features/home/hero-slides";
 import { projectReels, type ReelPhoto } from "@/features/home/project-photos";
 import { assetPath } from "@/lib/site";
+import { ensureServiceTemplates } from "@/lib/service-pages";
 import { removeHomepageService } from "./service-actions";
 import "./visual-editor.css";
 
@@ -53,7 +54,7 @@ export function VisualEditor() {
               const response = await fetch("/api/content", { cache: "no-store" });
               const document = response.ok ? await response.json() : null;
               if (!cancelled && document && document.version === 1 && Array.isArray(document.serviceCategories)) {
-                publishDocument(document);
+                publishDocument(ensureServiceTemplates(document));
               }
             } catch {
               // Keep the document already on the page if the live copy cannot be loaded.
@@ -314,7 +315,9 @@ function CardPopover({
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const [kind, id] = card.split(":");
+  const splitAt = card.indexOf(":");
+  const kind = splitAt < 0 ? card : card.slice(0, splitAt);
+  const id = splitAt < 0 ? "" : card.slice(splitAt + 1);
   const fields = cardFields(kind, id);
 
   function replace(path: string, file: File | undefined) {
@@ -642,6 +645,20 @@ type CardField = { path: string; label: string; long?: boolean; numeric?: boolea
 
 function cardFields(kind: string, id: string): { image: string; remove: boolean; texts: CardField[] } | null {
   const document = readCms();
+  if (kind === "offer") {
+    const separator = id.lastIndexOf(":");
+    const categoryId = separator > 0 ? id.slice(0, separator) : "";
+    const index = Number(separator > 0 ? id.slice(separator + 1) : "");
+    if (!categoryId || !Number.isInteger(index) || index < 0) return null;
+    return {
+      image: "",
+      remove: false,
+      texts: [
+        { path: `copy.offers.${categoryId}.${index}.title`, label: "Title" },
+        { path: `copy.offers.${categoryId}.${index}.description`, label: "Description", long: true },
+      ],
+    };
+  }
   if (kind === "service") {
     const index = document.serviceCategories.findIndex((item) => item.id === id);
     if (index < 0) return null;

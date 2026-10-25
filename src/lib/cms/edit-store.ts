@@ -45,13 +45,16 @@ export function updateDraft(mutator: (document: CmsDocument) => void) {
 export function setAt(path: string, value: unknown) {
   updateDraft((document) => {
     const keys = path.split(".");
-    let cursor: unknown = document;
+    let cursor = document as unknown as Record<string, unknown>;
     for (let index = 0; index < keys.length - 1; index += 1) {
-      if (cursor == null || typeof cursor !== "object") return;
-      cursor = (cursor as Record<string, unknown>)[keys[index]];
+      const key = keys[index];
+      const current = cursor[key];
+      if (current == null || typeof current !== "object") {
+        cursor[key] = /^\d+$/.test(keys[index + 1] ?? "") ? [] : {};
+      }
+      cursor = cursor[key] as Record<string, unknown>;
     }
-    if (cursor == null || typeof cursor !== "object") return;
-    (cursor as Record<string, unknown>)[keys[keys.length - 1]] = value;
+    cursor[keys[keys.length - 1]] = value;
   });
 }
 

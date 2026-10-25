@@ -1,4 +1,10 @@
 import type { CmsDocument } from "./cms/types";
+import {
+  categoryForPageSlug,
+  ensureServiceTemplates,
+  isServicePageSlug,
+  pageSlugForCategory,
+} from "./service-pages";
 
 export const PRODUCTION_ORIGIN = "https://primefixpros.com";
 const GENERIC_AREA = /^(california|southern california|ca|socal|so cal)$/i;
@@ -89,30 +95,31 @@ export function normalizePath(pathname: string) {
 }
 
 export function normalizeCms(document: CmsDocument): CmsDocument {
-  const area = areaLabel(document.site);
+  const prepared = ensureServiceTemplates(document);
+  const area = areaLabel(prepared.site);
   const blob = [
-    document.site.areaServed,
-    document.site.areaServedShort,
-    document.site.seoTitle,
-    document.site.seoDescription,
-    document.site.tagline,
-    document.site.description,
-    document.site.keywords,
-    document.copy.home.hero.tagline,
-    document.copy.portfolio.title,
-    document.copy.portfolio.description,
-    ...document.faqs.map((item) => item.a),
-    ...document.services.map((item) => item.summary),
+    prepared.site.areaServed,
+    prepared.site.areaServedShort,
+    prepared.site.seoTitle,
+    prepared.site.seoDescription,
+    prepared.site.tagline,
+    prepared.site.description,
+    prepared.site.keywords,
+    prepared.copy.home.hero.tagline,
+    prepared.copy.portfolio.title,
+    prepared.copy.portfolio.description,
+    ...prepared.faqs.map((item) => item.a),
+    ...prepared.services.map((item) => item.summary),
   ].join("\n");
-  const stockHero = document.copy.home.hero.tagline === OLD_HERO_TAGLINE;
+  const stockHero = prepared.copy.home.hero.tagline === OLD_HERO_TAGLINE;
   const stockPortfolio =
-    document.copy.portfolio.title === OLD_PORTFOLIO_TITLE ||
-    document.copy.portfolio.description === OLD_PORTFOLIO_DESCRIPTION;
-  if (!/southern california/i.test(blob) && !GENERIC_AREA.test(document.site.areaServed) && !GENERIC_AREA.test(document.site.areaServedShort) && !stockHero && !stockPortfolio) {
-    return document;
+    prepared.copy.portfolio.title === OLD_PORTFOLIO_TITLE ||
+    prepared.copy.portfolio.description === OLD_PORTFOLIO_DESCRIPTION;
+  if (!/southern california/i.test(blob) && !GENERIC_AREA.test(prepared.site.areaServed) && !GENERIC_AREA.test(prepared.site.areaServedShort) && !stockHero && !stockPortfolio) {
+    return prepared;
   }
 
-  const next = structuredClone(document);
+  const next = structuredClone(prepared);
   if (GENERIC_AREA.test(next.site.areaServed) || /southern california/i.test(next.site.areaServed)) {
     next.site.areaServed = area.full;
   }
@@ -136,12 +143,12 @@ export function normalizeCms(document: CmsDocument): CmsDocument {
 }
 
 function landingFor(document: CmsDocument, slug: string) {
-  const category = document.serviceCategories.find((item) => item.slug === slug && item.status === "active");
-  if (category?.featured && isLandingSlug(category.slug)) return category;
+  const mapped = categoryForPageSlug(slug, document.serviceCategories);
+  if (mapped?.status === "active" && mapped.featured) return mapped;
   const service = document.services.find((item) => item.slug === slug && item.status === "active");
   if (!service) return undefined;
   const parent = document.serviceCategories.find((item) => item.id === service.categoryId);
-  if (parent?.status === "active" && parent.featured && isLandingSlug(parent.slug)) return parent;
+  if (parent?.status === "active" && parent.featured && pageSlugForCategory(parent, document.serviceCategories)) return parent;
   return undefined;
 }
 
@@ -153,21 +160,31 @@ export function redirectTarget(pathname: string, document?: CmsDocument | null) 
   const match = /^\/services\/([a-z0-9-]+)$/.exec(path);
   if (!match) return null;
   const slug = match[1];
-  if (!slug || isLandingSlug(slug)) return null;
+  if (!slug || isServicePageSlug(slug)) return null;
+  const category = document.serviceCategories.find((item) => item.id === slug || item.slug === slug);
+  const categoryPage = category ? pageSlugForCategory(category, document.serviceCategories) : null;
+  if (categoryPage && categoryPage !== slug) return `/services/${categoryPage}`;
   const service = document.services.find((item) => item.slug === slug && item.status === "active");
   if (!service) return null;
   const parent = document.serviceCategories.find((item) => item.id === service.categoryId);
-  if (!parent || !isLandingSlug(parent.slug)) return null;
-  return `/services/${parent.slug}`;
+  const page = parent ? pageSlugForCategory(parent, document.serviceCategories) : null;
+  if (!page) return null;
+  return `/services/${page}`;
 }
 
 export function redirectRules(document: CmsDocument) {
   const rules = Object.entries(PORTFOLIO_REDIRECTS).map(([source, destination]) => ({ source, destination }));
+  for (const category of document.serviceCategories) {
+    const page = pageSlugForCategory(category, document.serviceCategories);
+    if (!page || page === category.slug) continue;
+    rules.push({ source: `/services/${category.slug}`, destination: `/services/${page}` });
+  }
   for (const service of document.services) {
-    if (service.status !== "active" || isLandingSlug(service.slug)) continue;
+    if (service.status !== "active" || isServicePageSlug(service.slug)) continue;
     const parent = document.serviceCategories.find((item) => item.id === service.categoryId);
-    if (!parent || !isLandingSlug(parent.slug)) continue;
-    rules.push({ source: `/services/${service.slug}`, destination: `/services/${parent.slug}` });
+    const page = parent ? pageSlugForCategory(parent, document.serviceCategories) : null;
+    if (!page) continue;
+    rules.push({ source: `/services/${service.slug}`, destination: `/services/${page}` });
   }
   return rules;
 }
@@ -415,11 +432,13 @@ export function pageMeta(pathname: string, source: CmsDocument): PageMeta {
 
   const serviceMatch = /^\/services\/([a-z0-9-]+)$/.exec(path);
   if (serviceMatch) {
-    const landing = landingFor(document, serviceMatch[1] ?? "");
+    const requested = serviceMatch[1] ?? "";
+    const landing = landingFor(document, requested);
     if (!landing) return hiddenPage(document, "Page not found", "/");
-    const title = serviceTitle(landing.slug, landing.name, area.short, document.site.shortName);
+    const pathSlug = pageSlugForCategory(landing, document.serviceCategories) ?? requested;
+    const title = serviceTitle(pathSlug, landing.name, area.short, document.site.shortName);
     const summary = serviceDescription(landing.summary, document.site.shortName, area);
-    const canonical = publicUrl(`/services/${landing.slug}`);
+    const canonical = publicUrl(`/services/${pathSlug}`);
     return {
       ...base,
       title,
