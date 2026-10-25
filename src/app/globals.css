@@ -24,24 +24,6 @@
 	--space-3xl: 4rem;
 }
 
-.dark {
-	--background: #0c0a09;
-	--foreground: #fafaf9;
-	--card: #1c1917;
-	--card-foreground: #fafaf9;
-	--primary: #fafaf9;
-	--primary-foreground: #1c1917;
-	--secondary: #d6d3d1;
-	--muted: #292524;
-	--muted-foreground: #a8a29e;
-	--accent: #8aa4b8;
-	--accent-foreground: #15202a;
-	--destructive: #f87171;
-	--border: #44403c;
-	--input: #44403c;
-	--ring: #fafaf9;
-}
-
 @layer base {
 	html {
 		height: 100%;

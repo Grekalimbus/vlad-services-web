@@ -37,13 +37,3 @@ export function CallNow({ className = buttonSecondaryClass, children }: CtaProps
     </a>
   );
 }
-
-export function BookService({ className = buttonSecondaryClass, children }: CtaProps) {
-  const { openQuote } = useQuote();
-
-  return (
-    <button type="button" className={className} onClick={() => openQuote("quote")}>
-      {children ?? ctas.book}
-    </button>
-  );
-}

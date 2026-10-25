@@ -1,8 +1,13 @@
+:root {
+  /* 0.5rem top + 3rem control + 1px border + bottom padding / home indicator. */
+  --mobile-cta-height: calc(3.5rem + 1px + max(0.75rem, env(safe-area-inset-bottom, 0px)));
+}
+
 .wrap {
   pointer-events: none;
   position: fixed;
   inset-inline: 0;
-  bottom: 0;
+  bottom: var(--browser-bottom-inset, 0px);
   z-index: 50;
 }
 

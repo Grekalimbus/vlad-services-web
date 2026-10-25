@@ -1,8 +1,5 @@
-export { ServiceCategoryCard } from "./service-category-card";
 export { Additionals } from "./additionals";
 export { Plan } from "./plan";
-export { PackageCards } from "./package-cards";
-export { TvMounting } from "./tv-mounting";
 export { TvPhotoMarquee } from "./tv-photo-marquee";
 export { TvGallery } from "./tv-gallery";
 export { TvBand } from "./tv-band";

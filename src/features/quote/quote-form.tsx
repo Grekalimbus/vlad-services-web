@@ -1,11 +1,11 @@
 "use client";
 
-import { FormEvent, useEffect, useId, useState, type ReactNode } from "react";
+import { FormEvent, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight, Mail, MapPin, Phone, Upload, User, List } from "lucide-react";
 import { useCms } from "@/lib/cms/use-cms";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
-import { quoteSuccessMessage, type LeadFormId } from "@/lib/leads";
+import { quoteSuccessMessage } from "@/lib/leads";
 import { quoteServices } from "@/lib/services";
 import { routes } from "@/lib/site";
 import { Checkbox } from "@/shared/ui";
@@ -16,17 +16,7 @@ const MAX_BYTES = 10 * 1024 * 1024;
 
 type Status = "idle" | "loading" | "success" | "error";
 
-type QuoteFormProps = {
-  formId?: LeadFormId;
-  defaultService?: string;
-  compact?: boolean;
-  onSuccess?: () => void;
-};
-
-export function QuoteForm({
-  defaultService,
-  onSuccess,
-}: QuoteFormProps) {
+export function QuoteForm() {
   const ids = {
     name: useId(),
     phone: useId(),
@@ -43,9 +33,10 @@ export function QuoteForm({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [zip, setZip] = useState("");
-  const [service, setService] = useState(defaultService ?? "");
+  const [service, setService] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const previewsRef = useRef<string[]>([]);
   const [photoError, setPhotoError] = useState("");
   const [privacy, setPrivacy] = useState(false);
   const [messaging, setMessaging] = useState(false);
@@ -64,10 +55,17 @@ export function QuoteForm({
     status !== "loading";
 
   useEffect(() => {
-    const urls = photos.map((file) => URL.createObjectURL(file));
+    const urls = previewsRef;
+    return () => urls.current.forEach((url) => URL.revokeObjectURL(url));
+  }, []);
+
+  function rememberPhotos(next: File[]) {
+    previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    const urls = next.map((file) => URL.createObjectURL(file));
+    previewsRef.current = urls;
+    setPhotos(next);
     setPreviews(urls);
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [photos]);
+  }
 
   function addPhotos(list: File[]) {
     const next = [...photos];
@@ -88,7 +86,7 @@ export function QuoteForm({
       }
       next.push(file);
     }
-    setPhotos(next);
+    rememberPhotos(next);
     setPhotoError(message);
   }
 
@@ -111,7 +109,6 @@ export function QuoteForm({
       const payload = (await response.json().catch(() => null)) as { error?: string } | null;
       if (!response.ok) throw new Error(payload?.error || "Could not send the request. Try again.");
       setStatus("success");
-      onSuccess?.();
     } catch (error) {
       setStatus("error");
       setFormError(error instanceof Error ? error.message : "Could not send the request. Try again.");
@@ -254,7 +251,7 @@ export function QuoteForm({
                   <span>{file.name}</span>
                   <button
                     type="button"
-                    onClick={() => setPhotos((current) => current.filter((_, item) => item !== index))}
+                    onClick={() => rememberPhotos(photos.filter((_, item) => item !== index))}
                   >
                     Remove
                   </button>

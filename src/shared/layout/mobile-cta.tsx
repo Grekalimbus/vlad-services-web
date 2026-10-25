@@ -2,14 +2,13 @@
 
 import { Phone } from "lucide-react";
 import { CallNow, QuoteCta } from "@/features/quote";
-import { phoneHref } from "@/lib/site";
 import { useCms } from "@/lib/cms/use-cms";
 import styles from "./mobile-cta.module.css";
 
 export function MobileCta() {
   const cms = useCms();
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} data-mobile-cta="">
       <div className={styles.bar}>
         <div className={styles.grid}>
           <CallNow className={styles.call}>

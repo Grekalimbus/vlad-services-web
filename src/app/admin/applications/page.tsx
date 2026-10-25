@@ -45,7 +45,6 @@ export default function ApplicationsPage() {
 
   useEffect(() => {
     if (!authenticated) return;
-    setLoaded(false);
     fetch("/api/admin/applications")
       .then(async (response) => {
         if (response.status === 401) {
@@ -121,7 +120,17 @@ export default function ApplicationsPage() {
   }
 
   if (!ready) return <main className={styles.login}>Loading…</main>;
-  if (!authenticated) return <Login onSuccess={() => setAuthenticated(true)} />;
+  if (!authenticated) {
+    return (
+      <Login
+        onSuccess={() => {
+          setLoaded(false);
+          setError("");
+          setAuthenticated(true);
+        }}
+      />
+    );
+  }
 
   return (
     <main className={styles.applications}>
@@ -372,10 +381,13 @@ function PhotoViewer({
   const onCloseRef = useRef(onClose);
   const onIndexRef = useRef(onIndex);
   const indexRef = useRef(index);
-  onCloseRef.current = onClose;
-  onIndexRef.current = onIndex;
-  indexRef.current = index;
   const photo = photos[index];
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    onIndexRef.current = onIndex;
+    indexRef.current = index;
+  }, [onClose, onIndex, index]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -445,7 +457,10 @@ function ConfirmDelete({
 }) {
   const cancelRef = useRef<HTMLButtonElement>(null);
   const onCancelRef = useRef(onCancel);
-  onCancelRef.current = onCancel;
+
+  useEffect(() => {
+    onCancelRef.current = onCancel;
+  }, [onCancel]);
 
   useEffect(() => {
     cancelRef.current?.focus();

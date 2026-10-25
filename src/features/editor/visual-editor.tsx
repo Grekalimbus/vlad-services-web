@@ -2,18 +2,19 @@
 
 import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { getPath } from "@/lib/cms/read";
-import { readCms } from "@/lib/cms/read";
+import { getPath, readCms } from "@/lib/cms/read";
 import {
   adoptSaved,
   discardDraft,
   isDirty,
   peekDraft,
+  publishDocument,
   setAt,
   setEditing,
 } from "@/lib/cms/edit-store";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { heroSlides } from "@/features/home/hero-slides";
+import { projectReels, type ReelPhoto } from "@/features/home/project-photos";
 import { assetPath } from "@/lib/site";
 import { removeHomepageService } from "./service-actions";
 import "./visual-editor.css";
@@ -45,7 +46,19 @@ export function VisualEditor() {
     const timer = window.setTimeout(() => {
       fetch("/api/admin/session")
         .then((response) => response.json())
-        .then((body: { authenticated?: boolean }) => {
+        .then(async (body: { authenticated?: boolean }) => {
+          if (cancelled) return;
+          if (body.authenticated) {
+            try {
+              const response = await fetch("/api/content", { cache: "no-store" });
+              const document = response.ok ? await response.json() : null;
+              if (!cancelled && document && document.version === 1 && Array.isArray(document.serviceCategories)) {
+                publishDocument(document);
+              }
+            } catch {
+              // Keep the document already on the page if the live copy cannot be loaded.
+            }
+          }
           if (!cancelled) setEditing(Boolean(body.authenticated));
         })
         .catch(() => {
@@ -234,10 +247,24 @@ function TextPopover({ panel, onClose }: { panel: Extract<Panel, { kind: "text" 
 function ImagePopover({ panel, onClose }: { panel: Extract<Panel, { kind: "image" }>; onClose: () => void }) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const src = textAt(panel.path);
+  const src = textAt(panel.path) || (panel.path === "copy.home.hero.builder" ? "/hero/builder.webp" : "");
+  const portrait = panel.path === "copy.home.hero.builder";
   return (
     <div className="editorPopover" style={anchor(panel.top, panel.left)} data-editor-ui>
-      {src ? <img src={assetPath(src)} alt="" style={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover", borderRadius: 8 }} /> : null}
+      {src ? (
+        <img
+          src={assetPath(src)}
+          alt=""
+          style={{
+            width: "100%",
+            height: portrait ? 220 : undefined,
+            aspectRatio: portrait ? undefined : "16 / 9",
+            objectFit: portrait ? "contain" : "cover",
+            background: portrait ? "#0c121c" : undefined,
+            borderRadius: 8,
+          }}
+        />
+      ) : null}
       <div className="editorRow" style={{ marginTop: "0.7rem" }}>
         <label className="editorPrimary">
           {pending ? "Uploading…" : "Replace image"}
@@ -376,7 +403,8 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const frames = galleryFrames(gallery);
-  const photosOnly = gallery.startsWith("photos:");
+  const photosOnly = gallery.startsWith("photos:") || gallery.startsWith("reels:");
+  const title = gallery === "reels:top" ? "Top carousel" : gallery === "reels:bottom" ? "Bottom carousel" : "Photos";
   const dragStart = useRef<{ index: number; x: number; y: number } | null>(null);
   const dragMoved = useRef(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -447,7 +475,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
         onClick={(event) => event.stopPropagation()}
       >
         <div className="editorModalHead">
-          <h2 id={titleId}>Photos</h2>
+          <h2 id={titleId}>{title}</h2>
           <button type="button" className="editorClose" onClick={onClose}>
             Close
           </button>
@@ -666,7 +694,32 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
 
 type Frame = { key: string; src: string; secondary?: string; captionPath?: string };
 
+function reelRow(gallery: string) {
+  if (gallery === "reels:top" || gallery === "reels:bottom") return gallery.slice("reels:".length) as "top" | "bottom";
+  return null;
+}
+
+function reelPhotos(gallery: string) {
+  const row = reelRow(gallery);
+  if (!row) return null;
+  return projectReels(readCms())[row].map((photo) => ({ ...photo }));
+}
+
+function commitReel(gallery: string, photos: ReelPhoto[]) {
+  const row = reelRow(gallery);
+  if (!row) return;
+  const current = projectReels(readCms());
+  setAt("copy.home.works.reels", { ...current, [row]: photos });
+}
+
 function galleryFrames(gallery: string): Frame[] {
+  const reel = reelPhotos(gallery);
+  if (reel) {
+    return reel.map((photo, index) => ({
+      key: `${index}-${photo.image}`,
+      src: photo.image,
+    }));
+  }
   const document = readCms();
   if (gallery.startsWith("slides:")) {
     return slideArray(gallery).slides.map((slide, index) => ({
@@ -730,6 +783,14 @@ function categoryEntries(gallery: string) {
 
 function reorderFrames(gallery: string, from: number, to: number) {
   if (from === to) return;
+  const reel = reelPhotos(gallery);
+  if (reel) {
+    if (from < 0 || to < 0 || from >= reel.length || to >= reel.length) return;
+    const [item] = reel.splice(from, 1);
+    reel.splice(to, 0, item);
+    commitReel(gallery, reel);
+    return;
+  }
   if (gallery.startsWith("slides:")) {
     const { path, slides } = slideArray(gallery);
     if (from < 0 || to < 0 || from >= slides.length || to >= slides.length) return;
@@ -752,6 +813,12 @@ function reorderFrames(gallery: string, from: number, to: number) {
 }
 
 function deleteFrame(gallery: string, index: number) {
+  const reel = reelPhotos(gallery);
+  if (reel) {
+    reel.splice(index, 1);
+    commitReel(gallery, reel);
+    return;
+  }
   if (gallery.startsWith("slides:")) {
     const { path, slides } = slideArray(gallery);
     slides.splice(index, 1);
@@ -764,6 +831,13 @@ function deleteFrame(gallery: string, index: number) {
 }
 
 function replaceFrame(gallery: string, index: number, src: string, secondary: boolean) {
+  const reel = reelPhotos(gallery);
+  if (reel) {
+    if (!reel[index]) return;
+    reel[index] = { ...reel[index], image: src };
+    commitReel(gallery, reel);
+    return;
+  }
   if (gallery.startsWith("slides:")) {
     const { path, slides } = slideArray(gallery);
     slides[index] = { ...slides[index], image: src };
@@ -784,6 +858,12 @@ function replaceFrame(gallery: string, index: number, src: string, secondary: bo
 }
 
 function addFrame(gallery: string, src: string) {
+  const reel = reelPhotos(gallery);
+  if (reel) {
+    reel.push({ image: src, alt: "Project photo" });
+    commitReel(gallery, reel);
+    return;
+  }
   if (gallery.startsWith("slides:")) {
     const { path, slides } = slideArray(gallery);
     slides.push({ image: src, alt: "Photo", position: "center" });

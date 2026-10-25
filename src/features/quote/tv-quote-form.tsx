@@ -21,7 +21,6 @@ type TvQuoteFormProps = {
   tvCount?: string;
   formId?: LeadFormId;
   compact?: boolean;
-  onSuccess?: () => void;
 };
 
 type FieldErrors = {
@@ -40,7 +39,6 @@ export function TvQuoteForm({
   tvCount,
   formId = "tv-mounting-quote",
   compact = false,
-  onSuccess,
 }: TvQuoteFormProps) {
   const ids = {
     count: useId(),
@@ -115,7 +113,6 @@ export function TvQuoteForm({
     setStatus("success");
     form.reset();
     setPhotoName("");
-    onSuccess?.();
   }
 
   if (status === "success") {

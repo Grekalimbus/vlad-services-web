@@ -13,9 +13,3 @@ export type ServiceLocation = {
 };
 
 export const locations = live(() => readCms().locations as ServiceLocation[]);
-
-export const activeLocations = live(() => locations.filter((location) => location.status === "active"));
-
-export const primaryLocation = live(
-  () => activeLocations[0] ?? locations.find((location) => location.id === "san-diego") ?? locations[0],
-);

@@ -29,8 +29,18 @@ export async function onRequest(context: {
   const asset = path.startsWith("/_next") || /\.(?:css|js|mjs|map|jpg|jpeg|png|webp|gif|svg|ico|woff2?|ttf|txt|xml|json|webmanifest)$/i.test(url.pathname);
 
   if (asset) return guard(await context.next(), context.request);
-  if (path.startsWith("/admin") || path.startsWith("/api")) {
+  if (path.startsWith("/api")) {
     return guard(await context.next(), context.request, "noindex, nofollow");
+  }
+  if (path.startsWith("/admin")) {
+    const response = guard(await context.next(), context.request, "noindex, nofollow");
+    const type = response.headers.get("content-type") ?? "";
+    if (!type.includes("text/html")) return response;
+    try {
+      return injectCms(response, normalizeCms(await loadDocument(context.env)));
+    } catch {
+      return response;
+    }
   }
 
   const early = redirectTarget(path);
@@ -138,6 +148,19 @@ export async function onRequest(context: {
     })
     .transform(new Response(response.body, { status: response.status, headers }));
   return rewritten;
+}
+
+function injectCms(response: Response, document: unknown) {
+  const payload = JSON.stringify(document).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
+  const headers = new Headers(response.headers);
+  headers.set("cache-control", "private, no-store");
+  return new HTMLRewriter()
+    .on("script#cms-data", {
+      element(element) {
+        element.setInnerContent(`window.__CMS__=${payload}`, { html: false });
+      },
+    })
+    .transform(new Response(response.body, { status: response.status, statusText: response.statusText, headers }));
 }
 
 function guard(response: Response, request?: Request, robots?: string) {

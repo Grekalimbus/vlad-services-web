@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { projectReels } from "@/features/home/project-photos";
 import { TvPhotoMarquee } from "@/features/services/tv-photo-marquee";
 import { useCms } from "@/lib/cms/use-cms";
 import { LANDING_SLUGS } from "@/lib/seo";
@@ -20,11 +21,11 @@ export function Works() {
   const works = cms.copy.home.works;
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const photos = cms.galleryItems.flatMap((entry) =>
-    entry.src ? [{ id: entry.id, src: entry.src, alt: entry.alt || entry.title }] : [],
-  );
-  const top = photos.filter((_, index) => index % 2 === 0);
-  const bottom = photos.filter((_, index) => index % 2 === 1);
+  const reels = projectReels(cms);
+  const rows = [
+    { gallery: "reels:top", direction: "right" as const, photos: reels.top },
+    { gallery: "reels:bottom", direction: "left" as const, photos: reels.bottom },
+  ];
   const services = cms.serviceCategories.filter(
     (category) => category.status === "active" && category.featured && pageSlugs.has(category.slug),
   );
@@ -55,12 +56,25 @@ export function Works() {
         </h2>
       </div>
 
-      {photos.length > 0 ? (
-        <div className={styles.reels}>
-          <TvPhotoMarquee photos={top.length > 0 ? top : photos} direction="right" heading={false} paired label="Projects" />
-          <TvPhotoMarquee photos={bottom.length > 0 ? bottom : photos} direction="left" heading={false} paired label="Projects" />
-        </div>
-      ) : null}
+      <div className={styles.reels}>
+        {rows.map((row) => (
+          <div key={row.gallery} data-cms-gallery={row.gallery} data-empty={row.photos.length === 0 ? "" : undefined}>
+            {row.photos.length > 0 ? (
+              <TvPhotoMarquee
+                photos={row.photos.map((photo, index) => ({
+                  id: `${row.gallery}-${index}`,
+                  src: photo.image,
+                  alt: photo.alt,
+                }))}
+                direction={row.direction}
+                heading={false}
+                paired
+                label="Projects"
+              />
+            ) : null}
+          </div>
+        ))}
+      </div>
 
       <div className={`${styles.container} ${styles.actionWrap}`}>
         <button

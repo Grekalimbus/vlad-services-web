@@ -1,25 +1,23 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./admin.module.css";
 
 export default function AdminPage() {
-  const router = useRouter();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/session")
       .then((response) => response.json())
       .then((body: { authenticated?: boolean }) => {
-        if (body.authenticated) router.replace("/");
+        if (body.authenticated) window.location.assign("/");
         else setReady(true);
       })
       .catch(() => setReady(true));
-  }, [router]);
+  }, []);
 
   if (!ready) return <main className={styles.login}>Loading…</main>;
-  return <Login onSuccess={() => router.replace("/")} />;
+  return <Login onSuccess={() => window.location.assign("/")} />;
 }
 
 function Login({ onSuccess }: { onSuccess: () => void }) {

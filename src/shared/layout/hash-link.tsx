@@ -15,7 +15,7 @@ function prefersReducedMotion() {
 	return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function scrollToHash(hash: string) {
+function scrollToHash(hash: string) {
 	const id = hash.replace(/^#/, "");
 	if (!id) return false;
 	const target = document.getElementById(id);

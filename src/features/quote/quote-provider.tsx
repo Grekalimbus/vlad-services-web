@@ -9,14 +9,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { LeadFormId } from "@/lib/leads";
 
-export type QuoteFormKind = "quote" | "tv";
+type QuoteFormKind = "quote" | "tv";
 
 type QuoteContextValue = {
   open: boolean;
   form: QuoteFormKind;
-  formId: LeadFormId;
   tvCount: string | null;
   openQuote: (form?: QuoteFormKind, tvCount?: string) => void;
   closeQuote: () => void;
@@ -58,7 +56,6 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     () => ({
       open,
       form,
-      formId: (form === "tv" ? "quote-dialog" : "quote-dialog") as LeadFormId,
       tvCount,
       openQuote,
       closeQuote,

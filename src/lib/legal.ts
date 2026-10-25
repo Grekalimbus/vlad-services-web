@@ -16,7 +16,3 @@ export type LegalPage = {
 };
 
 export const legalPages = live(() => readCms().legalPages as LegalPage[]);
-
-export function getLegalPage(slug: string) {
-  return legalPages.find((page) => page.slug === slug);
-}

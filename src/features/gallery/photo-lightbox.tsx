@@ -30,9 +30,12 @@ export function PhotoLightbox({
   const indexRef = useRef(index);
   const photo = photos[index];
   const count = photos.length;
-  onCloseRef.current = onClose;
-  onIndexRef.current = onIndex;
-  indexRef.current = index;
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    onIndexRef.current = onIndex;
+    indexRef.current = index;
+  }, [onClose, onIndex, index]);
 
   useEffect(() => {
     closeRef.current?.focus();

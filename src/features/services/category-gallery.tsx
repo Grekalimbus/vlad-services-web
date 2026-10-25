@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { QuoteCta } from "@/features/quote";
@@ -123,15 +123,12 @@ function SlideStage({
   const [zoom, setZoom] = useState(false);
   const editing = useEditing();
   const count = slides.length;
+  if (index >= count && index !== 0) setIndex(0);
   const slide = slides[Math.min(index, Math.max(count - 1, 0))];
   const leaving = frame ? slides[frame.leaving] : null;
   const sizes = large
     ? "(min-width: 1024px) 72rem, 100vw"
     : "(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 100vw";
-
-  useEffect(() => {
-    if (index >= count) setIndex(0);
-  }, [count, index]);
 
   function go(next: number, direction: -1 | 1) {
     if (!slide || next === index || frame || count < 2) return;

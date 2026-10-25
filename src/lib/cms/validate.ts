@@ -1,4 +1,3 @@
-import { fallbackDocument } from "./read";
 import type { CmsDocument } from "./types";
 
 const REQUIRED = [
@@ -112,8 +111,4 @@ export function mediaKey(key: string) {
 
 export function publicMediaPath(key: string) {
   return `/api/media/${key}`;
-}
-
-export function emptyDocument(): CmsDocument {
-  return structuredClone(fallbackDocument);
 }

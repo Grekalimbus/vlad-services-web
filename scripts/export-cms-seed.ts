@@ -76,6 +76,7 @@ const document = {
   copy: {
     home: {
       hero: {
+        builder: "/hero/builder.webp",
         image: "/works/hero.jpg",
         imageAlt: "Finished living room with a wall-mounted television",
         imageNext: "/works/tv-living-blue.jpg",

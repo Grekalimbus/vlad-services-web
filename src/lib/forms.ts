@@ -1,7 +1,6 @@
 import styles from "@/styles/shared.module.css";
 
 export const fieldClass = styles.field;
-export const textareaClass = styles.textarea;
 export const buttonPrimaryClass = styles.primaryButton;
 export const buttonSecondaryClass = styles.secondaryButton;
 

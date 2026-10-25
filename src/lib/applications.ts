@@ -11,8 +11,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type StoredPhoto = { key: string; name: string; type: string };
 
-const STATUSES = ["new", "contacted", "scheduled"] as const;
-type ApplicationStatus = (typeof STATUSES)[number];
+type ApplicationStatus = "new" | "contacted" | "scheduled";
 
 type StoredApplication = {
   id: string;

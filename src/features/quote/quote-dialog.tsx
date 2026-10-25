@@ -84,7 +84,7 @@ export function QuoteDialog() {
           {form === "tv" ? (
             <TvQuoteForm formId="quote-dialog" compact tvCount={tvCount ?? undefined} />
           ) : (
-            <QuoteForm formId="quote-dialog" compact />
+            <QuoteForm />
           )}
         </div>
       </div>
