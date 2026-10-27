@@ -17,6 +17,7 @@ import { heroSlides } from "@/features/home/hero-slides";
 import { projectReels, type ReelPhoto } from "@/features/home/project-photos";
 import { assetPath } from "@/lib/site";
 import { ensureServiceTemplates } from "@/lib/service-pages";
+import { ensureTrustItems } from "@/lib/cms/trust-items";
 import { removeHomepageService } from "./service-actions";
 import "./visual-editor.css";
 
@@ -54,7 +55,7 @@ export function VisualEditor() {
               const response = await fetch("/api/content", { cache: "no-store" });
               const document = response.ok ? await response.json() : null;
               if (!cancelled && document && document.version === 1 && Array.isArray(document.serviceCategories)) {
-                publishDocument(ensureServiceTemplates(document));
+                publishDocument(ensureTrustItems(ensureServiceTemplates(document)));
               }
             } catch {
               void 0;

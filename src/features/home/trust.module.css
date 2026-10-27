@@ -18,6 +18,14 @@
   padding-bottom: 20px;
 }
 
+@media (min-width: 900px) {
+  .section .container {
+    width: min(100% - 3rem, 74rem);
+    max-width: none;
+    padding-inline: 0;
+  }
+}
+
 .heading {
   composes: heading from "../../styles/shared.module.css";
   width: 100%;
@@ -99,7 +107,7 @@
 
 @media (min-width: 1100px) {
   .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .item {

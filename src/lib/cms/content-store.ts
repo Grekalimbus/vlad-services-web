@@ -1,4 +1,5 @@
 import { ensureServiceTemplates } from "@/lib/service-pages";
+import { ensureTrustItems } from "./trust-items";
 import { fallbackDocument } from "./read";
 import type { CmsDocument, CmsEnv } from "./types";
 import { inspectImage, mediaKey, publicMediaPath, validateDocument } from "./validate";
@@ -22,16 +23,16 @@ export async function loadDocument(env: CmsEnv): Promise<CmsDocument> {
     const row = await env.CMS_DB.prepare("SELECT body FROM documents WHERE id = ?")
       .bind("site")
       .first<{ body: string }>();
-    if (row?.body) return withCompanyEmail(ensureServiceTemplates(validateDocument(JSON.parse(row.body))));
+    if (row?.body) return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(validateDocument(JSON.parse(row.body)))));
   }
   if (env.readLocal) {
     try {
-      return withCompanyEmail(ensureServiceTemplates(validateDocument(await env.readLocal())));
+      return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(validateDocument(await env.readLocal()))));
     } catch {
-      return withCompanyEmail(ensureServiceTemplates(structuredClone(fallbackDocument)));
+      return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(structuredClone(fallbackDocument))));
     }
   }
-  return withCompanyEmail(ensureServiceTemplates(structuredClone(fallbackDocument)));
+  return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(structuredClone(fallbackDocument))));
 }
 
 export async function saveDocument(env: CmsEnv, input: unknown) {

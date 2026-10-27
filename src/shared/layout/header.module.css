@@ -61,17 +61,6 @@
 	height: 100%;
 }
 
-.logoLink > span {
-	transition:
-		width 300ms,
-		height 300ms;
-}
-
-.headerScrolled .logoLink > span {
-	width: calc(8.25rem * 0.85);
-	height: calc(2.35rem * 0.85);
-}
-
 .desktopNav {
 	display: none;
 	align-items: center;
@@ -338,11 +327,6 @@
 		height: auto;
 	}
 
-	.headerScrolled .logoLink > span {
-		width: calc(9.9rem * 0.85);
-		height: calc(2.75rem * 0.85);
-	}
-
 	.menuButton {
 		width: 2.75rem;
 		height: 2.75rem;
@@ -352,11 +336,6 @@
 @media (min-width: 1024px) {
 	.headerBar {
 		padding-inline: calc(1.5rem + 15px);
-	}
-
-	.headerScrolled .logoLink > span {
-		width: calc(11.275rem * 0.85);
-		height: calc(3.025rem * 0.85);
 	}
 
 	.headerRow {

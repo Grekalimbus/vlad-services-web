@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Calendar, ClipboardList, Shield, Users } from "lucide-react";
+import { Briefcase, Calendar, ClipboardList, Shield, Users } from "lucide-react";
 import { useCms } from "@/lib/cms/use-cms";
 import styles from "./trust.module.css";
 
@@ -10,6 +10,7 @@ const icons = {
   clients: Users,
   projects: ClipboardList,
   days: Calendar,
+  business: Briefcase,
 } as const;
 
 function useCountUp(target: number, active: boolean) {
