@@ -17,11 +17,6 @@ export function phoneHref(display: string) {
   return `tel:+${digits.length === 10 ? `1${digits}` : digits}`;
 }
 
-/**
- * Public company identity only.
- * Do not add the registered business address to this object or to any
- * public-facing component. That address is private and must stay off the site.
- */
 export const site = live(() => {
   const value = readCms().site;
   return {

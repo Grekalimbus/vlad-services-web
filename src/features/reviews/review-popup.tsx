@@ -9,7 +9,9 @@ import styles from "./review-popup.module.css";
 const STORAGE_KEY = "primefix-review-popups";
 const SHOW_MS = 3000;
 const EXIT_MS = 500;
-const COOLDOWN_MS = 3 * 60 * 1000;
+const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
+const COOLDOWNS_MS = [HOUR_MS, DAY_MS];
 const DELAYS_MS = [3000, 5000, 15000];
 
 type Review = {
@@ -22,6 +24,7 @@ type Review = {
 type Cycle = {
   startedAt: number;
   offset: number;
+  wave: number;
 };
 
 type Active = {
@@ -40,9 +43,13 @@ function windows(startedAt: number) {
   });
 }
 
-function cooldownEnds(startedAt: number) {
-  const slots = windows(startedAt);
-  return slots[slots.length - 1].hideAt + COOLDOWN_MS;
+function cooldownMs(wave: number) {
+  return COOLDOWNS_MS[wave % COOLDOWNS_MS.length];
+}
+
+function cooldownEnds(cycle: Cycle) {
+  const slots = windows(cycle.startedAt);
+  return slots[slots.length - 1].hideAt + cooldownMs(cycle.wave);
 }
 
 function readCycle(): Cycle | null {
@@ -51,7 +58,8 @@ function readCycle(): Cycle | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<Cycle>;
     if (typeof parsed.startedAt !== "number" || typeof parsed.offset !== "number") return null;
-    return { startedAt: parsed.startedAt, offset: parsed.offset };
+    const wave = typeof parsed.wave === "number" && parsed.wave >= 0 ? Math.floor(parsed.wave) : 0;
+    return { startedAt: parsed.startedAt, offset: parsed.offset, wave };
   } catch {
     return null;
   }
@@ -61,7 +69,7 @@ function writeCycle(cycle: Cycle) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cycle));
   } catch {
-    // Private mode can block storage; the in-memory schedule still runs.
+    void 0;
   }
 }
 
@@ -114,19 +122,27 @@ export function ReviewPopup() {
       timers.push(
         window.setTimeout(() => {
           if (cancelled) return;
-          const next = { startedAt: Date.now(), offset: cycle.offset + slots.length };
+          const next = {
+            startedAt: Date.now(),
+            offset: cycle.offset + slots.length,
+            wave: (cycle.wave + 1) % COOLDOWNS_MS.length,
+          };
           writeCycle(next);
           setActive(null);
           schedule(next);
-        }, Math.max(0, cooldownEnds(cycle.startedAt) - Date.now())),
+        }, Math.max(0, cooldownEnds(cycle) - Date.now())),
       );
     };
 
     const stored = readCycle();
     const now = Date.now();
-    const expired = !stored || now >= cooldownEnds(stored.startedAt);
+    const expired = !stored || now >= cooldownEnds(stored);
     const cycle = expired
-      ? { startedAt: now, offset: stored ? stored.offset + DELAYS_MS.length : 0 }
+      ? {
+          startedAt: now,
+          offset: stored ? stored.offset + DELAYS_MS.length : 0,
+          wave: stored ? (stored.wave + 1) % COOLDOWNS_MS.length : 0,
+        }
       : stored;
     if (expired) writeCycle(cycle);
     schedule(cycle);

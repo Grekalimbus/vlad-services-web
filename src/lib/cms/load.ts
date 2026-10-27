@@ -4,6 +4,7 @@ import { ensureServiceTemplates } from "@/lib/service-pages";
 import { rememberCms } from "./store";
 import { fallbackDocument, readCms } from "./read";
 import type { CmsDocument } from "./types";
+import { withCompanyEmail } from "./content-store";
 import { validateDocument } from "./validate";
 
 const PRODUCTION_TTL_MS = 15_000;
@@ -11,7 +12,7 @@ const PRODUCTION_TTL_MS = 15_000;
 let productionCache: { at: number; document: CmsDocument } | null = null;
 
 export const loadCms = cache(async (): Promise<CmsDocument> => {
-  return readSavedDocument();
+  return withCompanyEmail(await readSavedDocument());
 });
 
 export async function bindCms(): Promise<CmsDocument> {

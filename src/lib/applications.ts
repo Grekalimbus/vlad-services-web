@@ -234,7 +234,7 @@ async function deleteApplication(env: CmsEnv, id: string) {
     try {
       await discardImage(env, photo.key);
     } catch {
-      /* The application row is still removed. */
+      void 0;
     }
   }
   if (env.CMS_DB) {
@@ -256,7 +256,7 @@ async function ensureTable(env: CmsEnv) {
   try {
     await env.CMS_DB.prepare("ALTER TABLE applications ADD COLUMN status TEXT NOT NULL DEFAULT 'new'").bind().run();
   } catch {
-    /* The column is already present. */
+    void 0;
   }
 }
 

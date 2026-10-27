@@ -1,8 +1,6 @@
 .section {
   --hero-chrome: var(--mobile-cta-height, 0px);
   position: relative;
-  /* vh, then dvh, then svh. svh wins where it exists so the fold stays put
-     while mobile browser chrome shows and hides. */
   height: calc(100vh - var(--hero-chrome));
   height: calc(100dvh - var(--hero-chrome));
   height: calc(var(--hero-viewport, 100svh) - var(--hero-chrome));
@@ -47,6 +45,7 @@
   align-items: center;
   justify-content: flex-end;
   min-height: 0;
+  container-type: inline-size;
   padding-top: calc(5.5rem + env(safe-area-inset-top, 0px));
   padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
   padding-bottom: 0.35rem;
@@ -57,8 +56,8 @@
 
 .heading {
   margin: 0;
-  max-width: 22rem;
-  font-size: clamp(1.45rem, 6.4vw, 2.15rem);
+  max-width: 100%;
+  font-size: min(2.15rem, calc(100cqw / 12.6));
   font-weight: 900;
   line-height: 1.12;
   letter-spacing: -0.035em;
@@ -67,6 +66,7 @@
 
 .line {
   display: block;
+  white-space: nowrap;
 }
 
 .discount {
@@ -150,9 +150,9 @@
     justify-content: center;
     align-items: flex-start;
     width: auto;
-    max-width: 40rem;
+    max-width: calc(40rem + 30px);
     height: auto;
-    margin-left: max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem - 50px));
+    margin-left: max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem - 70px));
     margin-right: 1.25rem;
     padding-top: calc(5.5rem + env(safe-area-inset-top, 0px));
     padding-bottom: 2rem;
@@ -162,7 +162,7 @@
 
   .heading {
     max-width: none;
-    font-size: clamp(1.85rem, 2.55vw, 3.15rem);
+    font-size: clamp(calc(1.85rem + 8px), calc(2.55vw + 8px), calc(3.15rem + 8px));
   }
 
   .line {
@@ -170,7 +170,7 @@
   }
 
   .tagline {
-    max-width: 34rem;
+    max-width: calc(34rem + 30px);
     margin-top: 1.35rem;
     font-size: clamp(0.85rem, 1.15vw, 1.125rem);
   }
@@ -191,8 +191,6 @@
 
   .builder {
     object-position: right bottom;
-    /* -120px on wide screens; ease off as the column narrows so the figure
-       stays inside the viewport and clear of the headline. */
     transform: translateX(clamp(-120px, calc(40px - 12vw), -36px));
   }
 }
@@ -212,7 +210,7 @@
   }
 
   .heading {
-    font-size: clamp(1.2rem, 5.4vw, 1.4rem);
+    font-size: min(1.4rem, calc(100cqw / 12.6));
   }
 
   .tagline {
@@ -267,8 +265,8 @@
   }
 
   .heading {
-    max-width: 26rem;
-    font-size: clamp(1.15rem, 5vh, 1.6rem);
+    max-width: 100%;
+    font-size: min(1.6rem, 5vh, calc(100cqw / 12.6));
     text-align: left;
   }
 
@@ -305,5 +303,18 @@
 
   .figure {
     height: calc(100% - 5.5rem - env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (max-width: 899px) and (orientation: portrait) {
+  .copy {
+    justify-content: flex-start;
+    padding-top: calc(11rem + env(safe-area-inset-top, 0px));
+    transform: none;
+  }
+
+  .builder {
+    transform: translateY(max(0px, calc(20% - 44px))) scale(1.2);
+    transform-origin: center bottom;
   }
 }

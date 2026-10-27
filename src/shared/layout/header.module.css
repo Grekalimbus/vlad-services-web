@@ -101,7 +101,6 @@
 .navLabel::after {
 	content: "";
 	position: absolute;
-	/* 0.16em removes Inter's space under the capitals, leaving a 5px gap. */
 	top: calc(100% + 5px - 0.16em);
 	left: 0;
 	width: 100%;
@@ -380,5 +379,13 @@
 	.menuButton,
 	.mobileNav {
 		display: none;
+	}
+}
+
+@media (max-width: 1023px) {
+	.header,
+	.headerTop {
+		border-bottom-color: #c8c8c8;
+		background: #fff;
 	}
 }

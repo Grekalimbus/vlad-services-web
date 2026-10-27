@@ -57,7 +57,7 @@ export function VisualEditor() {
                 publishDocument(ensureServiceTemplates(document));
               }
             } catch {
-              // Keep the document already on the page if the live copy cannot be loaded.
+              void 0;
             }
           }
           if (!cancelled) setEditing(Boolean(body.authenticated));

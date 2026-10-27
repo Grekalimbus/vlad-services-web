@@ -8,5 +8,4 @@ export const yelpListing = {
   writeReviewUrl: socialLinks.yelp,
 };
 
-/** Recommended Yelp reviews. The public listing currently has none. */
 export const yelpReviews: GoogleReview[] = [];

@@ -71,7 +71,6 @@ export function adoptSaved(document: CmsDocument) {
   emit();
 }
 
-/** Replace the build-time snapshot with the document stored in the database. */
 export function publishDocument(document: CmsDocument) {
   if (draft) return;
   if (typeof window !== "undefined") window.__CMS__ = document;

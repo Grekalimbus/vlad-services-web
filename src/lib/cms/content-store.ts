@@ -3,21 +3,35 @@ import { fallbackDocument } from "./read";
 import type { CmsDocument, CmsEnv } from "./types";
 import { inspectImage, mediaKey, publicMediaPath, validateDocument } from "./validate";
 
+const COMPANY_EMAIL = "info@primefix.com";
+const PREVIOUS_COMPANY_EMAILS = ["info@primefixpros.com", "info@primefixhandyman.com"];
+
+export function withCompanyEmail(document: CmsDocument): CmsDocument {
+  let json = JSON.stringify(document);
+  let changed = false;
+  for (const email of PREVIOUS_COMPANY_EMAILS) {
+    if (!json.includes(email)) continue;
+    json = json.replaceAll(email, COMPANY_EMAIL);
+    changed = true;
+  }
+  return changed ? (JSON.parse(json) as CmsDocument) : document;
+}
+
 export async function loadDocument(env: CmsEnv): Promise<CmsDocument> {
   if (env.CMS_DB) {
     const row = await env.CMS_DB.prepare("SELECT body FROM documents WHERE id = ?")
       .bind("site")
       .first<{ body: string }>();
-    if (row?.body) return ensureServiceTemplates(validateDocument(JSON.parse(row.body)));
+    if (row?.body) return withCompanyEmail(ensureServiceTemplates(validateDocument(JSON.parse(row.body))));
   }
   if (env.readLocal) {
     try {
-      return ensureServiceTemplates(validateDocument(await env.readLocal()));
+      return withCompanyEmail(ensureServiceTemplates(validateDocument(await env.readLocal())));
     } catch {
-      return ensureServiceTemplates(structuredClone(fallbackDocument));
+      return withCompanyEmail(ensureServiceTemplates(structuredClone(fallbackDocument)));
     }
   }
-  return ensureServiceTemplates(structuredClone(fallbackDocument));
+  return withCompanyEmail(ensureServiceTemplates(structuredClone(fallbackDocument)));
 }
 
 export async function saveDocument(env: CmsEnv, input: unknown) {
@@ -104,7 +118,7 @@ export async function listMedia(env: CmsEnv) {
           const key = mediaKey(object.key);
           items.push({ key, src: publicMediaPath(key) });
         } catch {
-          // Skip objects that are not public image uploads.
+          void 0;
         }
       }
       cursor = page.truncated ? page.cursor : undefined;
@@ -121,7 +135,7 @@ export async function listMedia(env: CmsEnv) {
           const key = mediaKey(object.name);
           items.push({ key, src: publicMediaPath(key) });
         } catch {
-          // Skip objects that are not public image uploads.
+          void 0;
         }
       }
       cursor = page.list_complete ? undefined : page.cursor;

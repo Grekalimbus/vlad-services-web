@@ -25,7 +25,6 @@ function galleryPhotos(document: ReelSource): ReelPhoto[] {
   );
 }
 
-/** Homepage project rows. Saved rows win; otherwise the current gallery is split between them. */
 export function projectReels(document: ReelSource): { top: ReelPhoto[]; bottom: ReelPhoto[] } {
   const stored = getPath(document, "copy.home.works.reels");
   if (stored && typeof stored === "object") {

@@ -99,10 +99,6 @@ export function buildLeadPayload(input: {
   };
 }
 
-/**
- * Client-only stand-in until Mailchimp / a form endpoint is connected.
- * Consent records stay on the lead object so they can be forwarded later.
- */
 export async function submitLead(payload: LeadPayload) {
   await new Promise((resolve) => setTimeout(resolve, 600));
   if (process.env.NODE_ENV !== "production") {
