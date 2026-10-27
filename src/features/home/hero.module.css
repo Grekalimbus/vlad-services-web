@@ -154,7 +154,7 @@
 		width: auto;
 		max-width: calc(40rem + 30px);
 		height: auto;
-		margin-left: max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem - 140px));
+		margin-left: max(1.25rem, calc((100vw - 72rem) / 2 + 1.25rem - 100px));
 		margin-right: 1.25rem;
 		padding-top: calc(5.5rem + env(safe-area-inset-top, 0px));
 		padding-bottom: 2rem;
@@ -197,7 +197,7 @@
 
 	.builder {
 		object-position: right bottom;
-		transform: translateX(clamp(-120px, calc(-120px + max(0px, 100vw - 1760px) * 0.5), 0px));
+		transform: translateX(clamp(-80px, calc(-80px + max(0px, 100vw - 1760px) * 0.5), 40px));
 	}
 }
 
