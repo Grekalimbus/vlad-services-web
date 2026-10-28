@@ -16,6 +16,7 @@ import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { heroSlides } from "@/features/home/hero-slides";
 import { projectReels, type ReelPhoto } from "@/features/home/project-photos";
 import { assetPath } from "@/lib/site";
+import { projectIconOptions } from "@/lib/project-cards";
 import { ensureServiceTemplates } from "@/lib/service-pages";
 import { ensureTrustItems } from "@/lib/cms/trust-items";
 import { removeHomepageService } from "./service-actions";
@@ -363,7 +364,18 @@ function CardPopover({
       {fields.texts.map((field) => (
         <label key={field.path} className="editorLabel">
           {field.label}
-          {field.long ? (
+          {field.options ? (
+            <select value={textAt(field.path)} onChange={(event) => setAt(field.path, event.target.value)}>
+              {field.options.some((option) => option.value === textAt(field.path)) ? null : (
+                <option value={textAt(field.path)}>{textAt(field.path) || "Select"}</option>
+              )}
+              {field.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : field.long ? (
             <textarea value={textAt(field.path)} onChange={(event) => setAt(field.path, event.target.value)} />
           ) : (
             <input
@@ -642,7 +654,13 @@ function panelFor(element: HTMLElement): Panel {
   return { kind: "text", path: path || "", top, left };
 }
 
-type CardField = { path: string; label: string; long?: boolean; numeric?: boolean };
+type CardField = {
+  path: string;
+  label: string;
+  long?: boolean;
+  numeric?: boolean;
+  options?: { value: string; label: string }[];
+};
 
 function cardFields(kind: string, id: string): { image: string; remove: boolean; texts: CardField[] } | null {
   const document = readCms();
@@ -684,15 +702,14 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
     };
   }
   if (kind === "works") {
-    const card = document.copy.home.works.cards[Number(id)];
-    const texts: CardField[] =
-      card?.lines?.length > 0
-        ? card.lines.map((_, line) => ({
-            path: `copy.home.works.cards.${id}.lines.${line}`,
-            label: card.lines.length > 1 ? `Title line ${line + 1}` : "Title",
-          }))
-        : [{ path: `copy.home.works.cards.${id}.title`, label: "Title" }];
-    return { image: `copy.home.works.cards.${id}.src`, remove: false, texts };
+    return {
+      image: "",
+      remove: false,
+      texts: [
+        { path: `copy.home.works.cards.${id}.title`, label: "Title" },
+        { path: `copy.home.works.cards.${id}.icon`, label: "Icon", options: projectIconOptions },
+      ],
+    };
   }
   if (kind === "trust") {
     const index = document.trustItems.findIndex((item) => item.id === id);
@@ -783,6 +800,11 @@ function slideArray(gallery: string): { path: string; slides: SlideRecord[] } {
 
 function commitSlides(path: string, slides: SlideRecord[]) {
   setAt(path, slides);
+  const cardPhotos = /^copy\.home\.works\.cards\.(\d+)\.photos$/.exec(path);
+  if (cardPhotos) {
+    setAt(`copy.home.works.cards.${cardPhotos[1]}.src`, slides[0]?.image ?? "");
+    setAt(`copy.home.works.cards.${cardPhotos[1]}.alt`, slides[0]?.alt ?? "");
+  }
   if (path !== "copy.home.hero.slides") return;
   const first = slides[0];
   const second = slides[1];

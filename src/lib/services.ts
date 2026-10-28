@@ -1,5 +1,5 @@
 import { live, readCms } from "@/lib/cms/read";
-import { categoryForPageSlug, pageSlugForCategory, TEMPLATE_PAGE_SLUGS } from "@/lib/service-pages";
+import { categoryForPageSlug, pageSlugForCategory, SERVICE_PAGE_SLUGS } from "@/lib/service-pages";
 import { routes } from "@/lib/site";
 
 export type CatalogStatus = "active" | "planned";
@@ -80,4 +80,4 @@ export function landingForSlug(slug: string) {
   return undefined;
 }
 
-export const serviceRouteSlugs = ["tv-mounting", "electrical", "handyman", ...TEMPLATE_PAGE_SLUGS];
+export const serviceRouteSlugs = [...SERVICE_PAGE_SLUGS];

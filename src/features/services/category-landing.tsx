@@ -10,15 +10,15 @@ import styles from "./category-landing.module.css";
 
 export function CategoryLanding({ category }: { category: ServiceCategory }) {
   const cms = useCms();
-  const fresh = cms.serviceCategories.find((item) => item.id === category.id) ?? category;
-  const index = cms.serviceCategories.findIndex((item) => item.id === category.id);
+  const fresh = cms.serviceCategories.find((item) => item.id === category.id || item.slug === category.slug) ?? category;
+  const index = cms.serviceCategories.findIndex((item) => item.id === fresh.id);
   const photos = cms.galleryItems.flatMap((entry) =>
-    entry.categoryId === category.id && entry.src
+    entry.categoryId === fresh.id && entry.src
       ? [{ image: entry.src, alt: entry.alt, title: entry.title }]
       : [],
   );
   const reel = photos.map((photo, photoIndex) => ({
-    id: `${category.id}-${photoIndex}`,
+    id: `${fresh.id}-${photoIndex}`,
     src: photo.image,
     alt: photo.alt,
   }));
@@ -31,7 +31,7 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
       title={fresh.name}
       description={fresh.summary}
       hero={
-        <div data-cms-gallery={`photos:${category.id}`} data-empty={reel.length === 0 ? "" : undefined}>
+        <div data-cms-gallery={`photos:${fresh.id}`} data-empty={reel.length === 0 ? "" : undefined}>
           <TvPhotoMarquee photos={reel} label={fresh.name} roomy />
         </div>
       }
@@ -41,12 +41,12 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
           <h1 className={styles.pageTitle} data-cms={index >= 0 ? `serviceCategories.${index}.name` : undefined}>
             {fresh.name}
           </h1>
-          <OfferGrid categoryId={category.id} />
+          <OfferGrid categoryId={fresh.id} />
           <PhotoFeature
             name={fresh.name}
             namePath={index >= 0 ? `serviceCategories.${index}.name` : undefined}
             slides={photos}
-            galleryPath={`items:${category.id}`}
+            galleryPath={`items:${fresh.id}`}
           />
         </div>
       </TvBand>

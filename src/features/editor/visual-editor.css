@@ -127,8 +127,10 @@ html[data-editing] [data-cms-gallery][data-empty]::before {
 
 .editorPopover input,
 .editorPopover textarea,
+.editorPopover select,
 .editorModal input,
-.editorModal textarea {
+.editorModal textarea,
+.editorModal select {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #d9d6d1;

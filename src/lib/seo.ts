@@ -22,6 +22,12 @@ const PORTFOLIO_REDIRECTS: Record<string, string> = {
   "/portfolio/before-after": "/",
 };
 
+const LEGACY_SERVICE_REDIRECTS: Record<string, string> = {
+  "/services/service1": "/services/painter",
+  "/services/service2": "/services/appliance-expert",
+  "/services/service3": "/services/landscaper",
+};
+
 type Area = { short: string; full: string };
 
 export type PageMeta = {
@@ -154,7 +160,7 @@ function landingFor(document: CmsDocument, slug: string) {
 
 export function redirectTarget(pathname: string, document?: CmsDocument | null) {
   const path = normalizePath(pathname);
-  const portfolio = PORTFOLIO_REDIRECTS[path];
+  const portfolio = PORTFOLIO_REDIRECTS[path] ?? LEGACY_SERVICE_REDIRECTS[path];
   if (portfolio) return portfolio;
   if (!document) return null;
   const match = /^\/services\/([a-z0-9-]+)$/.exec(path);
@@ -173,7 +179,10 @@ export function redirectTarget(pathname: string, document?: CmsDocument | null) 
 }
 
 export function redirectRules(document: CmsDocument) {
-  const rules = Object.entries(PORTFOLIO_REDIRECTS).map(([source, destination]) => ({ source, destination }));
+  const rules = Object.entries({ ...PORTFOLIO_REDIRECTS, ...LEGACY_SERVICE_REDIRECTS }).map(([source, destination]) => ({
+    source,
+    destination,
+  }));
   for (const category of document.serviceCategories) {
     const page = pageSlugForCategory(category, document.serviceCategories);
     if (!page || page === category.slug) continue;
