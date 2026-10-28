@@ -105,6 +105,30 @@ function landingCategories(categories: CmsDocument["serviceCategories"]) {
   return categories.filter((category) => category.featured && category.status === "active");
 }
 
+function footerNeedsServices(document: CmsDocument) {
+  const hrefs = new Set(document.footerNav.map((item) => item.href.replace(/\/$/, "")));
+  return landingCategories(document.serviceCategories).some((category) => {
+    const slug = needsPublicSlug(category) ? (KNOWN_SLUGS[category.id] ?? slugify(category.name)) : category.slug;
+    return !hrefs.has(`/services/${slug}`);
+  });
+}
+
+function withFooterServices(document: CmsDocument) {
+  const hrefs = new Set(document.footerNav.map((item) => item.href.replace(/\/$/, "")));
+  const missing = landingCategories(document.serviceCategories).flatMap((category) => {
+    const href = `/services/${category.slug}`;
+    if (hrefs.has(href)) return [];
+    hrefs.add(href);
+    return [{ href, label: category.name.trim() || category.slug }];
+  });
+  if (!missing.length) return document.footerNav;
+  const insertAt = document.footerNav.findIndex(
+    (item) => item.href === "/#works" || item.href === "/portfolio" || /\bbook\b/i.test(item.label),
+  );
+  const index = insertAt < 0 ? document.footerNav.length : insertAt;
+  return [...document.footerNav.slice(0, index), ...missing, ...document.footerNav.slice(index)];
+}
+
 function cardsMatch(document: CmsDocument, categories: CmsDocument["serviceCategories"]) {
   const cards = document.copy.home.works.cards;
   if (cards.length !== categories.length) return false;
@@ -132,7 +156,10 @@ export function normalizeServiceCatalog(document: CmsDocument): CmsDocument {
   const slugChange = document.serviceCategories.some((category) => needsPublicSlug(category));
   const retired = hasRetired(document);
   const exploreLabel = /\bprojects?\b/i.test(document.copy.home.works.explore);
-  if (!retired && !slugChange && !exploreLabel && cardsMatch(document, landingCategories(document.serviceCategories))) return document;
+  const footerMissing = footerNeedsServices(document);
+  if (!retired && !slugChange && !exploreLabel && !footerMissing && cardsMatch(document, landingCategories(document.serviceCategories))) {
+    return document;
+  }
 
   const next = structuredClone(document);
   if (retired) {
@@ -154,6 +181,7 @@ export function normalizeServiceCatalog(document: CmsDocument): CmsDocument {
   }
 
   next.copy.home.works.explore = next.copy.home.works.explore.replace(/\s+projects?\b/gi, " ").replace(/\s+/g, " ").trim() || "Explore more";
+  next.footerNav = withFooterServices(next);
 
   const featured = landingCategories(next.serviceCategories);
   if (!cardsMatch(next, featured)) {
