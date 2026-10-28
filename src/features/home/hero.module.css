@@ -313,10 +313,12 @@
 
 @media (max-width: 899px) and (orientation: portrait) {
 	.copy {
+		position: relative;
+		z-index: 2;
 		flex: 0 0 auto;
 		justify-content: flex-start;
 		padding-top: calc(11rem + env(safe-area-inset-top, 0px));
-		padding-bottom: 0.75rem;
+		padding-bottom: 0;
 		transform: none;
 	}
 
@@ -327,6 +329,7 @@
 		height: auto;
 		min-height: 0;
 		max-height: none;
+		margin-top: 24px;
 	}
 
 	.builder {
