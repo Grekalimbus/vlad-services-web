@@ -11,8 +11,8 @@ export function BlogPageView() {
       title="Blog"
       description="Guides and project notes from PrimeFix will live here."
       crumbs={[
-        { name: "Home", href: "/" },
-        { name: "Blog", href: "/blog" },
+        { href: "/", label: "Home" },
+        { href: "/blog", label: "Blog" },
       ]}
     >
       <div className={styles.body}>

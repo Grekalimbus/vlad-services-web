@@ -15,8 +15,8 @@ export function AreasPageView() {
       title="Areas"
       description={`PrimeFix serves ${cms.site.areaServed}.`}
       crumbs={[
-        { name: "Home", href: "/" },
-        { name: "Areas", href: "/areas" },
+        { href: "/", label: "Home" },
+        { href: "/areas", label: "Areas" },
       ]}
     >
       <div className={styles.body}>
