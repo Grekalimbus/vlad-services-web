@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useLayoutEffect } from "react";
 import { useCms } from "@/lib/cms/use-cms";
+import { socialLinks } from "@/lib/social";
 import { HashLink } from "@/shared/layout/hash-link";
 import { assetPath } from "@/lib/site";
 import styles from "./hero.module.css";
@@ -102,13 +103,13 @@ export function Hero() {
   const cms = useCms();
   const hero = cms.copy.home.hero;
   const builderSrc = hero.builder || "/hero/builder.webp";
-  const kicker = hero.kicker || "HIRE YOUR PRO";
+  const kicker = hero.kicker || "HIRE a PRO";
   const badges = hero.badges?.length
     ? hero.badges
     : [
+        { id: "bbb", src: "/hero/badges/bbb.svg", alt: "BBB" },
         { id: "google", src: "/hero/badges/google.svg", alt: "Google" },
         { id: "yelp", src: "/hero/badges/yelp.svg", alt: "Yelp" },
-        { id: "bbb", src: "/hero/badges/bbb.svg", alt: "BBB" },
       ];
 
   return (
@@ -128,7 +129,7 @@ export function Hero() {
           <div className={styles.copy}>
             <div className={styles.cluster}>
               <p className={styles.kicker} data-cms="copy.home.hero.kicker">
-                {kicker}
+                <KickerText text={kicker} />
               </p>
               <h1 id="hero-heading" className={styles.heading}>
                 <span className={styles.line} data-cms="copy.home.hero.line1">{hero.line1}</span>
@@ -150,7 +151,11 @@ export function Hero() {
               </div>
             </div>
 
-            <HeroBadges badges={badges} className={styles.badgesDesktop} />
+            <HeroBadges
+              badges={badges}
+              className={styles.badgesDesktop}
+              googleUrl={cms.googleListing.mapsUrl}
+            />
           </div>
 
           <div className={styles.figure} data-cms-photo="copy.home.hero.builder" aria-hidden="true">
@@ -167,8 +172,24 @@ export function Hero() {
           </div>
         </div>
       </div>
-      <HeroBadges badges={badges} className={styles.badgeStrip} />
+      <HeroBadges
+        badges={badges}
+        className={styles.badgeStrip}
+        googleUrl={cms.googleListing.mapsUrl}
+      />
     </section>
+  );
+}
+
+function KickerText({ text }: { text: string }) {
+  const trimmed = text.trim();
+  const splitAt = trimmed.lastIndexOf(" ");
+  if (splitAt <= 0) return trimmed;
+  return (
+    <>
+      {trimmed.slice(0, splitAt)}{" "}
+      <span className={styles.kickerAccent}>{trimmed.slice(splitAt + 1)}</span>
+    </>
   );
 }
 
@@ -178,20 +199,61 @@ type HeroBadge = {
   alt: string;
 };
 
-function HeroBadges({ badges, className }: { badges: HeroBadge[]; className: string }) {
+const badgeSlots = ["bbb", "google", "yelp"] as const;
+
+const badgeLabels: Record<(typeof badgeSlots)[number], string> = {
+  bbb: "BBB",
+  google: "Google",
+  yelp: "Yelp",
+};
+
+function badgeHref(id: string, googleUrl: string) {
+  if (id === "google") return googleUrl;
+  if (id === "yelp") return socialLinks.yelp;
+  if (id === "bbb") return socialLinks.bbb;
+  return undefined;
+}
+
+function HeroBadges({
+  badges,
+  className,
+  googleUrl,
+}: {
+  badges: HeroBadge[];
+  className: string;
+  googleUrl: string;
+}) {
   if (!badges?.length) return null;
   return (
     <ul className={className} aria-label="Trust badges">
-      {badges.map((badge, index) => (
-        <li key={badge.id || badge.src} className={styles.badge}>
+      {badges.map((badge, index) => {
+        const slot = badgeSlots[index];
+        const href = badgeHref(slot ?? badge.id, googleUrl);
+        const image = (
           <img
             src={assetPath(badge.src)}
-            alt={badge.alt || ""}
+            alt={slot ? badgeLabels[slot] : badge.alt || ""}
             data-cms-src={`copy.home.hero.badges.${index}.src`}
             className={styles.badgeImage}
           />
-        </li>
-      ))}
+        );
+        return (
+          <li key={badge.id || badge.src} className={styles.badge}>
+            {href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.badgeLink}
+              >
+                {image}
+              </a>
+            ) : (
+              image
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

@@ -7,12 +7,13 @@ const businessYears = {
   label: "in Business",
 } as const;
 
-const defaultKicker = "HIRE YOUR PRO";
+const defaultKicker = "HIRE a PRO";
+const previousKicker = "HIRE YOUR PRO";
 
 const defaultBadges = [
+  { id: "bbb", src: "/hero/badges/bbb.svg", alt: "BBB" },
   { id: "google", src: "/hero/badges/google.svg", alt: "Google" },
   { id: "yelp", src: "/hero/badges/yelp.svg", alt: "Yelp" },
-  { id: "bbb", src: "/hero/badges/bbb.svg", alt: "BBB" },
 ];
 
 const defaultAngiListing = {
@@ -38,13 +39,15 @@ function ensureHeroAndReviews(document: CmsDocument): CmsDocument {
   const hero = document.copy?.home?.hero;
   if (!hero) return document;
 
-  const needsKicker = !hero.kicker;
+  const needsKicker = !hero.kicker || hero.kicker === previousKicker;
   const needsBadges = !Array.isArray(hero.badges) || hero.badges.length === 0;
   const needsAngi = document.angiListing == null;
   if (!needsKicker && !needsBadges && !needsAngi) return document;
 
   const next = structuredClone(document);
-  if (!next.copy.home.hero.kicker) next.copy.home.hero.kicker = defaultKicker;
+  if (!next.copy.home.hero.kicker || next.copy.home.hero.kicker === previousKicker) {
+    next.copy.home.hero.kicker = defaultKicker;
+  }
   if (!Array.isArray(next.copy.home.hero.badges) || next.copy.home.hero.badges.length === 0) {
     next.copy.home.hero.badges = defaultBadges.map((item) => ({ ...item }));
   }

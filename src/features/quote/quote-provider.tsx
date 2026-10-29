@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -34,23 +33,6 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const closeQuote = useCallback(() => setOpen(false), []);
-
-  useEffect(() => {
-    const key = "primefix-quote-shown";
-    if (window.sessionStorage.getItem(key)) return;
-    const timeout = window.setTimeout(() => {
-      if (window.sessionStorage.getItem(key)) return;
-      window.sessionStorage.setItem(key, "true");
-      setForm("quote");
-      setTvCount(null);
-      setOpen(true);
-    }, 12000);
-    return () => window.clearTimeout(timeout);
-  }, []);
-
-  useEffect(() => {
-    if (open) window.sessionStorage.setItem("primefix-quote-shown", "true");
-  }, [open]);
 
   const value = useMemo(
     () => ({

@@ -76,7 +76,11 @@
 	line-height: 1.08;
 	letter-spacing: 0;
 	white-space: nowrap;
-	color: #49b4f0;
+	color: #fff;
+}
+
+.kickerAccent {
+	color: #ff9f38;
 }
 
 .heading {
@@ -97,7 +101,7 @@
 
 .discount {
 	font-weight: 900;
-	color: #f6c453;
+	color: #ff9f38;
 }
 
 .tagline {
@@ -160,8 +164,19 @@
 	margin: 0;
 	padding: 4px 0.75rem;
 	list-style: none;
-	background: #f6c453;
+	background: linear-gradient(180deg, rgb(0 0 0 / 0.72) 0%, #000 100%);
 	pointer-events: auto;
+}
+
+.badgeStrip::before {
+	content: "";
+	position: absolute;
+	right: 0;
+	bottom: 100%;
+	left: 0;
+	height: 3.25rem;
+	background: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 0.72) 100%);
+	pointer-events: none;
 }
 
 .badge {
@@ -172,11 +187,23 @@
 	justify-content: center;
 }
 
+.badgeLink {
+	display: flex;
+	height: 100%;
+	max-width: 100%;
+	align-items: center;
+	justify-content: center;
+}
+
 .badgeImage {
 	width: auto;
 	height: 100%;
 	max-width: 100%;
 	object-fit: contain;
+}
+
+.badgeStrip .badge {
+	height: 80%;
 }
 
 .figure {
@@ -267,12 +294,12 @@
 
 	.badgesDesktop {
 		position: absolute;
-		bottom: calc(1.35rem + 80px);
+		bottom: calc(1.35rem + 30px);
 		left: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 1.15rem;
+		gap: 1.85rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -281,9 +308,19 @@
 	}
 
 	.badgesDesktop .badge {
-		height: 2.75rem;
-		max-width: 7.5rem;
+		position: relative;
+		height: 3.96rem;
+		max-width: 10.8rem;
 		flex: 0 0 auto;
+	}
+
+	.badgesDesktop .badgeLink {
+		cursor: pointer;
+	}
+
+	.badgesDesktop .badge:last-child {
+		height: 4.752rem;
+		max-width: 13.7rem;
 	}
 
 	.badgeStrip {
@@ -453,6 +490,7 @@
 		flex: 0 0 auto;
 		justify-content: flex-start;
 		width: 100%;
+		margin-top: 50px;
 		padding-top: 0;
 		padding-bottom: 0;
 		transform: none;
@@ -476,7 +514,6 @@
 		min-height: 0;
 		max-height: none;
 		margin-top: clamp(20px, 3.2svh, 30px);
-		padding-bottom: 50px;
 	}
 
 	.builder {
