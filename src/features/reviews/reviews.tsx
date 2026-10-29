@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { useCms } from "@/lib/cms/use-cms";
+import { angiListing, angiProfileUrl, angiReviews } from "@/lib/angi-reviews";
 import { googleListing, googleReviews } from "@/lib/google-reviews";
 import { yelpListing, yelpReviews } from "@/lib/yelp-reviews";
 import { YelpIcon } from "@/shared/brand-icons";
@@ -12,7 +13,7 @@ import styles from "./reviews.module.css";
 const PREVIEW_LENGTH = 168;
 const DESKTOP_PAGE_SIZE = 3;
 
-type SourceId = "google" | "yelp";
+type SourceId = "google" | "yelp" | "angi";
 
 export function Reviews() {
   const heading = useCms().copy.home.reviews;
@@ -21,10 +22,43 @@ export function Reviews() {
   const [source, setSource] = useState<SourceId>("google");
   const [start, setStart] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const listing = source === "google" ? googleListing : yelpListing;
-  const reviews = source === "google" ? googleReviews : yelpReviews;
-  const countLabel = source === "google" ? heading.countSuffix : "Yelp Reviews";
-  const writeLabel = source === "google" ? heading.writeReview : "Review us on Yelp";
+  const catalog = {
+    google: {
+      listing: googleListing,
+      reviews: googleReviews,
+      label: "Google",
+      countLabel: heading.countSuffix,
+      writeLabel: heading.writeReview,
+      empty: "No Google reviews yet",
+      emptyCta: "View the Google page",
+      emptyHref: googleListing.mapsUrl,
+    },
+    yelp: {
+      listing: yelpListing,
+      reviews: yelpReviews,
+      label: "Yelp",
+      countLabel: "Yelp Reviews",
+      writeLabel: "Review us on Yelp",
+      empty: "Yelp doesn't have recommended reviews for PrimeFix yet.",
+      emptyCta: "View the Yelp page",
+      emptyHref: yelpListing.profileUrl,
+    },
+    angi: {
+      listing: angiListing,
+      reviews: angiReviews,
+      label: "Angi",
+      countLabel: "Angi Reviews",
+      writeLabel: "Review us on Angi",
+      empty: "No Angi reviews yet",
+      emptyCta: "View the Angi page",
+      emptyHref: angiListing.profileUrl || angiProfileUrl,
+    },
+  } as const;
+  const current = catalog[source];
+  const listing = current.listing;
+  const reviews = current.reviews;
+  const countLabel = current.countLabel;
+  const writeLabel = current.writeLabel;
   const visible =
     reviews.length === 0
       ? []
@@ -85,7 +119,7 @@ export function Reviews() {
               </>
             ) : null}
             <span className={styles.muted}>
-              {reviews.length > 0 ? `${listing.reviewCount} ${countLabel}` : "No Yelp reviews yet"}
+              {reviews.length > 0 ? `${listing.reviewCount} ${countLabel}` : `No ${current.label} reviews yet`}
             </span>
             <span className={styles.sources} role="group" aria-label="Review source">
               <button
@@ -106,6 +140,15 @@ export function Reviews() {
                 <YelpIcon className={styles.yelpMark} />
                 <span className={shared.visuallyHidden}>Yelp reviews</span>
               </button>
+              <button
+                type="button"
+                className={source === "angi" ? styles.sourceActive : styles.source}
+                aria-pressed={source === "angi"}
+                onClick={() => selectSource("angi")}
+              >
+                <AngiMark />
+                <span className={shared.visuallyHidden}>Angi reviews</span>
+              </button>
             </span>
           </p>
           <a
@@ -122,14 +165,14 @@ export function Reviews() {
         <div className={styles.carousel}>
           <p id={statusId} className={shared.visuallyHidden} aria-live="polite">
             {visible[0]
-              ? `Showing ${source === "google" ? "Google" : "Yelp"} reviews, starting with ${visible[0].author}`
-              : "No recommended Yelp reviews yet"}
+              ? `Showing ${current.label} reviews, starting with ${visible[0].author}`
+              : `No recommended ${current.label} reviews yet`}
           </p>
           {visible.length === 0 ? (
             <div className={styles.empty}>
-              <p>Yelp doesn&apos;t have recommended reviews for PrimeFix yet.</p>
-              <a href={yelpListing.profileUrl} target="_blank" rel="noopener noreferrer">
-                View the Yelp page
+              <p>{current.empty}</p>
+              <a href={current.emptyHref} target="_blank" rel="noopener noreferrer">
+                {current.emptyCta}
               </a>
             </div>
           ) : (
@@ -223,6 +266,17 @@ function initials(name: string) {
   if (parts.length === 0) return "?";
   if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
   return `${parts[0].slice(0, 1)}${parts.at(-1)?.slice(0, 1) ?? ""}`.toUpperCase();
+}
+
+function AngiMark() {
+  return (
+    <svg viewBox="0 0 24 24" className={styles.angiMark} aria-hidden="true">
+      <path
+        fill="#FF6153"
+        d="M12 2.2 3.6 21h3.15l1.55-3.45h7.4L17.25 21H20.4L12 2.2Zm0 5.1 2.72 6.05H9.28L12 7.3Z"
+      />
+    </svg>
+  );
 }
 
 function GoogleMark() {

@@ -7,6 +7,8 @@ export const assetPath = (path: string) =>
 export const routes = {
   home: "/",
   service: (slug: string) => `/services/${slug}`,
+  areas: "/areas",
+  blog: "/blog",
   privacy: "/privacy-policy",
   messagingTerms: "/messaging-terms",
 } as const;

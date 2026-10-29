@@ -252,6 +252,7 @@ function ImagePopover({ panel, onClose }: { panel: Extract<Panel, { kind: "image
   const [pending, setPending] = useState(false);
   const src = textAt(panel.path) || (panel.path === "copy.home.hero.builder" ? "/hero/builder.webp" : "");
   const portrait = panel.path === "copy.home.hero.builder";
+  const badge = panel.path.includes("copy.home.hero.badges");
   return (
     <div className="editorPopover" style={anchor(panel.top, panel.left)} data-editor-ui>
       {src ? (
@@ -260,10 +261,10 @@ function ImagePopover({ panel, onClose }: { panel: Extract<Panel, { kind: "image
           alt=""
           style={{
             width: "100%",
-            height: portrait ? 220 : undefined,
-            aspectRatio: portrait ? undefined : "16 / 9",
-            objectFit: portrait ? "contain" : "cover",
-            background: portrait ? "#0c121c" : undefined,
+            height: portrait ? 220 : badge ? 88 : undefined,
+            aspectRatio: portrait || badge ? undefined : "16 / 9",
+            objectFit: portrait || badge ? "contain" : "cover",
+            background: portrait || badge ? "#0c121c" : undefined,
             borderRadius: 8,
           }}
         />

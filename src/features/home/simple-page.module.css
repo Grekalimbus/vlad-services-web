@@ -1,0 +1,18 @@
+.body {
+  composes: container from "../../styles/shared.module.css";
+  max-width: 48rem;
+  padding-block: 3rem;
+  text-align: left;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+  line-height: 1.75rem;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.list li + li {
+  margin-top: 0.5rem;
+}

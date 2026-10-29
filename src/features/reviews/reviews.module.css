@@ -415,7 +415,8 @@
 }
 
 .googleMark,
-.yelpMark {
+.yelpMark,
+.angiMark {
   width: 1rem;
   height: 1rem;
   flex-shrink: 0;

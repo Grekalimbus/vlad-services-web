@@ -333,6 +333,14 @@
 	}
 }
 
+@media (min-width: 1024px) and (max-width: 1279px) {
+	.navLink,
+	.dealsLink {
+		padding: 0 0.45rem;
+		font-size: 15px;
+	}
+}
+
 @media (min-width: 1024px) {
 	.headerBar {
 		padding-inline: calc(1.5rem + 15px);

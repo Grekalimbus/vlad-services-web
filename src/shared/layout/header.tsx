@@ -155,16 +155,30 @@ function isReviews(item: HeaderNavItem) {
 	return item.href.includes("#reviews") || item.label.trim().toLowerCase() === "reviews";
 }
 
+function isAreas(item: HeaderNavItem) {
+	return item.href.includes("/areas") || item.label.trim().toLowerCase() === "areas";
+}
+
+function isBlog(item: HeaderNavItem) {
+	return item.href.includes("/blog") || item.label.trim().toLowerCase() === "blog";
+}
+
 function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
 	const links: HeaderLink[] = [];
 	let deals = false;
 	let faq = false;
+	let areas = items.some(isAreas);
+	let blog = items.some(isBlog);
 	items.forEach((item, index) => {
 		if (isReviews(item) && !deals) {
 			links.push({ href: "/#deals", label: "Deals", kind: "deals" });
 			deals = true;
 		}
 		links.push({ ...item, cmsIndex: index });
+		if (isServices(item) && !areas) {
+			links.push({ href: "/areas", label: "Areas" });
+			areas = true;
+		}
 		if (isServices(item) && !deals && !items.some(isReviews)) {
 			links.push({ href: "/#deals", label: "Deals", kind: "deals" });
 			deals = true;
@@ -172,10 +186,16 @@ function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
 		if (isReviews(item) && !faq) {
 			links.push({ href: "/#faq", label: "FAQ" });
 			faq = true;
+			if (!blog) {
+				links.push({ href: "/blog", label: "Blog" });
+				blog = true;
+			}
 		}
 	});
+	if (!areas) links.push({ href: "/areas", label: "Areas" });
 	if (!deals) links.push({ href: "/#deals", label: "Deals", kind: "deals" });
 	if (!faq) links.push({ href: "/#faq", label: "FAQ" });
+	if (!blog) links.push({ href: "/blog", label: "Blog" });
 	return links;
 }
 

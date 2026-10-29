@@ -102,6 +102,14 @@ export function Hero() {
   const cms = useCms();
   const hero = cms.copy.home.hero;
   const builderSrc = hero.builder || "/hero/builder.webp";
+  const kicker = hero.kicker || "HIRE YOUR PRO";
+  const badges = hero.badges?.length
+    ? hero.badges
+    : [
+        { id: "google", src: "/hero/badges/google.svg", alt: "Google" },
+        { id: "yelp", src: "/hero/badges/yelp.svg", alt: "Yelp" },
+        { id: "bbb", src: "/hero/badges/bbb.svg", alt: "BBB" },
+      ];
 
   return (
     <section id="top" aria-labelledby="hero-heading" className={styles.section}>
@@ -118,24 +126,31 @@ export function Hero() {
       <div className={styles.layout}>
         <div className={styles.composition}>
           <div className={styles.copy}>
-            <h1 id="hero-heading" className={styles.heading}>
-              <span className={styles.line} data-cms="copy.home.hero.line1">{hero.line1}</span>
-              <span className={styles.line}>
-                <span data-cms="copy.home.hero.line2Lead">{hero.line2Lead}</span>{" "}
-                <strong className={styles.discount} data-cms="copy.home.hero.discount">{hero.discount}</strong>{" "}
-                <span data-cms="copy.home.hero.line2Tail">{hero.line2Tail}</span>
-              </span>
-            </h1>
+            <div className={styles.cluster}>
+              <p className={styles.kicker} data-cms="copy.home.hero.kicker">
+                {kicker}
+              </p>
+              <h1 id="hero-heading" className={styles.heading}>
+                <span className={styles.line} data-cms="copy.home.hero.line1">{hero.line1}</span>
+                <span className={styles.line}>
+                  <span data-cms="copy.home.hero.line2Lead">{hero.line2Lead}</span>{" "}
+                  <strong className={styles.discount} data-cms="copy.home.hero.discount">{hero.discount}</strong>{" "}
+                  <span data-cms="copy.home.hero.line2Tail">{hero.line2Tail}</span>
+                </span>
+              </h1>
 
-            <p className={styles.tagline} data-cms="copy.home.hero.tagline">
-              {hero.tagline}
-            </p>
+              <p className={styles.tagline} data-cms="copy.home.hero.tagline">
+                {hero.tagline}
+              </p>
 
-            <div className={styles.actions}>
-              <HashLink href="/#services" className={styles.startButton}>
-                <span data-cms="ctas.letsStart">{cms.ctas.letsStart}</span>
-              </HashLink>
+              <div className={styles.actions}>
+                <HashLink href="/#services" className={styles.startButton}>
+                  <span data-cms="ctas.letsStart">{cms.ctas.letsStart}</span>
+                </HashLink>
+              </div>
             </div>
+
+            <HeroBadges badges={badges} className={styles.badgesDesktop} />
           </div>
 
           <div className={styles.figure} data-cms-photo="copy.home.hero.builder" aria-hidden="true">
@@ -152,6 +167,31 @@ export function Hero() {
           </div>
         </div>
       </div>
+      <HeroBadges badges={badges} className={styles.badgeStrip} />
     </section>
+  );
+}
+
+type HeroBadge = {
+  id: string;
+  src: string;
+  alt: string;
+};
+
+function HeroBadges({ badges, className }: { badges: HeroBadge[]; className: string }) {
+  if (!badges?.length) return null;
+  return (
+    <ul className={className} aria-label="Trust badges">
+      {badges.map((badge, index) => (
+        <li key={badge.id || badge.src} className={styles.badge}>
+          <img
+            src={assetPath(badge.src)}
+            alt={badge.alt || ""}
+            data-cms-src={`copy.home.hero.badges.${index}.src`}
+            className={styles.badgeImage}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }
