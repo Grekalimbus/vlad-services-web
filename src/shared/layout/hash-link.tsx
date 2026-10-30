@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type MouseEvent, type ReactNode } from "react";
 
 type HashLinkProps = {
@@ -31,6 +31,7 @@ function scrollToHash(hash: string) {
 
 export function HashLink({ href, className, children, onClick }: HashLinkProps) {
 	const pathname = usePathname();
+	const router = useRouter();
 
 	return (
 		<Link
@@ -41,13 +42,20 @@ export function HashLink({ href, className, children, onClick }: HashLinkProps) 
 				if (event.defaultPrevented) return;
 				const hashIndex = href.indexOf("#");
 				if (hashIndex === -1) return;
-				const path = href.slice(0, hashIndex) || "/";
+				const path = href.slice(0, hashIndex);
 				const id = href.slice(hashIndex + 1);
 				if (!id) return;
 				const current = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
-				const targetPath = path.length > 1 ? path.replace(/\/$/, "") : path;
+				const bareHash = path === "";
+				const targetPath = bareHash ? current : path.length > 1 ? path.replace(/\/$/, "") : path;
 				if (current !== targetPath) return;
-				if (!scrollToHash(id)) return;
+				if (!scrollToHash(id)) {
+					if (bareHash && current !== "/") {
+						event.preventDefault();
+						router.push(`/#${id}`);
+					}
+					return;
+				}
 				event.preventDefault();
 				const url = new URL(window.location.href);
 				url.hash = id;
@@ -65,12 +73,14 @@ export function HashScroll() {
 	useEffect(() => {
 		const id = window.location.hash.replace(/^#/, "");
 		if (!id) return;
-		const frame = window.requestAnimationFrame(() => {
-			scrollToHash(id);
-		});
-		const timer = window.setTimeout(() => {
-			scrollToHash(id);
-		}, 80);
+		let attempts = 0;
+		let timer = 0;
+		const tryScroll = () => {
+			if (scrollToHash(id) || attempts > 25) return;
+			attempts += 1;
+			timer = window.setTimeout(tryScroll, 80);
+		};
+		const frame = window.requestAnimationFrame(tryScroll);
 		return () => {
 			window.cancelAnimationFrame(frame);
 			window.clearTimeout(timer);

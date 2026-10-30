@@ -3,6 +3,7 @@
 import { TvBand } from "./tv-band";
 import { TvPhotoMarquee } from "./tv-photo-marquee";
 import { OfferGrid, PhotoFeature } from "./category-gallery";
+import { ElectricianLanding } from "./electrician-landing";
 import { PageFrame } from "@/shared/layout";
 import { useCms } from "@/lib/cms/use-cms";
 import type { ServiceCategory } from "@/lib/services";
@@ -38,16 +39,27 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
     >
       <TvBand blend>
         <div className={styles.band}>
-          <h1 className={styles.pageTitle} data-cms={index >= 0 ? `serviceCategories.${index}.name` : undefined}>
-            {fresh.name}
-          </h1>
-          <OfferGrid categoryId={fresh.id} />
-          <PhotoFeature
-            name={fresh.name}
-            namePath={index >= 0 ? `serviceCategories.${index}.name` : undefined}
-            slides={photos}
-            galleryPath={`items:${fresh.id}`}
-          />
+          {fresh.id === "electrical" ? (
+            <ElectricianLanding
+              category={fresh}
+              namePath={index >= 0 ? `serviceCategories.${index}.name` : undefined}
+              photos={photos}
+              galleryPath={`items:${fresh.id}`}
+            />
+          ) : (
+            <>
+              <h1 className={styles.pageTitle} data-cms={index >= 0 ? `serviceCategories.${index}.name` : undefined}>
+                {fresh.name}
+              </h1>
+              <OfferGrid categoryId={fresh.id} />
+              <PhotoFeature
+                name={fresh.name}
+                namePath={index >= 0 ? `serviceCategories.${index}.name` : undefined}
+                slides={photos}
+                galleryPath={`items:${fresh.id}`}
+              />
+            </>
+          )}
         </div>
       </TvBand>
     </PageFrame>

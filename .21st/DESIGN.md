@@ -92,4 +92,5 @@ Generated from project sources at 2026-09-08T17:38:14.765Z.
 ## Decisions
 
 - Electrical and Handyman reuse the TV Mounting photo reel, white header, and light band. The first section is three white carousel cards with a visible title and Show more. The photos block is one large carousel with BOOK NOW underneath. Button and footer copy that said Get Quote is BOOK NOW.
+- The Electrician page replaces those offer cards with a row of blue icons, a worker description, a four-step quiz timeline, and a smaller photos card. Other service pages stay on the previous layout.
 

@@ -1,3 +1,4 @@
+import { AreasSection } from "@/features/areas";
 import { DealsSignup, Faq, Hero, ServicesOverview, Trust, Works } from "@/features/home";
 import { Reviews } from "@/features/reviews";
 import { CmsPage } from "@/lib/cms/cms-page";
@@ -30,6 +31,7 @@ export default async function Home() {
           <div className={styles.introBand}>
             <IntroAtmosphere />
             <Faq />
+            <AreasSection id="areas" />
             <DealsSignup />
           </div>
         </main>

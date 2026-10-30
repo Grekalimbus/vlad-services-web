@@ -8,7 +8,8 @@
 }
 
 .container {
-	composes: container from "../../styles/shared.module.css";
+	width: min(100% - 2.5rem, 72rem);
+	margin-inline: auto;
 }
 
 .panel {
@@ -183,6 +184,12 @@
 	font-size: 0.8125rem;
 	font-weight: 500;
 	color: #ff6b5a;
+}
+
+@media (max-width: 800px) {
+	.container {
+		width: min(100% - 1.5rem, 72rem);
+	}
 }
 
 @media (min-width: 640px) {

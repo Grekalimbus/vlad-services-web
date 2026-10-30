@@ -207,6 +207,31 @@
   color: #24180a;
 }
 
+@media (max-width: 639px) {
+  .summary {
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 16px 20px 24px;
+  }
+
+  .rating {
+    gap: 0.4rem 0.65rem;
+  }
+
+  .reviewLink {
+    width: 100%;
+    height: 50px;
+    min-height: 50px;
+    border-radius: 12px;
+    padding-inline: 0;
+  }
+
+  .reviewArrow {
+    display: none;
+  }
+}
+
 .carousel {
   position: relative;
   margin-top: 2.5rem;
@@ -464,7 +489,20 @@
 
 @media (min-width: 768px) {
   .carousel {
+    min-height: calc(22rem + 1.35rem + 0.55rem);
     padding-inline: 2rem;
+  }
+
+  .empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
   }
 
   .list {

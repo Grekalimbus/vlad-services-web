@@ -1,0 +1,369 @@
+.iconRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.15rem;
+  width: min(100% - 2.5rem, 56rem);
+  margin: 1.75rem auto 0;
+  padding: 0;
+  list-style: none;
+}
+
+.iconButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  width: 100%;
+  min-height: 10.5rem;
+  margin: 0;
+  padding: 1.35rem 1rem 1.15rem;
+  border: 1px solid #e4eaf2;
+  border-radius: 0.9rem;
+  background: #fff;
+  color: #1c2430;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.iconImage {
+  display: block;
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  transition: filter 160ms ease;
+}
+
+.iconLabel {
+  max-width: 16rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.iconButton:hover {
+  border-color: #c5d7ee;
+  box-shadow: 0 8px 22px rgb(18 52 92 / 7%);
+}
+
+.iconButton:hover .iconImage,
+.iconButton:focus-visible .iconImage {
+  filter: brightness(0.62);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid #0076fe;
+  outline-offset: 3px;
+}
+
+.story {
+  position: relative;
+  width: 100%;
+  min-height: min(calc(34rem * 1.15), calc((50vw - 300px - 2.5rem) * 938 / 541));
+  overflow: visible;
+  margin: 3.5rem auto 0;
+  padding-block: 1.5rem;
+}
+
+.figure {
+  position: absolute;
+  top: 50%;
+  right: calc(50% + 300px + 1.25rem);
+  left: auto;
+  z-index: 1;
+  width: auto;
+  height: min(calc(34rem * 1.15), calc((50vw - 300px - 2.5rem) * 938 / 541));
+  aspect-ratio: 541 / 938;
+  margin: 0;
+  overflow: hidden;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.story[data-side="end"] .figure {
+  right: auto;
+  left: calc(50% + 300px + 1.25rem);
+}
+
+.storyImage {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 100%;
+  margin-left: -114.73%;
+  pointer-events: auto;
+}
+
+.storyCopy {
+  position: relative;
+  z-index: 2;
+  width: min(100% - 2rem, 600px);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.storyTitle {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: #0076fe;
+}
+
+.storyBody {
+  margin-top: 1.05rem;
+}
+
+.storyBody p {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 400;
+  line-height: 1.65;
+  color: #3c4654;
+}
+
+.storyBody p + p {
+  margin-top: 0.9rem;
+}
+
+.quiz {
+  width: min(100% - 2.5rem, 72rem);
+  margin: 3.5rem auto 0;
+}
+
+.quizHeading {
+  position: relative;
+  margin: 0;
+  padding-bottom: 0.8rem;
+  text-align: center;
+  font-size: clamp(1.7rem, 2.5vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: #121417;
+}
+
+.quizWord {
+  color: #0076fe;
+}
+
+.quizHeading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 2.4rem;
+  height: 3px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #0076fe;
+}
+
+.steps {
+  --node: 2.4rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.45rem;
+  margin: 1.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--node) / 2);
+  bottom: calc(var(--node) / 2);
+  left: calc(var(--node) / 2);
+  width: 2px;
+  background: #7eb6ff;
+  transform: translateX(-1px);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: var(--node) minmax(0, 1fr);
+  gap: 0.85rem 1rem;
+  align-items: start;
+}
+
+.stepIndex {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: var(--node);
+  height: var(--node);
+  place-items: center;
+  border: 2px solid #0076fe;
+  border-radius: 999px;
+  background: #fff;
+  color: #0076fe;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stepCard {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.stepIcon {
+  display: grid;
+  width: 4.5rem;
+  height: 4.5rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #e7f2ff;
+  color: #0076fe;
+}
+
+.stepIcon svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.stepTitle {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: #121417;
+}
+
+.stepText {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #66707c;
+}
+
+@media (max-width: 720px) {
+  .iconRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .iconButton {
+    min-height: 9rem;
+    padding: 1rem 0.75rem 0.9rem;
+  }
+
+  .iconImage {
+    width: 72px;
+    height: 72px;
+  }
+
+  .iconLabel {
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .story,
+  .story[data-side="end"] {
+    display: block;
+    min-height: 0;
+    padding-block: 0;
+    flex-direction: column;
+  }
+
+  .figure,
+  .story[data-side="end"] .figure {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    width: min(100%, 22rem);
+    height: auto;
+    aspect-ratio: 541 / 938;
+    margin: 0 auto 1.25rem;
+    overflow: hidden;
+    transform: none;
+  }
+
+  .storyImage,
+  .story[data-side="end"] .storyImage {
+    width: auto;
+    height: 100%;
+    max-width: none;
+    margin-left: -114.73%;
+    object-fit: fill;
+  }
+}
+
+@media (min-width: 900px) {
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.05rem;
+    margin-top: 2.1rem;
+  }
+
+  .steps::before {
+    top: calc(var(--node) / 2);
+    bottom: auto;
+    left: 12.5%;
+    right: 12.5%;
+    width: auto;
+    height: 0;
+    border-top: 2px dotted #7eb6ff;
+    background: none;
+    transform: none;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .stepCard {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 0.85rem;
+    padding: 1.35rem 1rem 1.45rem;
+    border-radius: 1.35rem;
+    background: #fff;
+    text-align: center;
+    box-shadow:
+      0 1px 2px rgb(24 60 100 / 0.04),
+      0 12px 32px rgb(28 70 120 / 0.08);
+  }
+
+  .stepIcon {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .stepIcon svg {
+    width: 3.15rem;
+    height: 3.15rem;
+  }
+
+  .stepTitle,
+  .stepText {
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iconImage {
+    transition: none;
+  }
+}

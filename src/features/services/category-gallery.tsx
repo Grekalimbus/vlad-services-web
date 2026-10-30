@@ -91,25 +91,53 @@ export function PhotoFeature({
   namePath,
   slides,
   galleryPath,
+  compact = false,
+  body = "",
+  bodyPath,
 }: {
   name: string;
   namePath?: string;
   slides: Slide[];
   galleryPath: string;
+  compact?: boolean;
+  body?: string;
+  bodyPath?: string;
 }) {
   const editing = useEditing();
   const offers = useCms().copy.offers;
-  if (slides.length === 0 && !editing) return null;
+  if (slides.length === 0 && !editing && !body) return null;
   const headingId = `${name.toLowerCase().replace(/\s+/g, "-")}-photos-heading`;
+  const showReel = slides.length > 0 || editing;
+  const heading = (
+    <h2 id={headingId} className={styles.heading}>
+      <span data-cms={namePath}>{name}</span> <span className={styles.accent} data-cms="copy.offers.photosAccent">{offers.photosAccent}</span>
+    </h2>
+  );
 
   return (
-    <section className={styles.photos} aria-labelledby={headingId}>
-      <h2 id={headingId} className={styles.heading}>
-        <span data-cms={namePath}>{name}</span> <span className={styles.accent} data-cms="copy.offers.photosAccent">{offers.photosAccent}</span>
-      </h2>
-      <div className={styles.feature}>
-        <SlideStage slides={slides} label={`${name} photos`} large galleryPath={galleryPath} />
-      </div>
+    <section className={compact ? `${styles.photos} ${styles.photosCompact}` : styles.photos} aria-labelledby={headingId}>
+      {compact ? null : heading}
+      {showReel ? (
+        <div className={compact ? styles.compactFrame : styles.feature}>
+          <SlideStage slides={slides} label={`${name} photos`} large compact={compact} galleryPath={galleryPath} />
+        </div>
+      ) : null}
+      {compact ? (
+        <>
+          {heading}
+          {body ? (
+            <div className={styles.dealsCopy} data-cms={bodyPath}>
+              {body
+                .split(/\n\n+/)
+                .map((block) => block.trim())
+                .filter(Boolean)
+                .map((block) => (
+                  <p key={block.slice(0, 32)}>{block}</p>
+                ))}
+            </div>
+          ) : null}
+        </>
+      ) : null}
       <QuoteCta className={styles.book}>
         <span data-cms="copy.offers.book">{offers.book}</span>
       </QuoteCta>
@@ -121,11 +149,13 @@ function SlideStage({
   slides,
   label,
   large = false,
+  compact = false,
   galleryPath,
 }: {
   slides: Slide[];
   label: string;
   large?: boolean;
+  compact?: boolean;
   galleryPath: string;
 }) {
   const [index, setIndex] = useState(0);
@@ -136,9 +166,11 @@ function SlideStage({
   if (index >= count && index !== 0) setIndex(0);
   const slide = slides[Math.min(index, Math.max(count - 1, 0))];
   const leaving = frame ? slides[frame.leaving] : null;
-  const sizes = large
-    ? "(min-width: 1024px) 72rem, 100vw"
-    : "(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 100vw";
+  const sizes = compact
+    ? "(min-width: 720px) 600px, 100vw"
+    : large
+      ? "(min-width: 1024px) 72rem, 100vw"
+      : "(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 100vw";
 
   function go(next: number, direction: -1 | 1) {
     if (!slide || next === index || frame || count < 2) return;
@@ -149,7 +181,7 @@ function SlideStage({
 
   return (
     <>
-    <div className={large ? styles.featureMedia : styles.media} data-cms-gallery={galleryPath} data-empty={slide ? undefined : ""}>
+    <div className={compact ? styles.featureCompact : large ? styles.featureMedia : styles.media} data-cms-gallery={galleryPath} data-empty={slide ? undefined : ""}>
       {slide ? (
         <>
       {leaving ? (

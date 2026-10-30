@@ -174,9 +174,9 @@ function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
 			links.push({ href: "/#deals", label: "Deals", kind: "deals" });
 			deals = true;
 		}
-		links.push({ ...item, cmsIndex: index });
+		links.push({ ...item, href: isAreas(item) ? "#areas" : item.href, cmsIndex: index });
 		if (isServices(item) && !areas) {
-			links.push({ href: "/areas", label: "Areas" });
+			links.push({ href: "#areas", label: "Areas" });
 			areas = true;
 		}
 		if (isServices(item) && !deals && !items.some(isReviews)) {
@@ -192,7 +192,7 @@ function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
 			}
 		}
 	});
-	if (!areas) links.push({ href: "/areas", label: "Areas" });
+	if (!areas) links.push({ href: "#areas", label: "Areas" });
 	if (!deals) links.push({ href: "/#deals", label: "Deals", kind: "deals" });
 	if (!faq) links.push({ href: "/#faq", label: "FAQ" });
 	if (!blog) links.push({ href: "/blog", label: "Blog" });

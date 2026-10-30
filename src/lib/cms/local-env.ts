@@ -47,7 +47,7 @@ export function localEnv(): CmsEnv {
       try {
         const names = await readdir(path.join(root(), "media", "uploads"));
         return names
-          .filter((name) => /\.(jpe?g|png|webp|gif)$/i.test(name))
+          .filter((name) => /\.(jpe?g|png|webp|gif|svg)$/i.test(name))
           .map((name) => {
             const key = `uploads/${name}`;
             return { key, src: publicMediaPath(key) };
@@ -60,6 +60,7 @@ export function localEnv(): CmsEnv {
 }
 
 function typeFor(key: string) {
+  if (key.endsWith(".svg")) return "image/svg+xml";
   if (key.endsWith(".png")) return "image/png";
   if (key.endsWith(".webp")) return "image/webp";
   if (key.endsWith(".gif")) return "image/gif";

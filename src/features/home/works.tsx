@@ -67,7 +67,7 @@ export function Works() {
         <ul className={styles.grid}>
           {works.cards.map((card, index) => {
             const photos = card.photos.filter((photo) => photo.image);
-            const current = photos[(slide[index] ?? 0) % Math.max(photos.length, 1)] ?? null;
+            const currentIndex = photos.length ? (slide[index] ?? 0) % photos.length : 0;
             const Icon = projectIcons[card.icon]?.icon ?? Wrench;
             const label = (
               <span className={styles.cardLabel}>
@@ -85,17 +85,18 @@ export function Works() {
                     data-cms-gallery={`slides:copy.home.works.cards.${index}.photos`}
                     data-empty={photos.length === 0 ? "" : undefined}
                   >
-                    {current ? (
+                    {photos.map((photo, photoIndex) => (
                       <Image
-                        src={assetPath(current.image)}
+                        key={`${photo.image}-${photoIndex}`}
+                        src={assetPath(photo.image)}
                         alt=""
                         fill
-                        unoptimized={current.image.startsWith("/api/media/")}
+                        unoptimized={photo.image.startsWith("/api/media/")}
                         sizes="(min-width: 1024px) 22rem, (min-width: 720px) 45vw, 92vw"
-                        className={styles.cardImage}
-                        style={{ objectPosition: current.position || card.position }}
+                        className={photoIndex === currentIndex ? `${styles.cardImage} ${styles.cardImageOn}` : styles.cardImage}
+                        style={{ objectPosition: photo.position || card.position }}
                       />
-                    ) : null}
+                    ))}
                     <span className={styles.cardShade} aria-hidden="true" />
                   </div>
                   {photos.length > 1 ? (

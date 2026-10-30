@@ -68,9 +68,17 @@ const IMAGE_TYPES: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
   "image/gif": "gif",
+  "image/svg+xml": "svg",
 };
 
 export function inspectImage(bytes: Uint8Array, declaredType: string) {
+  const svg = inspectSvg(bytes);
+  if (svg) {
+    if (declaredType && declaredType !== "image/svg+xml" && declaredType !== "application/octet-stream") {
+      throw new Error("The file contents do not match its type.");
+    }
+    return svg;
+  }
   const type = sniff(bytes);
   if (!type || !IMAGE_TYPES[type]) throw new Error("Upload a JPEG, PNG, WebP, or GIF image.");
   if (declaredType && declaredType !== type && declaredType !== "application/octet-stream") {
@@ -78,6 +86,16 @@ export function inspectImage(bytes: Uint8Array, declaredType: string) {
   }
   if (bytes.byteLength > 8 * 1024 * 1024) throw new Error("Images must be 8 MB or smaller.");
   return { type, extension: IMAGE_TYPES[type] };
+}
+
+function inspectSvg(bytes: Uint8Array) {
+  if (bytes.byteLength < 20 || bytes.byteLength > 512 * 1024 || bytes[0] !== 0x3c) return null;
+  const text = new TextDecoder().decode(bytes).trim();
+  if (!/^(?:<\?xml[\s\S]*?)?<svg[\s>]/i.test(text)) return null;
+  if (/<script|foreignObject|<!ENTITY|javascript:|data:text\/html|\son[a-z]+\s*=/i.test(text)) {
+    throw new Error("This SVG includes content we cannot store.");
+  }
+  return { type: "image/svg+xml", extension: "svg" };
 }
 
 function sniff(bytes: Uint8Array) {
@@ -103,7 +121,7 @@ function sniff(bytes: Uint8Array) {
 }
 
 export function mediaKey(key: string) {
-  if (!/^uploads\/[a-zA-Z0-9-]+\.(jpg|png|webp|gif)$/.test(key)) {
+  if (!/^uploads\/[a-zA-Z0-9-]+\.(jpg|png|webp|gif|svg)$/.test(key)) {
     throw new Error("Invalid media key.");
   }
   return key;

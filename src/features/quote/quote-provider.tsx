@@ -15,7 +15,8 @@ type QuoteContextValue = {
   open: boolean;
   form: QuoteFormKind;
   tvCount: string | null;
-  openQuote: (form?: QuoteFormKind, tvCount?: string) => void;
+  service: string | null;
+  openQuote: (form?: QuoteFormKind, tvCount?: string, service?: string) => void;
   closeQuote: () => void;
 };
 
@@ -25,10 +26,12 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<QuoteFormKind>("quote");
   const [tvCount, setTvCount] = useState<string | null>(null);
+  const [service, setService] = useState<string | null>(null);
 
-  const openQuote = useCallback((next: QuoteFormKind = "quote", count?: string) => {
+  const openQuote = useCallback((next: QuoteFormKind = "quote", count?: string, serviceName?: string) => {
     setForm(next);
     setTvCount(next === "tv" && count ? count : null);
+    setService(next === "quote" && serviceName ? serviceName : null);
     setOpen(true);
   }, []);
 
@@ -39,10 +42,11 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
       open,
       form,
       tvCount,
+      service,
       openQuote,
       closeQuote,
     }),
-    [open, form, tvCount, openQuote, closeQuote],
+    [open, form, tvCount, service, openQuote, closeQuote],
   );
 
   return <QuoteContext.Provider value={value}>{children}</QuoteContext.Provider>;

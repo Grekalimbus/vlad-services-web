@@ -69,14 +69,20 @@
 .media {
   position: absolute;
   inset: 0;
+  transition: transform 500ms ease;
 }
 
 .cardImage {
   object-fit: cover;
-  transition: transform 500ms ease;
+  opacity: 0;
+  transition: opacity 480ms ease;
 }
 
-.card:hover .cardImage {
+.cardImageOn {
+  opacity: 1;
+}
+
+.card:hover .media {
   transform: scale(1.04);
 }
 
@@ -319,12 +325,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .media,
   .cardImage,
   .nav {
     transition: none;
   }
 
-  .card:hover .cardImage {
+  .card:hover .media {
     transform: none;
   }
 }

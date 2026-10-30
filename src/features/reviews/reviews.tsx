@@ -158,7 +158,7 @@ export function Reviews() {
             className={styles.reviewLink}
           >
             {writeLabel}
-            <ArrowRight size={16} aria-hidden="true" />
+            <ArrowRight size={16} aria-hidden="true" className={styles.reviewArrow} />
           </a>
         </div>
 

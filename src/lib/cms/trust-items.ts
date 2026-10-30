@@ -1,3 +1,4 @@
+import { ensureElectricalLanding } from "./electrical-landing";
 import type { CmsDocument } from "./types";
 
 const businessYears = {
@@ -32,7 +33,7 @@ export function ensureTrustItems(document: CmsDocument): CmsDocument {
     next = structuredClone(next);
     next.trustItems.push({ ...businessYears });
   }
-  return ensureHeroAndReviews(next);
+  return ensureElectricalLanding(ensureHeroAndReviews(next));
 }
 
 function ensureHeroAndReviews(document: CmsDocument): CmsDocument {

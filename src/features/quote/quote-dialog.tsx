@@ -10,7 +10,7 @@ import shared from "@/styles/shared.module.css";
 import styles from "@/styles/forms.module.css";
 
 export function QuoteDialog() {
-  const { open, form, tvCount, closeQuote } = useQuote();
+  const { open, form, tvCount, service, closeQuote } = useQuote();
   const cms = useCms();
   const booking = form === "quote";
   const title = booking ? "Book a Service" : cms.copy.forms.tvQuoteTitle;
@@ -84,7 +84,7 @@ export function QuoteDialog() {
           {form === "tv" ? (
             <TvQuoteForm formId="quote-dialog" compact tvCount={tvCount ?? undefined} />
           ) : (
-            <QuoteForm />
+            <QuoteForm initialService={service ?? ""} />
           )}
         </div>
       </div>

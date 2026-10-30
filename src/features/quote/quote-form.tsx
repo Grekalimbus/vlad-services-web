@@ -16,7 +16,7 @@ const MAX_BYTES = 10 * 1024 * 1024;
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export function QuoteForm() {
+export function QuoteForm({ initialService = "" }: { initialService?: string }) {
   const ids = {
     name: useId(),
     phone: useId(),
@@ -33,7 +33,11 @@ export function QuoteForm() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [zip, setZip] = useState("");
-  const [service, setService] = useState("");
+  const preset =
+    quoteServices.find((item) => item.name === initialService)?.name ??
+    quoteServices.find((item) => item.name.trim() === initialService.trim())?.name ??
+    "";
+  const [service, setService] = useState(preset);
   const [photos, setPhotos] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const previewsRef = useRef<string[]>([]);

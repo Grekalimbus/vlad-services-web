@@ -23,6 +23,9 @@
   composes: heading from "../../styles/shared.module.css";
   width: 100%;
   text-align: center;
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
 }
 
 .list {
@@ -73,4 +76,10 @@
   font-weight: 500;
   line-height: 1.7;
   color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
 }

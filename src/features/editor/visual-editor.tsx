@@ -274,7 +274,7 @@ function ImagePopover({ panel, onClose }: { panel: Extract<Panel, { kind: "image
           {pending ? "Uploading…" : "Replace image"}
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,.svg,image/svg+xml"
             hidden
             disabled={pending}
             onChange={(event) => {
@@ -355,10 +355,20 @@ function CardPopover({
     >
       {fields.image ? (
         <>
-          <img src={assetPath(textAt(fields.image))} alt="" style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8 }} />
+          <img
+            src={assetPath(textAt(fields.image))}
+            alt=""
+            style={{
+              width: "100%",
+              height: kind === "serviceIcon" ? 88 : 120,
+              objectFit: kind === "serviceIcon" ? "contain" : "cover",
+              background: kind === "serviceIcon" ? "#f3f7fb" : undefined,
+              borderRadius: 8,
+            }}
+          />
           <label className="editorPrimary" style={{ display: "inline-block", margin: "0.7rem 0" }}>
             {pending ? "Uploading…" : "Replace image"}
-            <input type="file" accept="image/*" hidden disabled={pending} onChange={(event) => replace(fields.image!, event.target.files?.[0])} />
+            <input type="file" accept="image/*,.svg,image/svg+xml" hidden disabled={pending} onChange={(event) => replace(fields.image!, event.target.files?.[0])} />
           </label>
         </>
       ) : null}
@@ -519,7 +529,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
                   {photosOnly ? "Change" : frame.secondary ? "Replace before" : "Replace"}
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,.svg,image/svg+xml"
                     hidden
                     onChange={(event) => {
                       const file = event.target.files?.[0];
@@ -533,7 +543,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
                     Replace after
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.svg,image/svg+xml"
                       hidden
                       onChange={(event) => {
                         const file = event.target.files?.[0];
@@ -554,7 +564,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
           {pending ? "Uploading…" : photosOnly ? "Add" : "Add photos"}
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,.svg,image/svg+xml"
             multiple
             hidden
             disabled={pending}
@@ -619,7 +629,7 @@ function directTarget(target: Element) {
   const card = target.closest<HTMLElement>("[data-cms-card]");
   if (card) {
     const button = target.closest("button");
-    if (button && card.contains(button)) return null;
+    if (button && button !== card && card.contains(button)) return null;
     return card;
   }
   const gallery = target.closest<HTMLElement>("[data-cms-gallery]");
@@ -665,6 +675,20 @@ type CardField = {
 
 function cardFields(kind: string, id: string): { image: string; remove: boolean; texts: CardField[] } | null {
   const document = readCms();
+  if (kind === "serviceIcon") {
+    const separator = id.lastIndexOf(":");
+    const categoryId = separator > 0 ? id.slice(0, separator) : "";
+    const index = Number(separator > 0 ? id.slice(separator + 1) : "");
+    if (!categoryId || !Number.isInteger(index) || index < 0) return null;
+    return {
+      image: `copy.serviceLanding.${categoryId}.icons.${index}.src`,
+      remove: false,
+      texts: [
+        { path: `copy.serviceLanding.${categoryId}.icons.${index}.text`, label: "Description" },
+        { path: `copy.serviceLanding.${categoryId}.icons.${index}.alt`, label: "Label" },
+      ],
+    };
+  }
   if (kind === "offer") {
     const separator = id.lastIndexOf(":");
     const categoryId = separator > 0 ? id.slice(0, separator) : "";
