@@ -18,11 +18,14 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
       ? [{ image: entry.src, alt: entry.alt, title: entry.title }]
       : [],
   );
-  const reel = photos.map((photo, photoIndex) => ({
+  const worksIndex = fresh.id === "electrical" ? electricalWorksCard(cms.copy.home.works.cards) : -1;
+  const worksPhotos = worksIndex >= 0 ? cms.copy.home.works.cards[worksIndex].photos.filter((photo) => photo.image) : [];
+  const reel = (worksPhotos.length > 0 ? worksPhotos : photos).map((photo, photoIndex) => ({
     id: `${fresh.id}-${photoIndex}`,
     src: photo.image,
     alt: photo.alt,
   }));
+  const gallery = worksPhotos.length > 0 ? `slides:copy.home.works.cards.${worksIndex}.photos` : `photos:${fresh.id}`;
 
   return (
     <PageFrame
@@ -32,7 +35,7 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
       title={fresh.name}
       description={fresh.summary}
       hero={
-        <div data-cms-gallery={`photos:${fresh.id}`} data-empty={reel.length === 0 ? "" : undefined}>
+        <div data-cms-gallery={gallery} data-empty={reel.length === 0 ? "" : undefined}>
           <TvPhotoMarquee photos={reel} label={fresh.name} roomy />
         </div>
       }
@@ -59,4 +62,10 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
       </TvBand>
     </PageFrame>
   );
+}
+
+function electricalWorksCard(cards: { href: string; title: string; icon: string }[]) {
+  const byHref = cards.findIndex((card) => card.href.replace(/\/$/, "") === "/services/electrical");
+  if (byHref >= 0) return byHref;
+  return cards.findIndex((card) => card.icon === "zap" || /^electrical$/i.test(card.title.trim()));
 }
