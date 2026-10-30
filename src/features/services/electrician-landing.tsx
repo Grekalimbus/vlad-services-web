@@ -90,10 +90,7 @@ export function ElectricianLanding({
           <PriceGrid />
         </div>
       </section>
-      <section className={styles.quiz} aria-labelledby="after-quiz-heading">
-        <h2 id="after-quiz-heading" className={styles.quizHeading} data-cms="copy.serviceLanding.electrical.stepsHeading">
-          <QuizHeading text={landing.stepsHeading} />
-        </h2>
+      <section className={styles.quiz}>
         <ol className={styles.steps}>
           {landing.steps.map((step, index) => {
             const Icon = stepIcons[index] ?? ClipboardList;
@@ -119,6 +116,9 @@ export function ElectricianLanding({
             );
           })}
         </ol>
+        <button type="button" className={styles.quote} onClick={() => openQuote("quote", undefined, category.name)}>
+          GET A QUOTE
+        </button>
       </section>
       <FaqSection
         id="electrical-faq"
@@ -202,18 +202,6 @@ function PriceGrid() {
         <PriceCard key={item.label} amount={item.amount} label={item.label} active={active} />
       ))}
     </ul>
-  );
-}
-
-function QuizHeading({ text }: { text: string }) {
-  const match = text.match(/^(.*?)(\bquiz\b)(.*)$/i);
-  if (!match) return text;
-  return (
-    <>
-      {match[1]}
-      <span className={styles.quizWord}>{match[2]}</span>
-      {match[3]}
-    </>
   );
 }
 
