@@ -26,6 +26,32 @@ function emit() {
   listeners.forEach((listener) => listener());
 }
 
+const EDITING_TAB = "primefix.admin.editing";
+
+export function allowEditingTab() {
+  try {
+    sessionStorage.setItem(EDITING_TAB, "1");
+  } catch {
+    void 0;
+  }
+}
+
+export function editingTabAllowed() {
+  try {
+    return sessionStorage.getItem(EDITING_TAB) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function clearEditingTab() {
+  try {
+    sessionStorage.removeItem(EDITING_TAB);
+  } catch {
+    void 0;
+  }
+}
+
 export function setEditing(value: boolean) {
   if (editing === value) return;
   editing = value;

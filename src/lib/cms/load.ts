@@ -7,32 +7,20 @@ import { fallbackDocument, readCms } from "./read";
 import type { CmsDocument } from "./types";
 import { withCompanyEmail } from "./content-store";
 import { validateDocument } from "./validate";
-import { readLiveGoogleRating } from "@/lib/google-place-rating";
+import { applyLiveGoogleRating } from "@/lib/google-place-rating";
 
 const PRODUCTION_TTL_MS = 15_000;
 
 let productionCache: { at: number; document: CmsDocument } | null = null;
 
 export const loadCms = cache(async (): Promise<CmsDocument> => {
-  return withCompanyEmail(await withLiveGoogleRating(await readSavedDocument()));
+  return withCompanyEmail(await applyLiveGoogleRating(await readSavedDocument()));
 });
 
 export async function bindCms(): Promise<CmsDocument> {
   const document = await loadCms();
   rememberCms(document);
   return document;
-}
-
-async function withLiveGoogleRating(document: CmsDocument): Promise<CmsDocument> {
-  const listing = document.googleListing;
-  if (!listing?.mapsUrl) return document;
-  const live = await readLiveGoogleRating(listing.mapsUrl);
-  if (!live) return document;
-  if (listing.rating === live.rating && listing.reviewCount === live.reviewCount) return document;
-  const next = structuredClone(document);
-  next.googleListing.rating = live.rating;
-  next.googleListing.reviewCount = live.reviewCount;
-  return next;
 }
 
 async function readSavedDocument(): Promise<CmsDocument> {

@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 import { getPath, readCms } from "@/lib/cms/read";
 import {
   adoptSaved,
+  clearEditingTab,
   discardDraft,
+  editingTabAllowed,
   isDirty,
   peekDraft,
   publishDocument,
@@ -45,24 +47,31 @@ export function VisualEditor() {
 
   useEffect(() => {
     if (admin) return;
+    if (!editingTabAllowed()) {
+      setEditing(false);
+      return;
+    }
     let cancelled = false;
     const timer = window.setTimeout(() => {
-      fetch("/api/admin/session")
+      fetch("/api/admin/session", { cache: "no-store", credentials: "same-origin" })
         .then((response) => response.json())
         .then(async (body: { authenticated?: boolean }) => {
           if (cancelled) return;
-          if (body.authenticated) {
-            try {
-              const response = await fetch("/api/content", { cache: "no-store" });
-              const document = response.ok ? await response.json() : null;
-              if (!cancelled && document && document.version === 1 && Array.isArray(document.serviceCategories)) {
-                publishDocument(ensureTrustItems(ensureServiceTemplates(document)));
-              }
-            } catch {
-              void 0;
-            }
+          if (body.authenticated !== true) {
+            clearEditingTab();
+            setEditing(false);
+            return;
           }
-          if (!cancelled) setEditing(Boolean(body.authenticated));
+          try {
+            const response = await fetch("/api/content", { cache: "no-store", credentials: "same-origin" });
+            const document = response.ok ? await response.json() : null;
+            if (!cancelled && document && document.version === 1 && Array.isArray(document.serviceCategories)) {
+              publishDocument(ensureTrustItems(ensureServiceTemplates(document)));
+            }
+          } catch {
+            void 0;
+          }
+          if (!cancelled) setEditing(true);
         })
         .catch(() => {
           if (!cancelled) setEditing(false);
@@ -171,7 +180,8 @@ export function VisualEditor() {
 
   async function logout() {
     if (dirty && !window.confirm("You have unsaved changes. Log out without saving?")) return;
-    await fetch("/api/admin/logout", { method: "POST" });
+    clearEditingTab();
+    await fetch("/api/admin/logout", { method: "POST", credentials: "same-origin" });
     setEditing(false);
     setPanel(null);
     setChip(null);

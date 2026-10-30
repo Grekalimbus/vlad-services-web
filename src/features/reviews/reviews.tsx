@@ -106,7 +106,9 @@ export function Reviews() {
           <p className={styles.rating}>
             {listing.rating != null ? (
               <>
-                <span className={styles.ratingValue}>{listing.rating.toFixed(1)}</span>
+                <span className={styles.ratingValue} data-cms={source === "google" ? "googleListing.rating" : undefined}>
+                  {listing.rating.toFixed(1)}
+                </span>
                 <span className={styles.stars} aria-hidden="true">
                   {Array.from({ length: 5 }, (_, index) => (
                     <Star
@@ -119,7 +121,14 @@ export function Reviews() {
               </>
             ) : null}
             <span className={styles.muted}>
-              {reviews.length > 0 ? `${listing.reviewCount} ${countLabel}` : `No ${current.label} reviews yet`}
+              {reviews.length > 0 ? (
+                <>
+                  <span data-cms={source === "google" ? "googleListing.reviewCount" : undefined}>{listing.reviewCount}</span>{" "}
+                  {countLabel}
+                </>
+              ) : (
+                `No ${current.label} reviews yet`
+              )}
             </span>
             <span className={styles.sources} role="group" aria-label="Review source">
               <button

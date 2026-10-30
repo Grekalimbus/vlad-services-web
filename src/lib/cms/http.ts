@@ -24,8 +24,8 @@ export async function handleLogin(request: Request, env: CmsEnv) {
   return login(request, env);
 }
 
-export async function handleLogout() {
-  return logout();
+export function handleLogout(request: Request) {
+  return logout(request);
 }
 
 export async function handleSession(request: Request, env: CmsEnv) {

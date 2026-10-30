@@ -34,10 +34,10 @@ export default function ApplicationsPage() {
   const [viewer, setViewer] = useState<{ photos: { src: string; alt: string }[]; index: number } | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/session")
+    fetch("/api/admin/session", { cache: "no-store", credentials: "same-origin" })
       .then((response) => response.json())
       .then((body: { authenticated?: boolean }) => {
-        setAuthenticated(Boolean(body.authenticated));
+        setAuthenticated(body.authenticated === true);
         setReady(true);
       })
       .catch(() => setReady(true));
@@ -506,6 +506,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
     const password = String(new FormData(event.currentTarget).get("password") ?? "");
     const response = await fetch("/api/admin/login", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ password }),
     });

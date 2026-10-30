@@ -1,4 +1,5 @@
 import { ensureServiceTemplates } from "@/lib/service-pages";
+import { applyLiveGoogleRating } from "@/lib/google-place-rating";
 import { ensureTrustItems } from "./trust-items";
 import { fallbackDocument } from "./read";
 import type { CmsDocument, CmsEnv } from "./types";
@@ -19,6 +20,10 @@ export function withCompanyEmail(document: CmsDocument): CmsDocument {
 }
 
 export async function loadDocument(env: CmsEnv): Promise<CmsDocument> {
+  return applyLiveGoogleRating(await readStoredDocument(env));
+}
+
+async function readStoredDocument(env: CmsEnv): Promise<CmsDocument> {
   if (env.CMS_DB) {
     const row = await env.CMS_DB.prepare("SELECT body FROM documents WHERE id = ?")
       .bind("site")

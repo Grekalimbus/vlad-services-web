@@ -1,23 +1,35 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { allowEditingTab } from "@/lib/cms/edit-store";
 import styles from "./admin.module.css";
 
 export default function AdminPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/session")
+    fetch("/api/admin/session", { cache: "no-store", credentials: "same-origin" })
       .then((response) => response.json())
       .then((body: { authenticated?: boolean }) => {
-        if (body.authenticated) window.location.assign("/");
-        else setReady(true);
+        if (body.authenticated === true) {
+          allowEditingTab();
+          window.location.assign("/");
+          return;
+        }
+        setReady(true);
       })
       .catch(() => setReady(true));
   }, []);
 
   if (!ready) return <main className={styles.login}>Loading…</main>;
-  return <Login onSuccess={() => window.location.assign("/")} />;
+  return (
+    <Login
+      onSuccess={() => {
+        allowEditingTab();
+        window.location.assign("/");
+      }}
+    />
+  );
 }
 
 function Login({ onSuccess }: { onSuccess: () => void }) {
@@ -31,6 +43,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
     const password = String(new FormData(event.currentTarget).get("password") ?? "");
     const response = await fetch("/api/admin/login", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ password }),
     });
