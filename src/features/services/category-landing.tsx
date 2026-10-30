@@ -40,12 +40,7 @@ export function CategoryLanding({ category }: { category: ServiceCategory }) {
       <TvBand blend>
         <div className={styles.band}>
           {fresh.id === "electrical" ? (
-            <ElectricianLanding
-              category={fresh}
-              namePath={index >= 0 ? `serviceCategories.${index}.name` : undefined}
-              photos={photos}
-              galleryPath={`items:${fresh.id}`}
-            />
+            <ElectricianLanding category={fresh} />
           ) : (
             <>
               <h1 className={styles.pageTitle} data-cms={index >= 0 ? `serviceCategories.${index}.name` : undefined}>

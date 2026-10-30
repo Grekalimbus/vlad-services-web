@@ -9,7 +9,7 @@ import styles from "./deals-signup.module.css";
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export function DealsSignup() {
+export function DealsSignup({ id = "deals" }: { id?: string }) {
 	const ids = {
 		name: useId(),
 		phone: useId(),
@@ -33,9 +33,8 @@ export function DealsSignup() {
 
 		if (name.length < 2) nextErrors.name = "Enter your name.";
 		if (!phonePattern.test(phone)) nextErrors.phone = "Enter a phone number.";
-		if (zip && !zipPattern.test(zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
-		if (email && !emailPattern.test(email))
-			nextErrors.email = "Enter a valid email.";
+		if (!zipPattern.test(zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
+		if (!emailPattern.test(email)) nextErrors.email = "Enter a valid email.";
 		if (data.get("smsConsent") !== "yes") nextErrors.sms = "Required";
 		if (data.get("emailConsent") !== "yes") nextErrors.emailConsent = "Required";
 
@@ -63,15 +62,15 @@ export function DealsSignup() {
 
 	return (
 		<section
-			id="deals"
-			aria-labelledby="deals-heading"
+			id={id}
+			aria-labelledby={`${id}-heading`}
 			className={styles.section}
 		>
 			<div className={styles.container}>
 				<div className={styles.panel}>
 					<div className={styles.photo} aria-hidden="true" />
 					<div className={styles.content}>
-						<h2 id="deals-heading" className={styles.heading}>
+						<h2 id={`${id}-heading`} className={styles.heading}>
 							<span data-cms="copy.home.deals.headingLead">{copy.headingLead}</span>{" "}
 							<span className={styles.accent} data-cms="copy.home.deals.headingAccent">{copy.headingAccent}</span>
 						</h2>
@@ -122,22 +121,24 @@ export function DealsSignup() {
 									<DealField
 										id={ids.zip}
 										name="zip"
-										label={copy.zipLabel}
-										cms="copy.home.deals.zipLabel"
+										label={requiredLabel(copy.zipLabel)}
+										cms={copy.zipLabel === requiredLabel(copy.zipLabel) ? "copy.home.deals.zipLabel" : undefined}
 										inputMode="numeric"
 										autoComplete="postal-code"
 										placeholder={copy.zipPlaceholder}
 										error={errors.zip}
+										required
 									/>
 									<DealField
 										id={ids.email}
 										name="email"
-										label={copy.emailLabel}
-										cms="copy.home.deals.emailLabel"
+										label={requiredLabel(copy.emailLabel)}
+										cms={copy.emailLabel === requiredLabel(copy.emailLabel) ? "copy.home.deals.emailLabel" : undefined}
 										type="email"
 										autoComplete="email"
 										placeholder={copy.emailPlaceholder}
 										error={errors.email}
+										required
 									/>
 								</div>
 								<div className={styles.consentWrap}>
@@ -174,11 +175,15 @@ function clearFixedErrors(current: Record<string, string>, data: FormData) {
 	const email = String(data.get("email") ?? "").trim();
 	if (name.length >= 2) delete next.name;
 	if (phonePattern.test(phone)) delete next.phone;
-	if (!zip || zipPattern.test(zip)) delete next.zip;
-	if (!email || emailPattern.test(email)) delete next.email;
+	if (zipPattern.test(zip)) delete next.zip;
+	if (emailPattern.test(email)) delete next.email;
 	if (data.get("smsConsent") === "yes") delete next.sms;
 	if (data.get("emailConsent") === "yes") delete next.emailConsent;
 	return next;
+}
+
+function requiredLabel(label: string) {
+	return label.replace(/\s*\(optional\)/gi, "").trim();
 }
 
 function DealField({
@@ -191,16 +196,18 @@ function DealField({
 	inputMode,
 	placeholder,
 	error,
+	required = false,
 }: {
 	id: string;
 	name: string;
 	label: string;
-	cms: string;
+	cms?: string;
 	type?: string;
 	autoComplete?: string;
 	inputMode?: "numeric";
 	placeholder: string;
 	error?: string;
+	required?: boolean;
 }) {
 	return (
 		<div className={styles.field}>
@@ -214,6 +221,7 @@ function DealField({
 				autoComplete={autoComplete}
 				inputMode={inputMode}
 				placeholder={placeholder}
+				required={required}
 				aria-invalid={Boolean(error)}
 				aria-describedby={error ? `${id}-error` : undefined}
 				className={error ? `${styles.input} ${styles.inputInvalid}` : styles.input}

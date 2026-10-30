@@ -53,26 +53,34 @@
 }
 
 .story {
-  position: relative;
   width: 100%;
-  min-height: min(calc(34rem * 1.15), calc((50vw - 300px - 2.5rem) * 938 / 541));
   overflow: visible;
   margin: 3.5rem auto 0;
-  padding-block: 1.5rem;
+}
+
+.storyLayout {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr min(600px, calc(100% - 2rem)) 1fr;
+  align-items: start;
+  width: 100%;
+}
+
+.storyStage {
+  display: contents;
 }
 
 .figure {
   position: absolute;
-  top: 50%;
+  top: 1.5rem;
   right: calc(50% + 300px + 1.25rem);
   left: auto;
   z-index: 1;
   width: auto;
-  height: min(calc(34rem * 1.15), calc((50vw - 300px - 2.5rem) * 938 / 541));
+  height: min(calc(34rem * 1.15 * 0.8), calc((50vw - 300px - 2.5rem) * 0.8 * 938 / 541));
   aspect-ratio: 541 / 938;
   margin: 0;
   overflow: hidden;
-  transform: translateY(-50%);
   pointer-events: none;
 }
 
@@ -91,10 +99,13 @@
 }
 
 .storyCopy {
+  grid-column: 2;
+  grid-row: 1;
   position: relative;
   z-index: 2;
-  width: min(100% - 2rem, 600px);
-  margin-inline: auto;
+  width: 100%;
+  margin: 0;
+  padding-top: 1.5rem;
   text-align: center;
 }
 
@@ -121,6 +132,66 @@
 
 .storyBody p + p {
   margin-top: 0.9rem;
+}
+
+.priceGrid {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  margin: 1.15rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.priceCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 5.6rem;
+  padding: 0.9rem 0.55rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(23 23 23 / 0.04),
+    0 12px 28px rgb(37 128 205 / 0.08);
+  text-align: center;
+}
+
+.priceValue {
+  position: relative;
+  margin: 0;
+  color: #0076fe;
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.priceFinal {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.priceLabel {
+  margin: 0;
+  color: #121417;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
 .quiz {
@@ -263,11 +334,28 @@
 }
 
 @media (max-width: 800px) {
-  .story,
-  .story[data-side="end"] {
+  .storyLayout {
+    display: block;
+  }
+
+  .storyStage,
+  .story[data-side="end"] .storyStage {
+    display: block;
+    position: relative;
     min-height: 0;
     padding-block: 1.5rem;
     overflow: visible;
+  }
+
+  .storyCopy {
+    width: min(100% - 2rem, 600px);
+    margin-inline: auto;
+    padding-top: 0;
+  }
+
+  .priceGrid {
+    width: min(100% - 2rem, 600px);
+    margin: 1.15rem auto 0;
   }
 
   .figure,

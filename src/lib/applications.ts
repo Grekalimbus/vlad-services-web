@@ -56,8 +56,8 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
     const service = plainText(form.get("service"), 80);
     if (name.length < 2) return json({ error: "Enter your name." }, 400);
     if (!phonePattern.test(phone)) return json({ error: "Enter a phone number." }, 400);
-    if (email && !emailPattern.test(email)) return json({ error: "Enter a valid email or leave it blank." }, 400);
-    if (zip && !zipPattern.test(zip)) return json({ error: "Enter a 5-digit ZIP code or leave it blank." }, 400);
+    if (!emailPattern.test(email)) return json({ error: "Enter a valid email." }, 400);
+    if (!zipPattern.test(zip)) return json({ error: "Enter a 5-digit ZIP code." }, 400);
 
     const files = form.getAll("photos").filter((value): value is File => value instanceof File && value.size > 0);
     if (files.length > MAX_PHOTOS) return json({ error: "You can upload up to 5 photos." }, 400);

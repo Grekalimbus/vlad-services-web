@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { CalendarClock, ClipboardList, CreditCard, Phone, type LucideIcon } from "lucide-react";
 import { AreasSection } from "@/features/areas";
 import { FaqSection } from "@/features/faq/faq-section";
-import { PhotoFeature } from "./category-gallery";
+import { DealsSignup } from "@/features/home/deals-signup";
 import { useQuote } from "@/features/quote";
 import { electricalLandingFrom } from "@/lib/cms/electrical-landing";
 import { useCms } from "@/lib/cms/use-cms";
@@ -13,22 +14,19 @@ import styles from "./electrician-landing.module.css";
 
 const stepIcons: LucideIcon[] = [ClipboardList, Phone, CalendarClock, CreditCard];
 
-type Photo = {
-  image: string;
-  alt: string;
-  title?: string;
-};
+const prices = [
+  { amount: 125, label: "Chandelier" },
+  { amount: 95, label: "Flush Fit Light" },
+  { amount: 120, label: "Ceiling Fan" },
+  { amount: 110, label: "Outlet" },
+  { amount: 100, label: "Dimmer/Switch" },
+  { amount: 75, label: "Panel Check/Reset" },
+] as const;
 
 export function ElectricianLanding({
   category,
-  namePath,
-  photos,
-  galleryPath,
 }: {
   category: { id: string; name: string; coverImage?: string };
-  namePath?: string;
-  photos: Photo[];
-  galleryPath: string;
 }) {
   const cms = useCms();
   const landing = electricalLandingFrom(cms);
@@ -64,27 +62,32 @@ export function ElectricianLanding({
         ))}
       </ul>
       <section className={styles.story} data-side="start" aria-labelledby="electrical-story-title">
-        {figureSrc ? (
-          <figure className={styles.figure}>
-            <Image
-              src={assetPath(figureSrc)}
-              alt={landing.description.imageAlt}
-              data-cms-src={coverIndex >= 0 ? `copy.home.serviceCovers.${coverIndex}.src` : undefined}
-              width={1672}
-              height={940}
-              unoptimized={figureSrc.startsWith("/api/media/")}
-              sizes="(min-width: 800px) 36rem, 100vw"
-              className={styles.storyImage}
-            />
-          </figure>
-        ) : null}
-        <div className={styles.storyCopy}>
-          <h1 id="electrical-story-title" className={styles.storyTitle} data-cms="copy.serviceLanding.electrical.description.title">
-            {landing.description.title}
-          </h1>
-          <div className={styles.storyBody} data-cms="copy.serviceLanding.electrical.description.body">
-            {paragraphs(landing.description.body)}
+        <div className={styles.storyLayout}>
+          <div className={styles.storyStage}>
+            {figureSrc ? (
+              <figure className={styles.figure}>
+                <Image
+                  src={assetPath(figureSrc)}
+                  alt={landing.description.imageAlt}
+                  data-cms-src={coverIndex >= 0 ? `copy.home.serviceCovers.${coverIndex}.src` : undefined}
+                  width={1672}
+                  height={940}
+                  unoptimized={figureSrc.startsWith("/api/media/")}
+                  sizes="(min-width: 800px) 36rem, 100vw"
+                  className={styles.storyImage}
+                />
+              </figure>
+            ) : null}
+            <div className={styles.storyCopy}>
+              <h1 id="electrical-story-title" className={styles.storyTitle} data-cms="copy.serviceLanding.electrical.description.title">
+                {landing.description.title}
+              </h1>
+              <div className={styles.storyBody} data-cms="copy.serviceLanding.electrical.description.body">
+                {paragraphs(landing.description.body)}
+              </div>
+            </div>
           </div>
+          <PriceGrid />
         </div>
       </section>
       <section className={styles.quiz} aria-labelledby="after-quiz-heading">
@@ -117,15 +120,6 @@ export function ElectricianLanding({
           })}
         </ol>
       </section>
-      <PhotoFeature
-        name={category.name}
-        namePath={namePath}
-        slides={photos}
-        galleryPath={galleryPath}
-        compact
-        body={landing.dealsBody}
-        bodyPath="copy.serviceLanding.electrical.dealsBody"
-      />
       <FaqSection
         id="electrical-faq"
         headingId="electrical-faq-heading"
@@ -139,7 +133,75 @@ export function ElectricianLanding({
         }}
       />
       <AreasSection id="areas" />
+      <DealsSignup id="electrical-deals" />
     </>
+  );
+}
+
+function useCountUp(target: number, active: boolean) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!active) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setValue(target);
+      return;
+    }
+    const duration = 3000;
+    const start = performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      setValue(Math.round(target * progress));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [active, target]);
+
+  return value;
+}
+
+function PriceCard({ amount, label, active }: { amount: number; label: string; active: boolean }) {
+  const current = useCountUp(amount, active);
+  return (
+    <li className={styles.priceCard}>
+      <p className={styles.priceValue}>
+        <span aria-hidden="true">${current}</span>
+        <span className={styles.priceFinal}>${amount}</span>
+      </p>
+      <p className={styles.priceLabel}>{label}</p>
+    </li>
+  );
+}
+
+function PriceGrid() {
+  const listRef = useRef<HTMLUListElement>(null);
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setActive(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <ul ref={listRef} className={styles.priceGrid} aria-label="Electrician prices">
+      {prices.map((item) => (
+        <PriceCard key={item.label} amount={item.amount} label={item.label} active={active} />
+      ))}
+    </ul>
   );
 }
 

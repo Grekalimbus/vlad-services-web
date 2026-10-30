@@ -46,11 +46,13 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
   const [messaging, setMessaging] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
   const copy = useCms().copy.forms;
-  const emailError = email.trim() && !emailPattern.test(email.trim()) ? "Enter a valid email or leave this blank." : "";
-  const zipError = zip.trim() && !zipPattern.test(zip.trim()) ? "Enter a 5-digit ZIP code or leave this blank." : "";
+  const emailError = email.trim() && !emailPattern.test(email.trim()) ? "Enter a valid email." : "";
+  const zipError = zip.trim() && !zipPattern.test(zip.trim()) ? "Enter a 5-digit ZIP code." : "";
   const ready =
     name.trim().length >= 2 &&
     phonePattern.test(phone.trim()) &&
+    emailPattern.test(email.trim()) &&
+    zipPattern.test(zip.trim()) &&
     privacy &&
     messaging &&
     !emailError &&
@@ -166,7 +168,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
           id={ids.email}
           name="email"
           label="Email"
-          optional
+          required
           type="email"
           icon={<Mail size={16} aria-hidden="true" />}
           value={email}
@@ -179,7 +181,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
           id={ids.zip}
           name="zip"
           label="ZIP Code"
-          optional
+          required
           inputMode="numeric"
           icon={<MapPin size={16} aria-hidden="true" />}
           value={zip}

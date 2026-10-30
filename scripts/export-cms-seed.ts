@@ -179,7 +179,7 @@ const document = {
         phonePlaceholder: "Enter a phone number.",
         zipLabel: "ZIP Code",
         zipPlaceholder: "Enter a 5-digit ZIP code.",
-        emailLabel: "Email (Optional)",
+        emailLabel: "Email",
         emailPlaceholder: "Enter your email",
         submit: "Sign Up",
         sending: "Sending…",
