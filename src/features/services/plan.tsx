@@ -92,17 +92,17 @@ export function Plan() {
 				<ul className={styles.options} role="radiogroup" aria-labelledby="plan-heading">
 					{tvCounts.map((item) => {
 						const active = selected === item.id;
-						const discount = isDiscountCard(item.id);
+						const discount = isDiscountCard(item.id) ? item.id : null;
 						return (
 							<li key={item.id}>
 								<label
 									className={active ? `${styles.card} ${styles.cardActive}` : styles.card}
-									data-cms-reveal={discount ? `tv-offer:${item.id}` : undefined}
+									data-cms-reveal={discount ? `tv-offer:${discount}` : undefined}
 									onClick={() => {
 										if (editing && discount) return;
 										setSelected(item.id);
 										if (discount) {
-											setOffer(item.id);
+											setOffer(discount);
 											return;
 										}
 										setOffer(null);
@@ -117,8 +117,8 @@ export function Plan() {
 										onChange={() => {
 											setSelected(item.id);
 											if (discount) {
-												if (editing) revealSurface(`tv-offer:${item.id}`);
-												else setOffer(item.id);
+												if (editing) revealSurface(`tv-offer:${discount}`);
+												else setOffer(discount);
 												return;
 											}
 											setOffer(null);
