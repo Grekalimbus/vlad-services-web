@@ -103,16 +103,21 @@ export function TvQuoteForm({
         hasMount: String(data.get("hasMount") ?? ""),
         mountType: String(data.get("mountType") ?? ""),
         concealment: String(data.get("concealment") ?? ""),
+        service: "TV Mounting",
       },
       photos: filesFromFormData(data, "wallPhoto"),
       smsConsent: data.get("smsConsent") === "yes",
       emailConsent: false,
     });
 
-    await submitLead(payload);
-    setStatus("success");
-    form.reset();
-    setPhotoName("");
+    try {
+      await submitLead(payload);
+      setStatus("success");
+      form.reset();
+      setPhotoName("");
+    } catch {
+      setStatus("error");
+    }
   }
 
   if (status === "success") {

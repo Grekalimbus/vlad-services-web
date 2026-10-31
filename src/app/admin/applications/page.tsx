@@ -6,6 +6,8 @@ import styles from "../admin.module.css";
 
 type Status = "new" | "contacted" | "scheduled";
 
+type ApplicationForm = "book" | "signup" | "tv";
+
 type Application = {
   id: string;
   submittedAt: string;
@@ -15,8 +17,16 @@ type Application = {
   zip: string;
   service: string;
   status: Status;
+  form: ApplicationForm;
+  details: Record<string, string>;
   photos: { index: number; name: string }[];
 };
+
+const tabs: { id: ApplicationForm; label: string }[] = [
+  { id: "book", label: "Book now" },
+  { id: "signup", label: "Sign up" },
+  { id: "tv", label: "TV" },
+];
 
 const PAGE_SIZE = 20;
 
@@ -28,6 +38,7 @@ export default function ApplicationsPage() {
   const [error, setError] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [tab, setTab] = useState<ApplicationForm>("book");
   const [page, setPage] = useState(1);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -73,8 +84,8 @@ export default function ApplicationsPage() {
       return true;
     });
     next.sort((left, right) => new Date(right.submittedAt).getTime() - new Date(left.submittedAt).getTime());
-    return next;
-  }, [items, from, to]);
+    return next.filter((item) => item.form === tab);
+  }, [items, from, to, tab]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
@@ -136,6 +147,28 @@ export default function ApplicationsPage() {
     <main className={styles.applications}>
       <div className={styles.applicationsInner}>
         <h1>Applications</h1>
+        <div className={styles.tabs} role="tablist" aria-label="Application forms">
+          {tabs.map((item) => {
+            const count = items.filter((entry) => entry.form === item.id).length;
+            const selected = tab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                className={selected ? styles.tabActive : styles.tab}
+                onClick={() => {
+                  setTab(item.id);
+                  setPage(1);
+                }}
+              >
+                {item.label}
+                <span>{count}</span>
+              </button>
+            );
+          })}
+        </div>
         {error ? <p className={styles.error}>{error}</p> : null}
         {!loaded ? <p className={styles.empty}>Loading…</p> : null}
         {loaded && !error ? (
@@ -177,9 +210,10 @@ export default function ApplicationsPage() {
             </button>
           </form>
         ) : null}
-        {loaded && !error && items.length === 0 ? <p className={styles.empty}>No applications yet.</p> : null}
-        {loaded && !error && items.length > 0 && filtered.length === 0 ? (
-          <p className={styles.empty}>No applications in this date range.</p>
+        {loaded && !error && filtered.length === 0 ? (
+          <p className={styles.empty}>
+            {items.some((item) => item.form === tab) ? "No applications in this date range." : "No applications yet."}
+          </p>
         ) : null}
         {visible.length > 0 ? (
           <div className={styles.board}>
@@ -250,6 +284,7 @@ export default function ApplicationsPage() {
                     <div className={styles.cell}>
                       <span className={styles.cellLabel}>Service</span>
                       {item.service ? <span>{item.service}</span> : <span className={styles.muted}>Not specified</span>}
+                      {formatDetails(item) ? <span className={styles.detail}>{formatDetails(item)}</span> : null}
                     </div>
                     <div className={styles.cell}>
                       <span className={styles.cellLabel}>Photos</span>
@@ -539,7 +574,37 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
 
 function normalize(item: Application): Application {
   const status = item.status === "contacted" || item.status === "scheduled" ? item.status : "new";
-  return { ...item, status };
+  const form = item.form === "signup" || item.form === "tv" ? item.form : "book";
+  const details: Record<string, string> = {};
+  if (item.details && typeof item.details === "object") {
+    for (const [key, value] of Object.entries(item.details)) {
+      if (typeof value === "string" && value.trim()) details[key] = value.trim();
+    }
+  }
+  return { ...item, status, form, details };
+}
+
+const detailLabels: Record<string, string> = {
+  hearAbout: "Heard via",
+  tvCount: "TVs",
+  offer: "Offer",
+  room: "Room",
+  mount: "Mount",
+  wall: "Wall",
+  size: "Size",
+  tvSize: "Size",
+  wallType: "Wall",
+  hasMount: "Has mount",
+  mountType: "Mount",
+  concealment: "Cables",
+};
+
+function formatDetails(item: Application) {
+  const hidden = new Set(["name", "phone", "email", "zip", "service"]);
+  return Object.entries(item.details)
+    .filter(([key, value]) => !hidden.has(key) && value && value !== item.service)
+    .map(([key, value]) => `${detailLabels[key] ?? key}: ${value}`)
+    .join(" · ");
 }
 
 function formatWhen(value: string) {

@@ -87,6 +87,62 @@
   font-size: 1.6rem;
 }
 
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 1rem;
+  padding: 0.25rem;
+  border-radius: 0.85rem;
+  background: #fff;
+}
+
+.tab,
+.tabActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: transparent;
+  padding: 0.55rem 0.85rem;
+  color: #5c5a56;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+}
+
+.tab span,
+.tabActive span {
+  min-width: 1.3rem;
+  border-radius: 999px;
+  background: #f3f1ee;
+  padding: 0.05rem 0.4rem;
+  color: #5c5a56;
+  font-size: 0.75rem;
+}
+
+.tabActive {
+  background: #171717;
+  color: #fff;
+}
+
+.tabActive span {
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
+}
+
+.detail {
+  display: block;
+  margin-top: 0.25rem;
+  color: #5c5a56;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  white-space: normal;
+}
+
 .empty {
   margin: 0;
   color: #5c5a56;

@@ -14,7 +14,7 @@ export function TvBand({ children, blend = false }: { children: ReactNode; blend
         <span className={`${styles.arc} ${styles.arcBr}`} />
         <span className={`${styles.arc} ${styles.arcBrInner}`} />
       </div>
-      {children}
+      <div className={styles.content}>{children}</div>
     </div>
   );
 }

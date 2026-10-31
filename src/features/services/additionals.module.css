@@ -86,8 +86,146 @@
   background: #e7eef4;
 }
 
-.image {
+.image,
+.enterRight,
+.enterLeft,
+.leaveRight,
+.leaveLeft {
   object-fit: cover;
+}
+
+.enterRight,
+.enterLeft {
+  z-index: 1;
+}
+
+.enterRight {
+  animation: enterRight 520ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+.enterLeft {
+  animation: enterLeft 520ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+.leaveRight,
+.leaveLeft {
+  z-index: 0;
+}
+
+.leaveLeft {
+  animation: leaveLeft 520ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+.leaveRight {
+  animation: leaveRight 520ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+@keyframes enterRight {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes enterLeft {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes leaveLeft {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes leaveRight {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.94);
+  color: #121417;
+  opacity: 0;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 160ms ease, background-color 160ms ease;
+}
+
+.arrowPrev {
+  left: 0.55rem;
+}
+
+.arrowNext {
+  right: 0.55rem;
+}
+
+.media:hover .arrow,
+.media:focus-within .arrow {
+  opacity: 1;
+}
+
+.arrow:hover {
+  background: #fff;
+}
+
+.arrow:focus-visible,
+.dot:focus-visible,
+.dotActive:focus-visible {
+  outline: 2px solid #0076fe;
+  outline-offset: 2px;
+}
+
+.arrow:focus-visible {
+  opacity: 1;
+}
+
+.pager {
+  position: absolute;
+  bottom: 0.55rem;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  gap: 0.28rem;
+  transform: translateX(-50%);
+}
+
+.dot,
+.dotActive {
+  width: 0.42rem;
+  height: 0.42rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.78);
+  box-shadow: 0 0 0 1px rgb(18 20 23 / 0.18);
+  cursor: pointer;
+}
+
+.dotActive {
+  background: #0076fe;
 }
 
 .title {
@@ -107,6 +245,23 @@
   font-weight: 400;
   line-height: 1.45;
   color: #6d7580;
+}
+
+@media (hover: none) {
+  .arrow {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow,
+  .enterRight,
+  .enterLeft,
+  .leaveRight,
+  .leaveLeft {
+    transition: none;
+    animation: none;
+  }
 }
 
 @media (min-width: 640px) {

@@ -134,6 +134,14 @@
 	transform: scale(1.05);
 }
 
+.cardStatic {
+	cursor: default;
+}
+
+.cardStatic:hover .image {
+	transform: none;
+}
+
 .shade {
 	position: absolute;
 	inset: 0;

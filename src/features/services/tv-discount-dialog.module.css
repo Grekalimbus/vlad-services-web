@@ -1,0 +1,214 @@
+.backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 105;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.25rem;
+}
+
+.dismiss {
+	position: absolute;
+	inset: 0;
+	border: 0;
+	background: rgb(4 10 18 / 0.72);
+	cursor: pointer;
+}
+
+.dialog {
+	position: relative;
+	z-index: 1;
+	width: min(100%, 29.5rem);
+	border: 2px solid #2f86e8;
+	border-radius: 1.35rem;
+	background: linear-gradient(180deg, #12263d 0%, #0b1828 100%);
+	padding: 2.15rem 1.7rem 1.35rem;
+	color: #fff;
+	text-align: center;
+	box-shadow: 0 28px 70px rgb(0 0 0 / 0.45);
+}
+
+.close {
+	position: absolute;
+	top: 0.85rem;
+	right: 0.85rem;
+	display: inline-flex;
+	width: 2rem;
+	height: 2rem;
+	align-items: center;
+	justify-content: center;
+	border: 0;
+	background: transparent;
+	color: #fff;
+	cursor: pointer;
+}
+
+.close:focus-visible {
+	outline: 2px solid #ff9f38;
+	outline-offset: 2px;
+	border-radius: 0.35rem;
+}
+
+.title {
+	margin: 0;
+	padding-inline: 1.4rem;
+	font-size: clamp(1.35rem, 2.6vw, 1.7rem);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	line-height: 1.2;
+	color: #fff;
+}
+
+.percent {
+	color: #ff9f38;
+}
+
+.subtitle {
+	margin: 0.55rem 0 0;
+	font-size: 1.08rem;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	line-height: 1.3;
+	color: #ff9f38;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-top: 1.25rem;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	text-align: left;
+}
+
+.input {
+	width: 100%;
+	height: 2.85rem;
+	border: 1px solid rgb(186 206 224 / 0.38);
+	border-radius: 0.75rem;
+	background: rgb(8 18 32 / 0.35);
+	padding-inline: 1rem;
+	color: #fff;
+	font: inherit;
+	font-size: 0.98rem;
+}
+
+.input::placeholder {
+	color: rgb(168 184 198);
+}
+
+.input:focus-visible {
+	outline: 2px solid #2f86e8;
+	outline-offset: 1px;
+}
+
+.inputInvalid {
+	border-color: #ff4d4f;
+}
+
+.inputInvalid:focus-visible {
+	outline-color: #ff4d4f;
+}
+
+.select {
+	composes: input;
+	appearance: none;
+	padding-right: 2.4rem;
+	cursor: pointer;
+	background-image:
+		linear-gradient(45deg, transparent 50%, rgb(186 206 224) 50%),
+		linear-gradient(135deg, rgb(186 206 224) 50%, transparent 50%);
+	background-position:
+		calc(100% - 1.15rem) 50%,
+		calc(100% - 0.75rem) 50%;
+	background-size:
+		0.4rem 0.4rem,
+		0.4rem 0.4rem;
+	background-repeat: no-repeat;
+}
+
+.select option {
+	color: #12263d;
+}
+
+.selectEmpty {
+	color: rgb(168 184 198);
+}
+
+.error {
+	margin: 0;
+	color: #ff6b5a;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	line-height: 1.3;
+}
+
+.alert {
+	margin: 0;
+	color: #ff6b5a;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.submit {
+	display: flex;
+	width: 100%;
+	min-height: 3rem;
+	align-items: center;
+	justify-content: center;
+	margin-top: 0.15rem;
+	border: 0;
+	border-radius: 999px;
+	background: #1c8ef2;
+	color: #fff;
+	cursor: pointer;
+	font: inherit;
+	font-size: 1.02rem;
+	font-weight: 750;
+}
+
+.submit:hover {
+	background: #3aa0ff;
+}
+
+.submit:focus-visible {
+	outline: 2px solid #ff9f38;
+	outline-offset: 3px;
+}
+
+.submit:disabled {
+	cursor: default;
+	opacity: 0.7;
+}
+
+.note {
+	margin: 0.95rem 0 0.15rem;
+	color: rgb(186 202 216);
+	font-size: 0.78rem;
+	line-height: 1.4;
+}
+
+:global(html[data-editing]) .title:empty::before,
+:global(html[data-editing]) .subtitle:empty::before,
+:global(html[data-editing]) .note:empty::before,
+:global(html[data-editing]) .submit span:empty::before {
+	content: "Edit text";
+	color: rgb(255 255 255 / 0.45);
+	font-weight: 600;
+}
+
+@media (max-width: 420px) {
+	.dialog {
+		padding: 2rem 1.05rem 1.15rem;
+	}
+
+	.title {
+		padding-inline: 1.1rem;
+	}
+}

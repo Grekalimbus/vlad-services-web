@@ -21,10 +21,11 @@ import { assetPath } from "@/lib/site";
 import { projectIconOptions } from "@/lib/project-cards";
 import { ensureServiceTemplates } from "@/lib/service-pages";
 import { ensureTrustItems } from "@/lib/cms/trust-items";
+import { peekReveal, revealSurface } from "@/lib/cms/reveal";
 import { removeHomepageService } from "./service-actions";
 import "./visual-editor.css";
 
-type Chip = { element: HTMLElement; top: number; left: number };
+type Chip = { element: HTMLElement; top: number; left: number; action: "edit" | "reveal" };
 type Panel =
   | { kind: "text"; path: string; top: number; left: number }
   | { kind: "image"; path: string; top: number; left: number }
@@ -111,12 +112,25 @@ export function VisualEditor() {
       hot = next;
     }
 
+    function placeChip(element: HTMLElement, action: Chip["action"]) {
+      const rect = element.getBoundingClientRect();
+      setChip((current) => {
+        if (current?.element === element && current.action === action) return current;
+        return { element, top: rect.top - 34, left: rect.left, action };
+      });
+    }
+
     function onOver(event: PointerEvent) {
       paint(event.target);
-      const control = event.target instanceof Element ? controlText(event.target) : null;
-      if (!control || window.matchMedia("(hover: none)").matches) return;
-      const rect = control.getBoundingClientRect();
-      setChip({ element: control, top: rect.top - 34, left: rect.left });
+      if (!(event.target instanceof Element) || window.matchMedia("(hover: none)").matches) return;
+      const control = controlText(event.target);
+      if (control) {
+        placeChip(control, "edit");
+        return;
+      }
+      if (directTarget(event.target)) return;
+      const reveal = event.target.closest<HTMLElement>("[data-cms-reveal]");
+      if (reveal) placeChip(reveal, "reveal");
     }
 
     function onClick(event: MouseEvent) {
@@ -124,22 +138,43 @@ export function VisualEditor() {
       if (event.target.closest("[data-editor-ui]")) return;
       const control = controlText(event.target);
       if (control) {
+        if (control.closest("[data-cms-surface]")) {
+          event.preventDefault();
+          event.stopPropagation();
+          setChip(null);
+          setPanel(panelFor(control));
+          return;
+        }
+        if (control.closest("[data-cms-reveal]")) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
         const coarse = window.matchMedia("(hover: none)").matches;
         if (coarse && armed !== control) {
           event.preventDefault();
           event.stopPropagation();
           armed = control;
           const rect = control.getBoundingClientRect();
-          setChip({ element: control, top: Math.max(8, rect.top - 36), left: rect.left });
+          setChip({ element: control, top: Math.max(8, rect.top - 36), left: rect.left, action: "edit" });
         }
         return;
       }
       const editable = directTarget(event.target);
-      if (!editable) return;
+      if (editable) {
+        event.preventDefault();
+        event.stopPropagation();
+        setChip(null);
+        setPanel(panelFor(editable));
+        return;
+      }
+      const reveal = event.target.closest<HTMLElement>("[data-cms-reveal]");
+      const revealId = reveal?.getAttribute("data-cms-reveal");
+      if (!reveal || !revealId) return;
       event.preventDefault();
       event.stopPropagation();
       setChip(null);
-      setPanel(panelFor(editable));
+      setPanel(null);
+      revealSurface(peekReveal() === revealId ? null : revealId);
     }
 
     document.addEventListener("pointerover", onOver);
@@ -220,13 +255,20 @@ export function VisualEditor() {
         <button
           type="button"
           className="editorChip"
-          style={{ top: Math.max(8, chip.top), left: Math.min(chip.left, window.innerWidth - 72) }}
+          style={{ top: Math.max(8, chip.top), left: Math.min(chip.left, window.innerWidth - (chip.action === "reveal" ? 128 : 72)) }}
           onClick={() => {
+            const revealId = chip.action === "reveal" ? chip.element.getAttribute("data-cms-reveal") : null;
+            if (revealId) {
+              revealSurface(revealId);
+              setChip(null);
+              setPanel(null);
+              return;
+            }
             setPanel(panelFor(chip.element));
             setChip(null);
           }}
         >
-          Edit
+          {chip.action === "reveal" ? "Edit popup" : "Edit"}
         </button>
       ) : null}
       {panel?.kind === "text" ? <TextPopover panel={panel} onClose={() => setPanel(null)} /> : null}
@@ -657,7 +699,12 @@ function directTarget(target: Element) {
 }
 
 function highlightTarget(target: Element) {
-  return controlText(target) ?? directTarget(target);
+  return controlText(target) ?? directTarget(target) ?? revealTarget(target);
+}
+
+function revealTarget(target: Element) {
+  if (controlText(target) || directTarget(target)) return null;
+  return target.closest<HTMLElement>("[data-cms-reveal]");
 }
 
 function panelFor(element: HTMLElement): Panel {
@@ -728,11 +775,21 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
   }
   if (kind === "additional") {
     return {
-      image: `copy.additionals.cards.${id}.image`,
+      image: "",
       remove: false,
       texts: [
         { path: `copy.additionals.cards.${id}.title`, label: "Title" },
         { path: `copy.additionals.cards.${id}.text`, label: "Description", long: true },
+      ],
+    };
+  }
+  if (kind === "tvShowcase") {
+    return {
+      image: `copy.tvShowcase.cards.${id}.image`,
+      remove: false,
+      texts: [
+        { path: `copy.tvShowcase.cards.${id}.title`, label: "Title" },
+        { path: `copy.tvShowcase.cards.${id}.alt`, label: "Image description" },
       ],
     };
   }
@@ -839,6 +896,12 @@ function commitSlides(path: string, slides: SlideRecord[]) {
   if (cardPhotos) {
     setAt(`copy.home.works.cards.${cardPhotos[1]}.src`, slides[0]?.image ?? "");
     setAt(`copy.home.works.cards.${cardPhotos[1]}.alt`, slides[0]?.alt ?? "");
+  }
+  const additionalSlides = /^copy\.additionals\.cards\.(\d+)\.slides$/.exec(path);
+  if (additionalSlides) {
+    setAt(`copy.additionals.cards.${additionalSlides[1]}.image`, slides[0]?.image ?? "");
+    setAt(`copy.additionals.cards.${additionalSlides[1]}.alt`, slides[0]?.alt ?? "");
+    setAt(`copy.additionals.cards.${additionalSlides[1]}.position`, slides[0]?.position ?? "center");
   }
   if (path !== "copy.home.hero.slides") return;
   const first = slides[0];

@@ -13,6 +13,8 @@ type StoredPhoto = { key: string; name: string; type: string };
 
 type ApplicationStatus = "new" | "contacted" | "scheduled";
 
+export type ApplicationForm = "book" | "signup" | "tv";
+
 type StoredApplication = {
   id: string;
   submittedAt: string;
@@ -22,6 +24,8 @@ type StoredApplication = {
   zip: string;
   service: string;
   status: ApplicationStatus;
+  form: ApplicationForm;
+  details: Record<string, string>;
   photos: StoredPhoto[];
 };
 
@@ -34,6 +38,8 @@ export type ApplicationView = {
   zip: string;
   service: string;
   status: ApplicationStatus;
+  form: ApplicationForm;
+  details: Record<string, string>;
   photos: { index: number; name: string }[];
 };
 
@@ -45,6 +51,8 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
     }
     const length = Number(request.headers.get("content-length") || 0);
     if (length > 52 * 1024 * 1024) return json({ error: "Upload is too large." }, 413);
+    const contentType = request.headers.get("content-type") ?? "";
+    if (contentType.includes("application/json")) return handleJsonApplication(request, env);
     const form = await request.formData();
     if (form.get("privacy") !== "yes" || form.get("messaging") !== "yes") {
       return json({ error: "Agree to the Privacy Policy and Messaging Terms & Conditions." }, 400);
@@ -72,7 +80,17 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
       photos.push({ name: plainText(file.name, 180) || "photo", type, bytes });
     }
 
-    await createApplication(env, { name, phone, email, zip, service, photos });
+    const hearAbout = plainText(form.get("hearAbout"), 80);
+    await createApplication(env, {
+      name,
+      phone,
+      email,
+      zip,
+      service,
+      photos,
+      form: "book",
+      details: hearAbout ? { hearAbout } : {},
+    });
     return json({ ok: true });
   } catch {
     return json({ error: "Could not save the request." }, 500);
@@ -143,6 +161,42 @@ export async function handleApplicationDelete(request: Request, env: CmsEnv, id:
   }
 }
 
+async function handleJsonApplication(request: Request, env: CmsEnv) {
+  let record: Record<string, unknown>;
+  try {
+    const raw = await request.text();
+    if (raw.length > 20_000) return json({ error: "Upload is too large." }, 413);
+    const body = JSON.parse(raw) as unknown;
+    if (!body || typeof body !== "object" || Array.isArray(body)) return json({ error: "Could not save the request." }, 400);
+    record = body as Record<string, unknown>;
+  } catch {
+    return json({ error: "Could not save the request." }, 400);
+  }
+  const form = parseForm(record.form);
+  if (!form) return json({ error: "Unknown form." }, 400);
+  const name = plainText(record.name, 120);
+  const phone = plainText(record.phone, 40);
+  const email = plainText(record.email, 200);
+  const zip = plainText(record.zip, 20);
+  const service = plainText(record.service, 120);
+  const hearAbout = plainText(record.hearAbout, 80);
+  if (name.length < 2) return json({ error: "Enter your name." }, 400);
+  if (!phonePattern.test(phone)) return json({ error: "Enter a phone number." }, 400);
+  if (zip && !zipPattern.test(zip)) return json({ error: "Enter a 5-digit ZIP code." }, 400);
+  if (form === "signup" || form === "book") {
+    if (!emailPattern.test(email)) return json({ error: "Enter a valid email." }, 400);
+    if (!zipPattern.test(zip)) return json({ error: "Enter a 5-digit ZIP code." }, 400);
+  }
+  if (form === "signup" && (record.smsConsent !== true || record.emailConsent !== true)) {
+    return json({ error: "Agree to the Privacy Policy and Messaging Terms & Conditions." }, 400);
+  }
+  const details = asDetails(record.details);
+  if (hearAbout) details.hearAbout = hearAbout;
+  const serviceLabel = service || (form === "signup" ? "Sign up" : "TV");
+  await createApplication(env, { name, phone, email, zip, service: serviceLabel, photos: [], form, details });
+  return json({ ok: true });
+}
+
 async function createApplication(
   env: CmsEnv,
   input: {
@@ -151,6 +205,8 @@ async function createApplication(
     email: string;
     zip: string;
     service: string;
+    form: ApplicationForm;
+    details: Record<string, string>;
     photos: { name: string; type: string; bytes: Uint8Array }[];
   },
 ) {
@@ -173,14 +229,28 @@ async function createApplication(
     zip: input.zip,
     service: input.service,
     status: "new",
+    form: input.form,
+    details: input.details,
     photos,
   };
   if (env.CMS_DB) {
     await ensureTable(env);
     await env.CMS_DB.prepare(
-      "INSERT INTO applications (id, submitted_at, name, phone, email, zip, service, photos, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO applications (id, submitted_at, name, phone, email, zip, service, photos, status, form, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     )
-      .bind(id, submittedAt, row.name, row.phone, row.email, row.zip, row.service, JSON.stringify(photos), row.status)
+      .bind(
+        id,
+        submittedAt,
+        row.name,
+        row.phone,
+        row.email,
+        row.zip,
+        row.service,
+        JSON.stringify(photos),
+        row.status,
+        row.form,
+        JSON.stringify(row.details),
+      )
       .run();
     return;
   }
@@ -193,7 +263,7 @@ async function readApplications(env: CmsEnv): Promise<StoredApplication[]> {
   if (env.CMS_DB) {
     await ensureTable(env);
     const page = await env.CMS_DB.prepare(
-      "SELECT id, submitted_at, name, phone, email, zip, service, photos, status FROM applications ORDER BY submitted_at DESC",
+      "SELECT id, submitted_at, name, phone, email, zip, service, photos, status, form, details FROM applications ORDER BY submitted_at DESC",
     )
       .bind()
       .all<Row>();
@@ -201,7 +271,7 @@ async function readApplications(env: CmsEnv): Promise<StoredApplication[]> {
   }
   const value = (await env.readApplications?.()) ?? [];
   if (!Array.isArray(value)) return [];
-  return value.filter(isStored).map(withStatus);
+  return value.filter(isStored).map(normalizeStored);
 }
 
 async function readPhoto(env: CmsEnv, key: string) {
@@ -258,6 +328,16 @@ async function ensureTable(env: CmsEnv) {
   } catch {
     void 0;
   }
+  try {
+    await env.CMS_DB.prepare("ALTER TABLE applications ADD COLUMN form TEXT NOT NULL DEFAULT 'book'").bind().run();
+  } catch {
+    void 0;
+  }
+  try {
+    await env.CMS_DB.prepare("ALTER TABLE applications ADD COLUMN details TEXT NOT NULL DEFAULT '{}'").bind().run();
+  } catch {
+    void 0;
+  }
 }
 
 function toView(item: StoredApplication): ApplicationView {
@@ -270,6 +350,8 @@ function toView(item: StoredApplication): ApplicationView {
     zip: item.zip,
     service: item.service,
     status: item.status,
+    form: item.form,
+    details: item.details,
     photos: item.photos.map((photo, index) => ({ index, name: photo.name })),
   };
 }
@@ -284,6 +366,8 @@ type Row = {
   service: string;
   photos: string;
   status?: string;
+  form?: string;
+  details?: string;
 };
 
 function fromRow(row: Row): StoredApplication {
@@ -303,16 +387,57 @@ function fromRow(row: Row): StoredApplication {
     zip: row.zip,
     service: row.service,
     status: asStatus(row.status),
+    form: storedForm(row.form),
+    details: asDetails(row.details),
     photos,
   };
 }
 
-function withStatus(item: StoredApplication): StoredApplication {
-  return { ...item, status: asStatus(item.status) };
+function normalizeStored(item: StoredApplication): StoredApplication {
+  return {
+    ...item,
+    name: typeof item.name === "string" ? item.name : "",
+    phone: typeof item.phone === "string" ? item.phone : "",
+    email: typeof item.email === "string" ? item.email : "",
+    zip: typeof item.zip === "string" ? item.zip : "",
+    service: typeof item.service === "string" ? item.service : "",
+    status: asStatus(item.status),
+    form: storedForm(item.form),
+    details: asDetails(item.details),
+    photos: Array.isArray(item.photos) ? item.photos : [],
+  };
 }
 
 function asStatus(value: unknown): ApplicationStatus {
   return value === "contacted" || value === "scheduled" || value === "new" ? value : "new";
+}
+
+function parseForm(value: unknown): ApplicationForm | null {
+  return value === "book" || value === "signup" || value === "tv" ? value : null;
+}
+
+function storedForm(value: unknown): ApplicationForm {
+  return parseForm(value) ?? "book";
+}
+
+function asDetails(value: unknown): Record<string, string> {
+  if (typeof value === "string") {
+    try {
+      return asDetails(JSON.parse(value));
+    } catch {
+      return {};
+    }
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const details: Record<string, string> = {};
+  for (const [key, item] of Object.entries(value)) {
+    if (!/^[a-zA-Z0-9_-]{1,40}$/.test(key) || typeof item !== "string") continue;
+    const text = item.trim().slice(0, 300);
+    if (!text) continue;
+    details[key] = text;
+    if (Object.keys(details).length >= 24) break;
+  }
+  return details;
 }
 
 async function readStatus(request: Request) {

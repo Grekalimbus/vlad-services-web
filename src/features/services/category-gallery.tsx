@@ -89,19 +89,25 @@ function OfferCard({ offer, categoryId, index }: { offer: Offer; categoryId: str
 export function PhotoFeature({
   name,
   namePath,
+  accent,
+  accentPath,
   slides,
   galleryPath,
   compact = false,
   body = "",
   bodyPath,
+  cta,
 }: {
   name: string;
   namePath?: string;
+  accent?: string;
+  accentPath?: string;
   slides: Slide[];
   galleryPath: string;
   compact?: boolean;
   body?: string;
   bodyPath?: string;
+  cta?: { label: string; path: string; href: string };
 }) {
   const editing = useEditing();
   const offers = useCms().copy.offers;
@@ -110,7 +116,10 @@ export function PhotoFeature({
   const showReel = slides.length > 0 || editing;
   const heading = (
     <h2 id={headingId} className={styles.heading}>
-      <span data-cms={namePath}>{name}</span> <span className={styles.accent} data-cms="copy.offers.photosAccent">{offers.photosAccent}</span>
+      <span data-cms={namePath}>{name}</span>{" "}
+      <span className={styles.accent} data-cms={accentPath ?? "copy.offers.photosAccent"}>
+        {accent ?? offers.photosAccent}
+      </span>
     </h2>
   );
 
@@ -138,9 +147,15 @@ export function PhotoFeature({
           ) : null}
         </>
       ) : null}
-      <QuoteCta className={styles.book}>
-        <span data-cms="copy.offers.book">{offers.book}</span>
-      </QuoteCta>
+      {cta ? (
+        <a href={cta.href} className={styles.book}>
+          <span data-cms={cta.path}>{cta.label}</span>
+        </a>
+      ) : (
+        <QuoteCta className={styles.book}>
+          <span data-cms="copy.offers.book">{offers.book}</span>
+        </QuoteCta>
+      )}
     </section>
   );
 }

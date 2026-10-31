@@ -26,11 +26,13 @@
   text-align: center;
 }
 
-.iconImage {
+.iconImage,
+.iconGlyph {
   display: block;
   width: 88px;
   height: 88px;
   object-fit: contain;
+  color: #0076fe;
   transition: filter 160ms ease;
 }
 
@@ -43,7 +45,9 @@
 }
 
 .iconButton:hover .iconImage,
-.iconButton:focus-visible .iconImage {
+.iconButton:hover .iconGlyph,
+.iconButton:focus-visible .iconImage,
+.iconButton:focus-visible .iconGlyph {
   filter: brightness(0.62);
 }
 
@@ -96,6 +100,13 @@
   height: 100%;
   margin-left: -114.73%;
   pointer-events: auto;
+}
+
+.storyImageFit {
+  width: 100%;
+  margin-left: 0;
+  object-fit: cover;
+  object-position: center 18%;
 }
 
 .storyCopy {
@@ -325,7 +336,8 @@
     padding: 1rem 0.75rem 0.9rem;
   }
 
-  .iconImage {
+  .iconImage,
+  .iconGlyph {
     width: 72px;
     height: 72px;
   }

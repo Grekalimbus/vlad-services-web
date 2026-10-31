@@ -3,6 +3,8 @@ import { buildConsentRecord, type ConsentRecord } from "@/lib/consent";
 export type LeadFormId =
   | "general-quote"
   | "tv-mounting-quote"
+  | "tv-discount"
+  | "tv-quiz"
   | "quote-dialog"
   | "deals-signup";
 
@@ -100,9 +102,26 @@ export function buildLeadPayload(input: {
 }
 
 export async function submitLead(payload: LeadPayload) {
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  if (process.env.NODE_ENV !== "production") {
-    console.info("PrimeFix lead", payload);
-  }
+  const form = payload.type === "deals" ? "signup" : payload.type === "tv-mounting" ? "tv" : "book";
+  const fields = payload.fields;
+  const response = await fetch("/api/applications", {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({
+      form,
+      name: fields.name ?? "",
+      phone: fields.phone ?? "",
+      email: fields.email ?? "",
+      zip: fields.zip ?? "",
+      service: fields.service ?? "",
+      hearAbout: fields.hearAbout ?? "",
+      formId: payload.source.formId,
+      smsConsent: payload.consents.sms.granted,
+      emailConsent: payload.consents.email.granted,
+      details: fields,
+    }),
+  });
+  const body = (await response.json().catch(() => null)) as { error?: string } | null;
+  if (!response.ok) throw new Error(body?.error || "Could not send the request. Try again.");
   return { ok: true as const, payload };
 }

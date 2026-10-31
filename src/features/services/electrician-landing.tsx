@@ -2,34 +2,76 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { CalendarClock, ClipboardList, CreditCard, Phone, type LucideIcon } from "lucide-react";
+import {
+  AirVent,
+  CookingPot,
+  DoorOpen,
+  Drill,
+  Droplets,
+  Flower2,
+  Hammer,
+  House,
+  Layers,
+  Leaf,
+  Microwave,
+  Paintbrush,
+  PaintRoller,
+  Palette,
+  Plug,
+  Refrigerator,
+  Ruler,
+  Scissors,
+  Shovel,
+  Sofa,
+  TreePine,
+  WashingMachine,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 import { AreasSection } from "@/features/areas";
 import { FaqSection } from "@/features/faq/faq-section";
 import { DealsSignup } from "@/features/home/deals-signup";
 import { useQuote } from "@/features/quote";
-import { electricalLandingFrom } from "@/lib/cms/electrical-landing";
+import { serviceLandingFrom } from "@/lib/cms/service-landing";
 import { useCms } from "@/lib/cms/use-cms";
 import { assetPath } from "@/lib/site";
+import { ProcessSteps } from "./process-steps";
 import styles from "./electrician-landing.module.css";
 
-const stepIcons: LucideIcon[] = [ClipboardList, Phone, CalendarClock, CreditCard];
+const glyphs: Record<string, LucideIcon> = {
+  AirVent,
+  CookingPot,
+  DoorOpen,
+  Drill,
+  Droplets,
+  Flower2,
+  Hammer,
+  House,
+  Layers,
+  Leaf,
+  Microwave,
+  Paintbrush,
+  PaintRoller,
+  Palette,
+  Plug,
+  Refrigerator,
+  Ruler,
+  Scissors,
+  Shovel,
+  Sofa,
+  TreePine,
+  WashingMachine,
+  Wrench,
+};
 
-const prices = [
-  { amount: 125, label: "Chandelier" },
-  { amount: 95, label: "Flush Fit Light" },
-  { amount: 120, label: "Ceiling Fan" },
-  { amount: 110, label: "Outlet" },
-  { amount: 100, label: "Dimmer/Switch" },
-  { amount: 75, label: "Panel Check/Reset" },
-] as const;
-
-export function ElectricianLanding({
+export function ServiceLanding({
   category,
 }: {
-  category: { id: string; name: string; coverImage?: string };
+  category: { id: string; slug: string; name: string; coverImage?: string };
 }) {
   const cms = useCms();
-  const landing = electricalLandingFrom(cms);
+  const landing = serviceLandingFrom(cms, category);
+  const copyBase = `copy.serviceLanding.${category.id}`;
   const coverIndex = cms.copy.home.serviceCovers.findIndex((item) => item.id === category.id);
   const cover = coverIndex >= 0 ? cms.copy.home.serviceCovers[coverIndex] : undefined;
   const figureSrc = cover?.src || category.coverImage || "";
@@ -47,21 +89,15 @@ export function ElectricianLanding({
               aria-label={`${icon.text}. Book ${category.name.trim()}`}
               onClick={() => openQuote("quote", undefined, category.name)}
             >
-              <img
-                src={assetPath(icon.src)}
-                alt=""
-                width={88}
-                height={88}
-                className={styles.iconImage}
-              />
-              <span className={styles.iconLabel} data-cms={`copy.serviceLanding.${category.id}.icons.${index}.text`}>
+              <LandingIcon src={icon.src} />
+              <span className={styles.iconLabel} data-cms={`${copyBase}.icons.${index}.text`}>
                 {icon.text}
               </span>
             </button>
           </li>
         ))}
       </ul>
-      <section className={styles.story} data-side="start" aria-labelledby="electrical-story-title">
+      <section className={styles.story} data-side="start" aria-labelledby={`${category.slug}-story-title`}>
         <div className={styles.storyLayout}>
           <div className={styles.storyStage}>
             {figureSrc ? (
@@ -74,66 +110,41 @@ export function ElectricianLanding({
                   height={940}
                   unoptimized={figureSrc.startsWith("/api/media/")}
                   sizes="(min-width: 800px) 36rem, 100vw"
-                  className={styles.storyImage}
+                  className={category.slug === "electrical" ? styles.storyImage : `${styles.storyImage} ${styles.storyImageFit}`}
                 />
               </figure>
             ) : null}
             <div className={styles.storyCopy}>
-              <h1 id="electrical-story-title" className={styles.storyTitle} data-cms="copy.serviceLanding.electrical.description.title">
+              <h1 id={`${category.slug}-story-title`} className={styles.storyTitle} data-cms={`${copyBase}.description.title`}>
                 {landing.description.title}
               </h1>
-              <div className={styles.storyBody} data-cms="copy.serviceLanding.electrical.description.body">
+              <div className={styles.storyBody} data-cms={`${copyBase}.description.body`}>
                 {paragraphs(landing.description.body)}
               </div>
             </div>
           </div>
-          <PriceGrid />
+          <PriceGrid prices={landing.prices} label={category.name.trim()} base={copyBase} />
         </div>
       </section>
-      <section className={styles.quiz}>
-        <ol className={styles.steps}>
-          {landing.steps.map((step, index) => {
-            const Icon = stepIcons[index] ?? ClipboardList;
-            return (
-              <li key={`${step.title}-${index}`} className={styles.step}>
-                <span className={styles.stepIndex} aria-hidden="true">
-                  {index + 1}
-                </span>
-                <div className={styles.stepCard}>
-                  <span className={styles.stepIcon} aria-hidden="true">
-                    <Icon strokeWidth={1.75} />
-                  </span>
-                  <div>
-                    <h3 className={styles.stepTitle} data-cms={`copy.serviceLanding.electrical.steps.${index}.title`}>
-                      {step.title}
-                    </h3>
-                    <p className={styles.stepText} data-cms={`copy.serviceLanding.electrical.steps.${index}.text`}>
-                      {step.text}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-        <button type="button" className={styles.quote} onClick={() => openQuote("quote", undefined, category.name)}>
-          GET A QUOTE
-        </button>
-      </section>
+      <ProcessSteps
+        steps={landing.steps}
+        serviceName={category.name}
+        pathFor={(index, field) => `${copyBase}.steps.${index}.${field}`}
+      />
       <FaqSection
-        id="electrical-faq"
-        headingId="electrical-faq-heading"
+        id={`${category.slug}-faq`}
+        headingId={`${category.slug}-faq-heading`}
         headingLead={landing.faq.headingLead}
         headingAccent={landing.faq.headingAccent}
         items={landing.faq.items}
         paths={{
-          headingLead: "copy.serviceLanding.electrical.faq.headingLead",
-          headingAccent: "copy.serviceLanding.electrical.faq.headingAccent",
-          item: (index, field) => `copy.serviceLanding.electrical.faq.items.${index}.${field}`,
+          headingLead: `${copyBase}.faq.headingLead`,
+          headingAccent: `${copyBase}.faq.headingAccent`,
+          item: (index, field) => `${copyBase}.faq.items.${index}.${field}`,
         }}
       />
       <AreasSection id="areas" />
-      <DealsSignup id="electrical-deals" />
+      <DealsSignup id={`${category.slug}-deals`} />
     </>
   );
 }
@@ -163,7 +174,17 @@ function useCountUp(target: number, active: boolean) {
   return value;
 }
 
-function PriceCard({ amount, label, active }: { amount: number; label: string; active: boolean }) {
+function PriceCard({
+  amount,
+  label,
+  labelPath,
+  active,
+}: {
+  amount: number;
+  label: string;
+  labelPath: string;
+  active: boolean;
+}) {
   const current = useCountUp(amount, active);
   return (
     <li className={styles.priceCard}>
@@ -171,12 +192,30 @@ function PriceCard({ amount, label, active }: { amount: number; label: string; a
         <span aria-hidden="true">${current}</span>
         <span className={styles.priceFinal}>${amount}</span>
       </p>
-      <p className={styles.priceLabel}>{label}</p>
+      <p className={styles.priceLabel} data-cms={labelPath}>
+        {label}
+      </p>
     </li>
   );
 }
 
-function PriceGrid() {
+function LandingIcon({ src }: { src: string }) {
+  if (src.startsWith("lucide:")) {
+    const Icon = glyphs[src.slice("lucide:".length)] ?? Wrench;
+    return <Icon className={styles.iconGlyph} strokeWidth={1.35} aria-hidden="true" />;
+  }
+  return <img src={assetPath(src)} alt="" width={88} height={88} className={styles.iconImage} />;
+}
+
+function PriceGrid({
+  prices,
+  label,
+  base,
+}: {
+  prices: { amount: number; label: string }[];
+  label: string;
+  base: string;
+}) {
   const listRef = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState(false);
 
@@ -197,9 +236,15 @@ function PriceGrid() {
   }, []);
 
   return (
-    <ul ref={listRef} className={styles.priceGrid} aria-label="Electrician prices">
-      {prices.map((item) => (
-        <PriceCard key={item.label} amount={item.amount} label={item.label} active={active} />
+    <ul ref={listRef} className={styles.priceGrid} aria-label={`${label} prices`}>
+      {prices.map((item, index) => (
+        <PriceCard
+          key={`${item.label}-${index}`}
+          amount={Number(item.amount) || 0}
+          label={item.label}
+          labelPath={`${base}.prices.${index}.label`}
+          active={active}
+        />
       ))}
     </ul>
   );

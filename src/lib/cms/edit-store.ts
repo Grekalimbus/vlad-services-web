@@ -1,3 +1,4 @@
+import { clearReveal } from "./reveal";
 import type { CmsDocument } from "./types";
 
 let draft: CmsDocument | null = null;
@@ -55,7 +56,10 @@ export function clearEditingTab() {
 export function setEditing(value: boolean) {
   if (editing === value) return;
   editing = value;
-  if (!value) draft = null;
+  if (!value) {
+    draft = null;
+    clearReveal();
+  }
   emit();
 }
 

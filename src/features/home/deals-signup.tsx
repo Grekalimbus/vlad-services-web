@@ -46,18 +46,24 @@ export function DealsSignup({ id = "deals" }: { id?: string }) {
 		}
 
 		setStatus("loading");
-		await submitLead(
-			buildLeadPayload({
-				type: "deals",
-				formId: "deals-signup",
-				fields: { name, phone, zip, email },
-				photos: [],
-				smsConsent: data.get("smsConsent") === "yes",
-				emailConsent: data.get("emailConsent") === "yes",
-			}),
-		);
-		form.reset();
-		setStatus("success");
+		try {
+			await submitLead(
+				buildLeadPayload({
+					type: "deals",
+					formId: "deals-signup",
+					fields: { name, phone, zip, email, service: "Sign up" },
+					photos: [],
+					smsConsent: data.get("smsConsent") === "yes",
+					emailConsent: data.get("emailConsent") === "yes",
+				}),
+			);
+			form.reset();
+			setStatus("success");
+		} catch (error) {
+			setStatus("error");
+			setErrors({ form: error instanceof Error ? error.message : "Could not send the request." });
+			document.getElementById(ids.error)?.focus();
+		}
 	}
 
 	return (
@@ -95,7 +101,9 @@ export function DealsSignup({ id = "deals" }: { id?: string }) {
 										role="alert"
 										className={styles.formError}
 									>
-										<span data-cms="copy.home.deals.error">{copy.error}</span>
+										<span data-cms={errors.form ? undefined : "copy.home.deals.error"}>
+										{errors.form ?? copy.error}
+									</span>
 									</p>
 								) : null}
 								<div className={styles.grid}>

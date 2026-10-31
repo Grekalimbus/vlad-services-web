@@ -11,6 +11,7 @@ export type ElectricalLanding = {
   stepsHeading: string;
   steps: { title: string; text: string }[];
   dealsBody: string;
+  prices: { amount: number; label: string }[];
   faq: {
     headingLead: string;
     headingAccent: string;
@@ -54,6 +55,14 @@ export const electricalLanding: ElectricalLanding = {
   ],
   dealsBody:
     "These photos are finished electrical jobs in homes around San Diego and the nearby cities. Chandeliers sit centered over dining tables. Pendant lights line up over a kitchen island. Ceiling fans clear the doorway, and outlet and switch plates lie flat on the wall. Each picture is the end of one visit: the old fixture is down, the box is secure, the new piece is level, and the circuit was tested before the ladder was packed.\n\nMost of this work takes about an hour when the fixture is already chosen. We bring the hardware for a standard hang, cover the floor, and do not leave wire nuts, blades, or packing behind. If a box is loose, a fan needs a new brace, or a switch is on the wrong circuit, we stop and say so before any extra work begins. The price set on the call is the price for the job in the photo. Looking through the set is the quickest way to judge the finish you can expect in your own room.",
+  prices: [
+    { amount: 125, label: "Chandelier" },
+    { amount: 95, label: "Flush Fit Light" },
+    { amount: 120, label: "Ceiling Fan" },
+    { amount: 110, label: "Outlet" },
+    { amount: 100, label: "Dimmer/Switch" },
+    { amount: 75, label: "Panel Check/Reset" },
+  ],
   faq: {
     headingLead: "QUESTIONS &",
     headingAccent: "ANSWERS",
@@ -110,6 +119,17 @@ function mergeIcons(saved: ElectricalLanding["icons"] | undefined) {
   });
 }
 
+function priceList(
+  saved: ElectricalLanding["prices"] | undefined,
+  fallback: ElectricalLanding["prices"],
+) {
+  if (!saved?.length) return fallback;
+  return saved.map((item) => ({
+    amount: Number(item.amount) || 0,
+    label: item.label || "",
+  }));
+}
+
 function mergeFaq(saved: ElectricalLanding["faq"] | undefined) {
   if (!saved?.items?.length) return electricalLanding.faq;
   return {
@@ -149,6 +169,7 @@ export function electricalLandingFrom(document: CmsDocument): ElectricalLanding 
     description: { ...electricalLanding.description, ...saved.description },
     icons: mergeIcons(saved.icons),
     steps: saved.steps?.length ? saved.steps : electricalLanding.steps,
+    prices: priceList(saved.prices, electricalLanding.prices),
     dealsBody: saved.dealsBody || electricalLanding.dealsBody,
     stepsHeading: saved.stepsHeading || electricalLanding.stepsHeading,
     faq: mergeFaq(saved.faq),
@@ -168,6 +189,7 @@ export function ensureElectricalLanding(document: CmsDocument): CmsDocument {
         description: { ...electricalLanding.description, ...current.description },
         icons: mergeIcons(current.icons),
         steps: current.steps?.length ? current.steps : electricalLanding.steps,
+        prices: priceList(current.prices, electricalLanding.prices),
         dealsBody: current.dealsBody || electricalLanding.dealsBody,
         stepsHeading: current.stepsHeading || electricalLanding.stepsHeading,
         faq: mergeFaq(current.faq),

@@ -6,6 +6,11 @@
   margin-top: -3.4rem;
 }
 
+.content {
+  position: relative;
+  z-index: 1;
+}
+
 .backdrop {
   position: absolute;
   inset: 0;

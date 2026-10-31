@@ -2,9 +2,10 @@
 
 import { FormEvent, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { ArrowRight, Mail, MapPin, Phone, Upload, User, List } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Phone, Upload, User, List, MessageCircle } from "lucide-react";
 import { useCms } from "@/lib/cms/use-cms";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
+import { hearAboutOptions } from "@/lib/hear-about";
 import { quoteSuccessMessage } from "@/lib/leads";
 import { quoteServices } from "@/lib/services";
 import { routes } from "@/lib/site";
@@ -22,6 +23,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
     phone: useId(),
     email: useId(),
     zip: useId(),
+    hearAbout: useId(),
     service: useId(),
     photos: useId(),
     error: useId(),
@@ -33,6 +35,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [zip, setZip] = useState("");
+  const [hearAbout, setHearAbout] = useState("");
   const preset =
     quoteServices.find((item) => item.name === initialService)?.name ??
     quoteServices.find((item) => item.name.trim() === initialService.trim())?.name ??
@@ -106,6 +109,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
     body.set("phone", phone.trim());
     body.set("email", email.trim());
     body.set("zip", zip.trim());
+    body.set("hearAbout", hearAbout);
     body.set("service", service);
     body.set("privacy", "yes");
     body.set("messaging", "yes");
@@ -190,6 +194,29 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
           onChange={setZip}
           error={zipError}
         />
+
+        <div className={styles.bookSpan}>
+          <label htmlFor={ids.hearAbout} className={styles.bookLabel}>
+            How did you hear about us? <span className={styles.bookOptional}>Optional</span>
+          </label>
+          <div className={styles.bookControl}>
+            <MessageCircle size={16} aria-hidden="true" className={styles.bookIcon} />
+            <select
+              id={ids.hearAbout}
+              name="hearAbout"
+              value={hearAbout}
+              onChange={(event) => setHearAbout(event.target.value)}
+              className={styles.bookSelect}
+            >
+              <option value="">How did you hear about us?</option>
+              {hearAboutOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         <div className={styles.bookSpan}>
           <label htmlFor={ids.service} className={styles.bookLabel}>

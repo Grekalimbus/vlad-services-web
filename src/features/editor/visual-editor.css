@@ -2,7 +2,8 @@ html[data-editing] [data-cms],
 html[data-editing] [data-cms-src],
 html[data-editing] [data-cms-photo],
 html[data-editing] [data-cms-card],
-html[data-editing] [data-cms-gallery] {
+html[data-editing] [data-cms-gallery],
+html[data-editing] [data-cms-reveal] {
   pointer-events: auto;
 }
 
