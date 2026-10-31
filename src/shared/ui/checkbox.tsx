@@ -4,11 +4,12 @@ import styles from "./checkbox.module.css";
 type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "children"> & {
   children: ReactNode;
   invalid?: boolean;
+  tone?: "dark";
 };
 
-export function Checkbox({ children, className = "", invalid = false, ...props }: CheckboxProps) {
+export function Checkbox({ children, className = "", invalid = false, tone, ...props }: CheckboxProps) {
   return (
-    <label className={`${styles.root} ${className}`.trim()}>
+    <label className={`${styles.root} ${className}`.trim()} data-tone={tone}>
       <input {...props} type="checkbox" className={styles.input} aria-invalid={invalid || undefined} />
       <span className={`${styles.box} ${invalid ? styles.invalid : ""}`.trim()} aria-hidden="true">
         <svg viewBox="0 0 16 16" className={styles.mark}>

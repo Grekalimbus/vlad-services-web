@@ -272,18 +272,31 @@
   padding: 0.75rem;
 }
 
+.bookDismiss {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgb(3 8 16 / 0.62);
+  cursor: pointer;
+}
+
 .bookDialog {
   position: relative;
   z-index: 10;
   width: min(100%, 26rem);
   max-height: min(92dvh, calc(100dvh - 1.5rem));
   overflow: auto;
-  border-radius: 1.5rem;
-  background: #fff;
-  padding: 1.25rem 1.1rem 1.15rem;
-  color: #171717;
+  border: 2px solid #3b93f6;
+  border-radius: 1.15rem;
+  background: linear-gradient(180deg, #12375f 0%, #0c2748 42%, #0a203c 100%);
+  padding: 1.35rem 1.15rem 1.2rem;
+  color: #fff;
+  color-scheme: dark;
   text-align: left;
-  box-shadow: 0 24px 60px rgb(23 23 23 / 0.28);
+  box-shadow:
+    0 0 0 1px rgb(59 147 246 / 0.45),
+    0 0 32px rgb(47 140 255 / 0.28),
+    0 24px 70px rgb(0 0 0 / 0.45);
 }
 
 .bookClose {
@@ -297,43 +310,27 @@
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e4e2dc;
+  border: 0;
   border-radius: 999px;
-  background: #fff;
-  color: #171717;
+  background: transparent;
+  color: #fff;
 }
 
 .bookHeader {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 5.5rem;
-  gap: 0.5rem;
-  align-items: center;
-  padding-right: 1.75rem;
+  padding-right: 2rem;
 }
 
 .bookTitle {
   margin: 0;
+  color: #fff;
   font-size: 1.85rem;
-  font-weight: 750;
+  font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1.05;
 }
 
 .bookTitle span {
-  color: var(--accent);
-}
-
-.bookLead {
-  margin: 0.45rem 0 0;
-  max-width: 18rem;
-  color: #5c5a56;
-  font-size: 0.92rem;
-  line-height: 1.4;
-}
-
-.bookArt {
-  width: 5.5rem;
-  height: auto;
+  color: #3aa0ff;
 }
 
 .bookBody {
@@ -359,15 +356,16 @@
   display: flex;
   align-items: baseline;
   gap: 0.4rem;
-  margin-bottom: 0.35rem;
-  font-size: 0.92rem;
+  margin-bottom: 0.4rem;
+  color: #fff;
+  font-size: 0.95rem;
   font-weight: 700;
 }
 
 .bookOptional {
   font-size: 0.78rem;
   font-weight: 500;
-  color: #8a8782;
+  color: #9eb0c4;
 }
 
 .bookControl {
@@ -379,7 +377,7 @@
   top: 50%;
   left: 0.85rem;
   display: inline-flex;
-  color: var(--accent);
+  color: #9ec4e6;
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -388,23 +386,29 @@
 .bookSelect {
   width: 100%;
   height: 2.85rem;
-  border: 1px solid #e1e4ea;
-  border-radius: 0.8rem;
-  background: #fff;
+  border: 1px solid rgb(176 206 230 / 0.32);
+  border-radius: 0.75rem;
+  background: #0c2744;
   padding: 0 0.85rem 0 2.5rem;
-  color: #171717;
+  color: #fff;
   font: inherit;
   font-size: 0.95rem;
   text-align: left;
 }
 
 .bookInput::placeholder {
-  color: #a3a8b3;
+  color: #8ea3b8;
+}
+
+.bookInput:-webkit-autofill {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  box-shadow: 0 0 0 1000px #0c2744 inset;
 }
 
 .bookSelect {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #8a8782 50%), linear-gradient(135deg, #8a8782 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, #c5d7e8 50%), linear-gradient(135deg, #c5d7e8 50%, transparent 50%);
   background-position:
     calc(100% - 1.1rem) 50%,
     calc(100% - 0.75rem) 50%;
@@ -412,12 +416,13 @@
     0.35rem 0.35rem,
     0.35rem 0.35rem;
   background-repeat: no-repeat;
+  background-color: #0c2744;
 }
 
 .bookInput:focus,
 .bookSelect:focus {
-  border-color: var(--accent);
-  outline: 2px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-color: #3aa0ff;
+  outline: 2px solid rgb(58 160 255 / 0.35);
   outline-offset: 1px;
 }
 
@@ -429,26 +434,26 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  border: 1.5px dashed #c9d7ea;
-  border-radius: 0.95rem;
-  background: #f8fbfe;
+  border: 1.5px dashed rgb(176 206 230 / 0.45);
+  border-radius: 0.85rem;
+  background: #0c2744;
   padding: 1rem;
-  color: #5c5a56;
+  color: #d5e2ee;
   font-size: 0.92rem;
   text-align: center;
 }
 
 .bookDrop svg {
-  color: var(--accent);
+  color: #3aa0ff;
 }
 
 .bookDropAction {
-  color: var(--accent);
+  color: #3aa0ff;
   font-weight: 700;
 }
 
 .bookDropHelp {
-  color: #8a8782;
+  color: #9eb0c4;
   font-size: 0.78rem;
 }
 
@@ -486,7 +491,7 @@
 .bookPreviews button {
   border: 0;
   background: transparent;
-  color: var(--accent);
+  color: #3aa0ff;
   font: inherit;
   font-size: 0.78rem;
   cursor: pointer;
@@ -498,15 +503,23 @@
   margin: 0;
   border: 0;
   padding: 0;
+  color: #e8eef5;
 }
 
 .bookChecks label {
-  display: flex;
-  gap: 0.6rem;
-  align-items: flex-start;
-  color: #3f3f46;
-  font-size: 0.92rem;
+  color: #e8eef5;
+  font-size: 0.95rem;
   line-height: 1.35;
+}
+
+.bookChecks a {
+  color: #3aa0ff;
+}
+
+.bookDialog .success {
+  border-color: rgb(120 190 150 / 0.4);
+  background: rgb(12 40 32 / 0.55);
+  color: #e7fff2;
 }
 
 .bookSubmit {
@@ -519,12 +532,12 @@
   gap: 0.45rem;
   border: 0;
   border-radius: 999px;
-  background: var(--accent);
+  background: #1c93f6;
   color: #fff;
   font: inherit;
   font-size: 1rem;
-  font-weight: 750;
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 
 .bookSubmit:disabled {
@@ -534,8 +547,8 @@
 
 @media (min-width: 720px) {
   .bookDialog {
-    width: min(100%, 44rem);
-    padding: 1.6rem 1.5rem 1.4rem;
+    width: min(100%, 42rem);
+    padding: 1.45rem 1.45rem 1.35rem;
   }
 
   .bookGrid {

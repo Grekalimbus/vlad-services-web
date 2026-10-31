@@ -72,6 +72,23 @@
   box-shadow: 0 1px 2px rgb(37 128 205 / 0.35);
 }
 
+.root[data-tone="dark"] .box {
+  border-color: rgb(226 232 240 / 0.85);
+  background: transparent;
+  box-shadow: none;
+}
+
+.root[data-tone="dark"]:hover .box,
+.root[data-tone="dark"] .input:focus-visible + .box {
+  border-color: #7ec8ff;
+}
+
+.root[data-tone="dark"] .input:checked + .box {
+  border-color: #2f9bff;
+  background: #2f9bff;
+  box-shadow: none;
+}
+
 .input:checked + .box .mark {
   opacity: 1;
   transform: scale(1);

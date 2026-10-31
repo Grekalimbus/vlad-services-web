@@ -196,29 +196,6 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
         />
 
         <div className={styles.bookSpan}>
-          <label htmlFor={ids.hearAbout} className={styles.bookLabel}>
-            How did you hear about us? <span className={styles.bookOptional}>Optional</span>
-          </label>
-          <div className={styles.bookControl}>
-            <MessageCircle size={16} aria-hidden="true" className={styles.bookIcon} />
-            <select
-              id={ids.hearAbout}
-              name="hearAbout"
-              value={hearAbout}
-              onChange={(event) => setHearAbout(event.target.value)}
-              className={styles.bookSelect}
-            >
-              <option value="">How did you hear about us?</option>
-              {hearAboutOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className={styles.bookSpan}>
           <label htmlFor={ids.service} className={styles.bookLabel}>
             Service Needed <span className={styles.bookOptional}>Optional</span>
           </label>
@@ -235,6 +212,29 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
               {quoteServices.map((item) => (
                 <option key={item.id} value={item.name}>
                   {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.bookSpan}>
+          <label htmlFor={ids.hearAbout} className={styles.bookLabel}>
+            How did you hear about us? <span className={styles.bookOptional}>Optional</span>
+          </label>
+          <div className={styles.bookControl}>
+            <MessageCircle size={16} aria-hidden="true" className={styles.bookIcon} />
+            <select
+              id={ids.hearAbout}
+              name="hearAbout"
+              value={hearAbout}
+              onChange={(event) => setHearAbout(event.target.value)}
+              className={styles.bookSelect}
+            >
+              <option value="">How did you hear about us?</option>
+              {hearAboutOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
                 </option>
               ))}
             </select>
@@ -297,14 +297,14 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
 
       <fieldset className={styles.bookChecks}>
         <legend className={styles.srOnly}>Agreements</legend>
-        <Checkbox name="privacy" checked={privacy} onChange={(event) => setPrivacy(event.target.checked)}>
+        <Checkbox tone="dark" name="privacy" checked={privacy} onChange={(event) => setPrivacy(event.target.checked)}>
           I agree to the{" "}
           <Link href={routes.privacy} className={styles.consentLink} target="_blank" rel="noopener noreferrer">
             Privacy Policy
           </Link>
           <span aria-hidden="true"> *</span>
         </Checkbox>
-        <Checkbox name="messaging" checked={messaging} onChange={(event) => setMessaging(event.target.checked)}>
+        <Checkbox tone="dark" name="messaging" checked={messaging} onChange={(event) => setMessaging(event.target.checked)}>
           I agree to the{" "}
           <Link href={routes.messagingTerms} className={styles.consentLink} target="_blank" rel="noopener noreferrer">
             Messaging Terms & Conditions

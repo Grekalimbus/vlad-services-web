@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { DealsPopup } from "@/features/home/deals-popup";
 import { QuoteDialog, QuoteProvider } from "@/features/quote";
 import { ReviewPopup } from "@/features/reviews/review-popup";
 import { MobileCta } from "./mobile-cta";
@@ -18,6 +19,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <QuoteProvider>
       {children}
       {admin ? null : <QuoteDialog />}
+      {admin ? null : <DealsPopup />}
       {admin ? null : <ReviewPopup />}
       {admin ? null : <MobileCta />}
       <VisualEditor />

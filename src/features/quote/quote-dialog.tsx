@@ -13,7 +13,7 @@ export function QuoteDialog() {
   const { open, form, tvCount, service, closeQuote } = useQuote();
   const cms = useCms();
   const booking = form === "quote";
-  const title = booking ? "Book a Service" : cms.copy.forms.tvQuoteTitle;
+  const title = cms.copy.forms.tvQuoteTitle;
   const titlePath = booking ? undefined : "copy.forms.tvQuoteTitle";
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ export function QuoteDialog() {
       <button
         type="button"
         aria-label="Close quote form"
-        className={styles.dialogDismiss}
+        className={booking ? styles.bookDismiss : styles.dialogDismiss}
         onClick={closeQuote}
       />
       <div
@@ -58,13 +58,9 @@ export function QuoteDialog() {
               <span className={shared.visuallyHidden}>Close</span>
             </button>
             <div className={styles.bookHeader}>
-              <div>
-                <h2 id={titleId} className={styles.bookTitle}>
-                  Book <span>a Service</span>
-                </h2>
-                <p className={styles.bookLead}>Tell us about your project and we&apos;ll get back to you soon.</p>
-              </div>
-              <ToolsArt />
+              <h2 id={titleId} className={styles.bookTitle}>
+                Hire a <span>PRO</span>
+              </h2>
             </div>
           </>
         ) : (
@@ -89,19 +85,5 @@ export function QuoteDialog() {
         </div>
       </div>
     </div>
-  );
-}
-
-function ToolsArt() {
-  return (
-    <svg className={styles.bookArt} viewBox="0 0 112 84" aria-hidden="true">
-      <ellipse cx="56" cy="72" rx="28" ry="6" fill="#d7e8f6" />
-      <path d="M34 38h44l6 28H28l6-28z" fill="#f4f8fb" stroke="#2580cd" strokeWidth="2" />
-      <path d="M40 38c0-10 8-16 16-16s16 6 16 16" fill="none" stroke="#2580cd" strokeWidth="2" />
-      <path d="M48 22v-8h6v8" stroke="#171717" strokeWidth="2" />
-      <path d="M62 18l8-8 4 4-8 8" stroke="#2580cd" strokeWidth="2" fill="none" />
-      <circle cx="74" cy="14" r="3" fill="#2580cd" />
-      <path d="M46 48h8M46 54h14" stroke="#8aa4b8" strokeWidth="2" />
-    </svg>
   );
 }

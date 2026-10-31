@@ -1,15 +1,31 @@
 "use client";
 
 import { useCms } from "@/lib/cms/use-cms";
+import { dealsBackground, dealsHeading } from "@/lib/cms/deals-copy";
 import { ConsentFields } from "@/features/quote";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
+import { assetPath } from "@/lib/site";
+import { X } from "lucide-react";
 import { FormEvent, useId, useState } from "react";
+import shared from "@/styles/shared.module.css";
 import styles from "./deals-signup.module.css";
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export function DealsSignup({ id = "deals" }: { id?: string }) {
+export function DealsSignup({
+	id = "deals",
+	titleKey = id,
+	headingId,
+	popup = false,
+	onClose,
+}: {
+	id?: string;
+	titleKey?: string | null;
+	headingId?: string;
+	popup?: boolean;
+	onClose?: () => void;
+}) {
 	const ids = {
 		name: useId(),
 		phone: useId(),
@@ -17,7 +33,10 @@ export function DealsSignup({ id = "deals" }: { id?: string }) {
 		email: useId(),
 		error: useId(),
 	};
-	const copy = useCms().copy.home.deals;
+	const cms = useCms();
+	const copy = cms.copy.home.deals;
+	const heading = dealsHeading(cms, titleKey);
+	const background = dealsBackground(cms);
 	const [status, setStatus] = useState<Status>("idle");
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -69,16 +88,29 @@ export function DealsSignup({ id = "deals" }: { id?: string }) {
 	return (
 		<section
 			id={id}
-			aria-labelledby={`${id}-heading`}
-			className={styles.section}
+			aria-labelledby={headingId ?? `${id}-heading`}
+			className={popup ? `${styles.section} ${styles.sectionPopup}` : styles.section}
 		>
 			<div className={styles.container}>
 				<div className={styles.panel}>
-					<div className={styles.photo} aria-hidden="true" />
+					<div
+						className={styles.photo}
+						style={{ backgroundImage: `url("${assetPath(background)}")` }}
+						aria-hidden="true"
+					/>
+					<span className={styles.backgroundHit} data-cms-photo="copy.home.deals.background">
+						Background
+					</span>
+					{onClose ? (
+						<button type="button" className={styles.popupClose} onClick={onClose}>
+							<X size={18} aria-hidden="true" />
+							<span className={shared.visuallyHidden}>Close</span>
+						</button>
+					) : null}
 					<div className={styles.content}>
-						<h2 id={`${id}-heading`} className={styles.heading}>
-							<span data-cms="copy.home.deals.headingLead">{copy.headingLead}</span>{" "}
-							<span className={styles.accent} data-cms="copy.home.deals.headingAccent">{copy.headingAccent}</span>
+						<h2 id={headingId ?? `${id}-heading`} className={styles.heading}>
+							<span data-cms={heading.leadPath}>{heading.lead}</span>{" "}
+							<span className={styles.accent} data-cms={heading.accentPath}>{heading.accent}</span>
 						</h2>
 						{status === "success" ? (
 							<p role="status" className={styles.success}>
