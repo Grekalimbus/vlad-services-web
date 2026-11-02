@@ -21,7 +21,8 @@ export function Header() {
 	const pathname = usePathname();
 	const path = pathname.replace(/\/$/, "");
 	const admin = path === "/admin" || path.startsWith("/admin/");
-	const solid = isServicePageSlug(path.startsWith("/services/") ? path.slice("/services/".length) : "");
+	const solid =
+		path === "/deals" || isServicePageSlug(path.startsWith("/services/") ? path.slice("/services/".length) : "");
 
 	useEffect(() => {
 		const updateHeader = () => {
@@ -171,7 +172,7 @@ function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
 	let blog = items.some(isBlog);
 	items.forEach((item, index) => {
 		if (isReviews(item) && !deals) {
-			links.push({ href: "/#deals", label: "Deals", kind: "deals" });
+			links.push({ href: "/deals", label: "Deals", kind: "deals" });
 			deals = true;
 		}
 		links.push({ ...item, href: isAreas(item) ? "#areas" : item.href, cmsIndex: index });
@@ -180,7 +181,7 @@ function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
 			areas = true;
 		}
 		if (isServices(item) && !deals && !items.some(isReviews)) {
-			links.push({ href: "/#deals", label: "Deals", kind: "deals" });
+			links.push({ href: "/deals", label: "Deals", kind: "deals" });
 			deals = true;
 		}
 		if (isReviews(item) && !faq) {
@@ -193,7 +194,7 @@ function headerLinks(items: HeaderNavItem[]): HeaderLink[] {
 		}
 	});
 	if (!areas) links.push({ href: "#areas", label: "Areas" });
-	if (!deals) links.push({ href: "/#deals", label: "Deals", kind: "deals" });
+	if (!deals) links.push({ href: "/deals", label: "Deals", kind: "deals" });
 	if (!faq) links.push({ href: "/#faq", label: "FAQ" });
 	if (!blog) links.push({ href: "/blog", label: "Blog" });
 	return links;
@@ -210,11 +211,13 @@ function HeaderLinks({
 	dealsClass: string;
 	onNavigate?: () => void;
 }) {
+	const pathname = usePathname();
 	return headerLinks(items).map((item) => (
 		<HashLink
 			key={`${item.kind ?? "nav"}-${item.href}-${item.cmsIndex ?? "extra"}`}
 			href={item.href}
 			className={item.kind === "deals" ? dealsClass : linkClass}
+			aria-current={item.kind === "deals" && pathname === "/deals" ? "page" : undefined}
 			onClick={onNavigate}
 		>
 			<span

@@ -71,6 +71,20 @@ const IMAGE_TYPES: Record<string, string> = {
   "image/svg+xml": "svg",
 };
 
+const VIDEO_LIMIT = 40 * 1024 * 1024;
+
+export function inspectMedia(bytes: Uint8Array, declaredType: string) {
+  const video = sniffVideo(bytes);
+  if (video) {
+    if (declaredType && !declaredType.startsWith("video/") && declaredType !== "application/octet-stream") {
+      throw new Error("The file contents do not match its type.");
+    }
+    if (bytes.byteLength > VIDEO_LIMIT) throw new Error("Videos must be 40 MB or smaller.");
+    return video;
+  }
+  return inspectImage(bytes, declaredType);
+}
+
 export function inspectImage(bytes: Uint8Array, declaredType: string) {
   const svg = inspectSvg(bytes);
   if (svg) {
@@ -98,6 +112,16 @@ function inspectSvg(bytes: Uint8Array) {
   return { type: "image/svg+xml", extension: "svg" };
 }
 
+function sniffVideo(bytes: Uint8Array) {
+  if (bytes.length > 12 && bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) {
+    return { type: "video/mp4", extension: "mp4" };
+  }
+  if (bytes.length > 4 && bytes[0] === 0x1a && bytes[1] === 0x45 && bytes[2] === 0xdf && bytes[3] === 0xa3) {
+    return { type: "video/webm", extension: "webm" };
+  }
+  return null;
+}
+
 function sniff(bytes: Uint8Array) {
   if (bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
   if (bytes.length > 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
@@ -121,7 +145,7 @@ function sniff(bytes: Uint8Array) {
 }
 
 export function mediaKey(key: string) {
-  if (!/^uploads\/[a-zA-Z0-9-]+\.(jpg|png|webp|gif|svg)$/.test(key)) {
+  if (!/^uploads\/[a-zA-Z0-9-]+\.(jpg|png|webp|gif|svg|mp4|webm)$/.test(key)) {
     throw new Error("Invalid media key.");
   }
   return key;

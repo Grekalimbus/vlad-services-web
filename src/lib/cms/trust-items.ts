@@ -1,4 +1,5 @@
 import { ensureDeals } from "./deals-copy";
+import { ensureDealsPage } from "./deals-page";
 import { ensureServiceLandings } from "./service-landing";
 import { ensureTvMounting } from "./tv-page";
 import type { CmsDocument } from "./types";
@@ -35,7 +36,7 @@ export function ensureTrustItems(document: CmsDocument): CmsDocument {
     next = structuredClone(next);
     next.trustItems.push({ ...businessYears });
   }
-  return ensureDeals(ensureTvMounting(ensureServiceLandings(ensureHeroAndReviews(next))));
+  return ensureDealsPage(ensureDeals(ensureTvMounting(ensureServiceLandings(ensureHeroAndReviews(next)))));
 }
 
 function ensureHeroAndReviews(document: CmsDocument): CmsDocument {

@@ -22,6 +22,7 @@ import { projectIconOptions } from "@/lib/project-cards";
 import { ensureServiceTemplates } from "@/lib/service-pages";
 import { ensureTrustItems } from "@/lib/cms/trust-items";
 import { peekReveal, revealSurface } from "@/lib/cms/reveal";
+import { removeDeal } from "./deal-actions";
 import { removeHomepageService } from "./service-actions";
 import "./visual-editor.css";
 
@@ -388,6 +389,10 @@ function CardPopover({
           if (cover >= 0) setAt(`copy.home.serviceCovers.${cover}.src`, src);
           if (index >= 0) setAt(`serviceCategories.${index}.coverImage`, src);
         }
+        if (kind === "deal" && file) {
+          const video = file.type.startsWith("video/") || /\.(mp4|webm)$/i.test(file.name);
+          setAt(`copy.dealsPage.items.${id}.kind`, video ? "video" : "image");
+        }
         setPending(false);
       })
       .catch((reason: unknown) => {
@@ -407,20 +412,34 @@ function CardPopover({
     >
       {fields.image ? (
         <>
-          <img
-            src={assetPath(textAt(fields.image))}
-            alt=""
-            style={{
-              width: "100%",
-              height: kind === "serviceIcon" ? 88 : 120,
-              objectFit: kind === "serviceIcon" ? "contain" : "cover",
-              background: kind === "serviceIcon" ? "#f3f7fb" : undefined,
-              borderRadius: 8,
-            }}
-          />
+          {kind === "deal" && textAt(`copy.dealsPage.items.${id}.kind`) === "video" ? (
+            <video
+              src={assetPath(textAt(fields.image))}
+              controls
+              style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8, background: "#0c121c" }}
+            />
+          ) : (
+            <img
+              src={assetPath(textAt(fields.image))}
+              alt=""
+              style={{
+                width: "100%",
+                height: kind === "serviceIcon" ? 88 : 120,
+                objectFit: kind === "serviceIcon" ? "contain" : "cover",
+                background: kind === "serviceIcon" ? "#f3f7fb" : undefined,
+                borderRadius: 8,
+              }}
+            />
+          )}
           <label className="editorPrimary" style={{ display: "inline-block", margin: "0.7rem 0" }}>
-            {pending ? "Uploading…" : "Replace image"}
-            <input type="file" accept="image/*,.svg,image/svg+xml" hidden disabled={pending} onChange={(event) => replace(fields.image!, event.target.files?.[0])} />
+            {pending ? "Uploading…" : kind === "deal" ? "Replace photo or video" : "Replace image"}
+            <input
+              type="file"
+              accept={kind === "deal" ? "image/*,.svg,image/svg+xml,video/mp4,video/webm,.mp4,.webm" : "image/*,.svg,image/svg+xml"}
+              hidden
+              disabled={pending}
+              onChange={(event) => replace(fields.image, event.target.files?.[0])}
+            />
           </label>
         </>
       ) : null}
@@ -457,7 +476,8 @@ function CardPopover({
             type="button"
             className="editorDanger"
             onClick={() => {
-              removeHomepageService(id);
+              if (kind === "deal") removeDeal(Number(id));
+              else removeHomepageService(id);
               onClose();
             }}
           >
@@ -465,7 +485,7 @@ function CardPopover({
           </button>
         ) : (
           <button type="button" className="editorDanger" onClick={() => setConfirming(true)}>
-            Remove service
+            {kind === "deal" ? "Remove deal" : "Remove service"}
           </button>
         )
       ) : null}
@@ -780,6 +800,18 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
       texts: [
         { path: `copy.additionals.cards.${id}.title`, label: "Title" },
         { path: `copy.additionals.cards.${id}.text`, label: "Description", long: true },
+      ],
+    };
+  }
+  if (kind === "deal") {
+    const index = Number(id);
+    if (!Number.isInteger(index) || index < 0) return null;
+    return {
+      image: `copy.dealsPage.items.${index}.media`,
+      remove: true,
+      texts: [
+        { path: `copy.dealsPage.items.${index}.title`, label: "Title" },
+        { path: `copy.dealsPage.items.${index}.text`, label: "Description", long: true },
       ],
     };
   }

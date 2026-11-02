@@ -8,6 +8,7 @@ type HashLinkProps = {
 	href: string;
 	className?: string;
 	children: ReactNode;
+	"aria-current"?: "page" | undefined;
 	onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
@@ -29,7 +30,7 @@ function scrollToHash(hash: string) {
 	return true;
 }
 
-export function HashLink({ href, className, children, onClick }: HashLinkProps) {
+export function HashLink({ href, className, children, onClick, ...props }: HashLinkProps) {
 	const pathname = usePathname();
 	const router = useRouter();
 
@@ -37,6 +38,7 @@ export function HashLink({ href, className, children, onClick }: HashLinkProps) 
 		<Link
 			href={href}
 			className={className}
+			aria-current={props["aria-current"]}
 			onClick={(event) => {
 				onClick?.(event);
 				if (event.defaultPrevented) return;

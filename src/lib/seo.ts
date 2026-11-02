@@ -570,6 +570,37 @@ export function pageMeta(pathname: string, source: CmsDocument): PageMeta {
     };
   }
 
+  if (path === "/deals") {
+    const title = clip(`Deals | ${document.site.shortName}`, 60);
+    const summary = clip(`Current PrimeFix deals for TV mounting, electrical, and handyman work in ${area.short}.`, 160);
+    const canonical = publicUrl("/deals");
+    return {
+      ...base,
+      title,
+      description: summary,
+      canonical,
+      index: true,
+      jsonLd: graph([
+        business,
+        website,
+        {
+          "@type": "WebPage",
+          "@id": `${canonical}#webpage`,
+          url: canonical,
+          name: title,
+          description: summary,
+          inLanguage: "en-US",
+          isPartOf: { "@id": `${origin}/#website` },
+          about: { "@id": `${origin}/#business` },
+        },
+        crumbNode(origin, [
+          { name: "Home", path: "/" },
+          { name: "Deals", path: "/deals" },
+        ]),
+      ]),
+    };
+  }
+
   if (path === "/404") {
     return { ...hiddenPage(document, "Page not found", "/"), canonical: "", description: `That page is not on the ${document.site.shortName} site.` };
   }

@@ -3,7 +3,7 @@ import { applyLiveGoogleRating } from "@/lib/google-place-rating";
 import { ensureTrustItems } from "./trust-items";
 import { fallbackDocument } from "./read";
 import type { CmsDocument, CmsEnv } from "./types";
-import { inspectImage, mediaKey, publicMediaPath, validateDocument } from "./validate";
+import { inspectMedia, mediaKey, publicMediaPath, validateDocument } from "./validate";
 
 const COMPANY_EMAIL = "info@primefix.com";
 const PREVIOUS_COMPANY_EMAILS = ["info@primefixpros.com", "info@primefixhandyman.com"];
@@ -103,7 +103,7 @@ export async function discardImage(env: CmsEnv, key: string) {
 
 export async function saveMedia(env: CmsEnv, file: File) {
   const bytes = new Uint8Array(await file.arrayBuffer());
-  const image = inspectImage(bytes, file.type);
+  const image = inspectMedia(bytes, file.type);
   const key = `uploads/${crypto.randomUUID()}.${image.extension}`;
   await storeImage(env, key, bytes, image.type);
   return { key, src: publicMediaPath(key), type: image.type };
