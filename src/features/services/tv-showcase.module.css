@@ -1,7 +1,12 @@
 .section {
   position: relative;
   z-index: 1;
-  padding-bottom: 0.5rem;
+  margin-top: 40px;
+  padding-bottom: 0;
+}
+
+.frame.frame {
+  padding-bottom: 0;
 }
 
 .shade.shade {
@@ -17,7 +22,9 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0.3rem;
+  text-align: left;
 }
 
 .note {

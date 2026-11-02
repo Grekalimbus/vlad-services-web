@@ -14,7 +14,7 @@ export function TvShowcase() {
 
   return (
     <section className={styles.section} aria-label="TV mounting scenes">
-      <div className={overview.container}>
+      <div className={`${overview.container} ${styles.frame}`}>
         <ul
           className={`${overview.strip} ${overview.stripCompact}`}
           style={{ "--count": cards.length } as CSSProperties}
