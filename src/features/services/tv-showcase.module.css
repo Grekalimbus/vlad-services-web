@@ -3,3 +3,26 @@
   z-index: 1;
   padding-bottom: 0.5rem;
 }
+
+.shade.shade {
+  background: linear-gradient(
+    to top,
+    rgb(0 0 0 / 0.82) 0%,
+    rgb(0 0 0 / 0.42) 42%,
+    transparent 68%
+  );
+}
+
+.copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.note {
+  color: rgb(255 255 255 / 0.9);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.3;
+}

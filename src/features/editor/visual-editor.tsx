@@ -789,6 +789,7 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
       remove: false,
       texts: [
         { path: `copy.tvShowcase.cards.${id}.title`, label: "Title" },
+        { path: `copy.tvShowcase.cards.${id}.text`, label: "Description" },
         { path: `copy.tvShowcase.cards.${id}.alt`, label: "Image description" },
       ],
     };

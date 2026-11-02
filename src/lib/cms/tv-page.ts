@@ -3,7 +3,7 @@ import { electricalLanding } from "./electrical-landing";
 
 export type TvSlide = { image: string; alt: string; position: string };
 
-export type TvShowcaseCard = { title: string; image: string; alt: string; position: string };
+export type TvShowcaseCard = { title: string; text: string; image: string; alt: string; position: string };
 
 type AdditionalCard = CmsDocument["copy"]["additionals"]["cards"][number] & { slides?: TvSlide[] };
 
@@ -63,10 +63,10 @@ const extraSlides: TvSlide[][] = [
 ];
 
 const defaultShowcase: TvShowcaseCard[] = [
-  { title: "Fireplace", image: "/works/hero.jpg", alt: "Television mounted above a fireplace", position: "center 40%" },
-  { title: "Living Room", image: "/works/tv-living-blue.jpg", alt: "Television mounted in a living room", position: "center 42%" },
-  { title: "Bedroom", image: "/works/pexels-bedroom-tv.jpg", alt: "Television mounted in a bedroom", position: "center 48%" },
-  { title: "Office", image: "/works/tv-office-wall.jpg", alt: "Television mounted on an office wall", position: "center 32%" },
+  { title: "Fireplace", text: "Screen sits above the fire.", image: "/works/hero.jpg", alt: "Television mounted above a fireplace", position: "center 40%" },
+  { title: "Living Room", text: "Main wall in the room.", image: "/works/tv-living-blue.jpg", alt: "Television mounted in a living room", position: "center 42%" },
+  { title: "Bedroom", text: "Quiet set across the bed.", image: "/works/pexels-bedroom-tv.jpg", alt: "Television mounted in a bedroom", position: "center 48%" },
+  { title: "Office", text: "Work screen on the wall.", image: "/works/tv-office-wall.jpg", alt: "Television mounted on an office wall", position: "center 32%" },
 ];
 
 const defaultGalleryBody =
@@ -181,7 +181,10 @@ function tvReady(document: CmsDocument) {
   const slidesReady = (copy.additionals.cards as AdditionalCard[]).every(
     (card) => Array.isArray(card.slides) && card.slides.some((slide) => slide.image),
   );
-  const showcaseReady = (copy.tvShowcase?.cards.length ?? 0) >= 4;
+  const showcase = copy.tvShowcase?.cards;
+  const showcaseReady = Boolean(
+    showcase && showcase.length >= 4 && showcase.every((card) => card.text?.trim()),
+  );
   const gallery = copy.tvGallery;
   const galleryReady = Boolean(gallery.body?.trim()) && !isOldBook(gallery.book) && !isOldHeading(gallery);
   const stepsReady = (copy.tvPage.steps?.length ?? 0) >= 4;
@@ -226,9 +229,19 @@ export function ensureTvMounting(document: CmsDocument): CmsDocument {
     if (!slides || slides.length === 0) card.slides = seededSlides(card, index);
   });
 
-  if (!next.copy.tvShowcase?.cards || next.copy.tvShowcase.cards.length < 4) {
-    next.copy.tvShowcase = { cards: defaultShowcase.map((card) => ({ ...card })) };
-  }
+  const savedShowcase = next.copy.tvShowcase?.cards ?? [];
+  next.copy.tvShowcase = {
+    cards: (savedShowcase.length >= 4 ? savedShowcase : defaultShowcase).map((card, index) => {
+      const fallback = defaultShowcase[index];
+      return {
+        title: card.title?.trim() || fallback?.title || "",
+        text: card.text?.trim() || fallback?.text || "",
+        image: card.image?.trim() || fallback?.image || "",
+        alt: card.alt?.trim() || fallback?.alt || "",
+        position: card.position?.trim() || fallback?.position || "center",
+      };
+    }),
+  };
 
   const gallery = next.copy.tvGallery;
   if (!gallery.body?.trim()) gallery.body = defaultGalleryBody;
@@ -330,8 +343,15 @@ export function additionalSlides(card: CmsDocument["copy"]["additionals"]["cards
 
 export function tvShowcaseCards(document: CmsDocument) {
   const cards = asTv(document).copy.tvShowcase?.cards?.filter((card) => card);
-  if (cards && cards.length >= 4) return cards;
-  return defaultShowcase;
+  const source = cards && cards.length >= 4 ? cards : defaultShowcase;
+  return source.map((card, index) => {
+    const fallback = defaultShowcase[index];
+    return {
+      ...fallback,
+      ...card,
+      text: card.text?.trim() || fallback?.text || "",
+    };
+  });
 }
 
 export function tvSteps(document: CmsDocument) {

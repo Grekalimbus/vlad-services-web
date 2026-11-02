@@ -31,8 +31,8 @@ export function TvMountingPage() {
     >
       <Plan />
       <TvBand>
-        <Additionals />
         <TvShowcase />
+        <Additionals />
         <ProcessSteps
           steps={tvSteps(cms)}
           serviceName={page.title || "TV Mounting"}

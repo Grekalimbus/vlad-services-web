@@ -35,13 +35,18 @@ export function TvShowcase() {
                     data-cms-src={`copy.tvShowcase.cards.${index}.image`}
                   />
                 ) : null}
-                <span className={overview.shade} aria-hidden="true" />
+                <span className={`${overview.shade} ${styles.shade}`} aria-hidden="true" />
                 <span className={overview.index} aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className={overview.footer}>
-                  <span className={overview.title} data-cms={`copy.tvShowcase.cards.${index}.title`}>
-                    {card.title}
+                  <span className={styles.copy}>
+                    <span className={overview.title} data-cms={`copy.tvShowcase.cards.${index}.title`}>
+                      {card.title}
+                    </span>
+                    <span className={styles.note} data-cms={`copy.tvShowcase.cards.${index}.text`}>
+                      {card.text}
+                    </span>
                   </span>
                 </span>
               </div>
