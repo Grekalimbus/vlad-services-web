@@ -221,6 +221,8 @@
 	max-width: 100%;
 	object-fit: contain;
 	object-position: center bottom;
+	transform-origin: center bottom;
+	transform: scale(1.07);
 }
 
 @media (min-width: 900px) {
@@ -338,9 +340,11 @@
 
 	.builder {
 		object-position: right bottom;
+		transform-origin: right bottom;
 		transform: translateX(
-			clamp(-80px, calc(-80px + max(0px, 100vw - 1760px) * 0.5), 40px)
-		);
+			clamp(-60px, calc(-60px + max(0px, 100vw - 1760px) * 0.5), 60px)
+		)
+		scale(1.1);
 	}
 }
 
@@ -490,7 +494,7 @@
 		flex: 0 0 auto;
 		justify-content: flex-start;
 		width: 100%;
-		margin-top: 50px;
+		margin-top: 20px;
 		padding-top: 0;
 		padding-bottom: 0;
 		transform: none;
@@ -525,6 +529,7 @@
 		max-height: calc(100cqh - 12.25rem);
 		object-fit: contain;
 		object-position: center bottom;
-		transform: none;
+		transform-origin: center bottom;
+		transform: scale(1.07);
 	}
 }
