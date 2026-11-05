@@ -1,6 +1,7 @@
 import { loadDocument } from "../src/lib/cms/content-store";
 import { applySecurityHeaders } from "../src/lib/form-guard";
 import { getPath } from "../src/lib/cms/read";
+import { toPublicCms } from "../src/lib/cms/public-projection";
 import { normalizeCms, normalizePath, pageMeta, redirectTarget } from "../src/lib/seo";
 import type { CmsEnv } from "../src/lib/cms/types";
 
@@ -70,7 +71,8 @@ export async function onRequest(context: {
 
   const meta = pageMeta(response.status === 404 ? "/404" : path, document);
   const robots = response.status === 404 || !meta.index ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
-  const payload = JSON.stringify(document).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
+  // Keep HTML text rewrites on the full document, but ship a lean client payload.
+  const payload = JSON.stringify(toPublicCms(document, path)).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
   const jsonLd = JSON.stringify(meta.jsonLd).replace(/</g, "\\u003c").replace(/&/g, "\\u0026");
   const headers = new Headers(response.headers);
   headers.set("cache-control", "private, no-store");
