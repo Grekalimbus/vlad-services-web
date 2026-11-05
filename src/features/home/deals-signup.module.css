@@ -248,6 +248,11 @@
 	opacity: 0.65;
 }
 
+.privacyWrap {
+	margin-top: 0.85rem;
+	text-align: center;
+}
+
 .success {
 	margin: 1.75rem auto 0;
 	max-width: 28rem;

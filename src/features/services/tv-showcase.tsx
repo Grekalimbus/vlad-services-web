@@ -20,7 +20,7 @@ export function TvShowcase() {
           style={{ "--count": cards.length } as CSSProperties}
         >
           {cards.map((card, index) => (
-            <li key={`${card.title}-${index}`} className={overview.item}>
+            <li key={`${card.title}-${index}`} className={`${overview.item} ${styles.item}`}>
               <div className={`${overview.card} ${overview.cardStatic}`} data-cms-card={`tvShowcase:${index}`}>
                 {card.image ? (
                   <Image

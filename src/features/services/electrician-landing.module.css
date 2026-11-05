@@ -242,6 +242,14 @@
   cursor: pointer;
 }
 
+.quoteTight {
+  margin: 20px auto 0;
+}
+
+.quizTightTop {
+  margin-top: 20px;
+}
+
 .quote:hover {
   background: #0066e0;
 }

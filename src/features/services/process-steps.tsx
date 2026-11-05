@@ -6,19 +6,38 @@ import styles from "./electrician-landing.module.css";
 
 const stepIcons: LucideIcon[] = [ClipboardList, Phone, CalendarClock, CreditCard];
 
-export function ProcessSteps({
-  steps,
+export function GetQuoteButton({
   serviceName,
-  pathFor,
+  tight = false,
 }: {
-  steps: { title: string; text: string }[];
   serviceName: string;
-  pathFor: (index: number, field: "title" | "text") => string;
+  tight?: boolean;
 }) {
   const { openQuote } = useQuote();
 
   return (
-    <section className={styles.quiz}>
+    <button
+      type="button"
+      className={tight ? `${styles.quote} ${styles.quoteTight}` : styles.quote}
+      onClick={() => openQuote("quote", undefined, serviceName)}
+    >
+      GET A QUOTE
+    </button>
+  );
+}
+
+export function ProcessSteps({
+  steps,
+  pathFor,
+  tightTop = false,
+}: {
+  steps: { title: string; text: string }[];
+  serviceName?: string;
+  pathFor: (index: number, field: "title" | "text") => string;
+  tightTop?: boolean;
+}) {
+  return (
+    <section className={tightTop ? `${styles.quiz} ${styles.quizTightTop}` : styles.quiz}>
       <ol className={styles.steps}>
         {steps.map((step, index) => {
           const Icon = stepIcons[index] ?? ClipboardList;
@@ -44,9 +63,6 @@ export function ProcessSteps({
           );
         })}
       </ol>
-      <button type="button" className={styles.quote} onClick={() => openQuote("quote", undefined, serviceName)}>
-        GET A QUOTE
-      </button>
     </section>
   );
 }

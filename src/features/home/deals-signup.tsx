@@ -2,7 +2,7 @@
 
 import { useCms } from "@/lib/cms/use-cms";
 import { dealsBackground, dealsHeading } from "@/lib/cms/deals-copy";
-import { ConsentFields } from "@/features/quote";
+import { ConsentFields, PrivacyNotice } from "@/features/quote";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { assetPath } from "@/lib/site";
@@ -54,8 +54,6 @@ export function DealsSignup({
 		if (!phonePattern.test(phone)) nextErrors.phone = "Enter a phone number.";
 		if (!zipPattern.test(zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
 		if (!emailPattern.test(email)) nextErrors.email = "Enter a valid email.";
-		if (data.get("smsConsent") !== "yes") nextErrors.sms = "Required";
-		if (data.get("emailConsent") !== "yes") nextErrors.emailConsent = "Required";
 
 		setErrors(nextErrors);
 		if (Object.keys(nextErrors).length > 0) {
@@ -182,11 +180,7 @@ export function DealsSignup({
 									/>
 								</div>
 								<div className={styles.consentWrap}>
-									<ConsentFields
-										tone="inverse"
-										invalidSms={Boolean(errors.sms)}
-										invalidEmail={Boolean(errors.emailConsent)}
-									/>
+									<ConsentFields tone="inverse" />
 								</div>
 								<button
 									type="submit"
@@ -197,6 +191,9 @@ export function DealsSignup({
 									{status === "loading" ? copy.sending : copy.submit}
 								</span>
 								</button>
+								<div className={styles.privacyWrap}>
+									<PrivacyNotice variant="signup" tone="inverse" />
+								</div>
 							</form>
 						)}
 					</div>
@@ -217,8 +214,6 @@ function clearFixedErrors(current: Record<string, string>, data: FormData) {
 	if (phonePattern.test(phone)) delete next.phone;
 	if (zipPattern.test(zip)) delete next.zip;
 	if (emailPattern.test(email)) delete next.email;
-	if (data.get("smsConsent") === "yes") delete next.sms;
-	if (data.get("emailConsent") === "yes") delete next.emailConsent;
 	return next;
 }
 

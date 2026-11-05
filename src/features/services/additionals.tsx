@@ -6,10 +6,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { additionalSlides, type TvSlide } from "@/lib/cms/tv-page";
 import { useCms } from "@/lib/cms/use-cms";
 import { assetPath } from "@/lib/site";
+import { GetQuoteButton } from "./process-steps";
 import styles from "./additionals.module.css";
 
 export function Additionals() {
-  const copy = useCms().copy.additionals;
+  const cms = useCms();
+  const copy = cms.copy.additionals;
+  const serviceName = cms.copy.tvPage.title || "TV Mounting";
   return (
     <section className={styles.section} aria-labelledby="additionals-heading">
       <svg
@@ -48,6 +51,7 @@ export function Additionals() {
               </li>
             ))}
           </ul>
+          <GetQuoteButton serviceName={serviceName} tight />
         </div>
       </div>
     </section>

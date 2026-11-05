@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useId, useState } from "react";
-import { ConsentFields } from "./consent-fields";
+import { ConsentFields, PrivacyNotice } from "./consent-fields";
 import { useCms } from "@/lib/cms/use-cms";
 import { fieldClass, phonePattern } from "@/lib/forms";
 import { tvSizes } from "@/lib/services";
@@ -107,7 +107,7 @@ export function TvQuoteForm({
       },
       photos: filesFromFormData(data, "wallPhoto"),
       smsConsent: data.get("smsConsent") === "yes",
-      emailConsent: false,
+      emailConsent: null,
     });
 
     try {
@@ -291,6 +291,7 @@ export function TvQuoteForm({
       >
         {status === "loading" ? "Sending…" : <span data-cms="ctas.quote">{cms.ctas.quote}</span>}
       </button>
+      <PrivacyNotice />
     </form>
   );
 }

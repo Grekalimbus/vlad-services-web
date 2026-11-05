@@ -1,5 +1,10 @@
 import { isAuthorized } from "./cms/auth";
 import { discardImage, loadImage, storeImage } from "./cms/content-store";
+import {
+  buildApplicationConsents,
+  parseApplicationConsents,
+  type ApplicationConsents,
+} from "./consent";
 import { applySecurityHeaders, clientIp, plainText, rateLimit, sameOrigin } from "./form-guard";
 import type { CmsEnv } from "./cms/types";
 
@@ -27,6 +32,7 @@ type StoredApplication = {
   form: ApplicationForm;
   details: Record<string, string>;
   photos: StoredPhoto[];
+  consents?: ApplicationConsents | null;
 };
 
 export type ApplicationView = {
@@ -41,6 +47,7 @@ export type ApplicationView = {
   form: ApplicationForm;
   details: Record<string, string>;
   photos: { index: number; name: string }[];
+  consents: ApplicationConsents | null;
 };
 
 export async function handleApplicationPost(request: Request, env: CmsEnv) {
@@ -54,9 +61,6 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
     const contentType = request.headers.get("content-type") ?? "";
     if (contentType.includes("application/json")) return handleJsonApplication(request, env);
     const form = await request.formData();
-    if (form.get("privacy") !== "yes" || form.get("messaging") !== "yes") {
-      return json({ error: "Agree to the Privacy Policy and Messaging Terms & Conditions." }, 400);
-    }
     const name = plainText(form.get("name"), 120);
     const phone = plainText(form.get("phone"), 40);
     const email = plainText(form.get("email"), 200);
@@ -80,7 +84,17 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
       photos.push({ name: plainText(file.name, 180) || "photo", type, bytes });
     }
 
+    if (!service) return json({ error: "Select a service." }, 400);
     const hearAbout = plainText(form.get("hearAbout"), 80);
+    if (!hearAbout) return json({ error: "Tell us how you heard about us." }, 400);
+    const description = plainText(form.get("description"), 450);
+    const consents = buildApplicationConsents({
+      privacyPolicy: "accepted",
+      smsConsent: null,
+      emailConsent: null,
+    });
+    const details: Record<string, string> = { hearAbout };
+    if (description) details.description = description;
     await createApplication(env, {
       name,
       phone,
@@ -89,7 +103,8 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
       service,
       photos,
       form: "book",
-      details: hearAbout ? { hearAbout } : {},
+      details,
+      consents,
     });
     return json({ ok: true });
   } catch {
@@ -187,13 +202,28 @@ async function handleJsonApplication(request: Request, env: CmsEnv) {
     if (!emailPattern.test(email)) return json({ error: "Enter a valid email." }, 400);
     if (!zipPattern.test(zip)) return json({ error: "Enter a 5-digit ZIP code." }, 400);
   }
-  if (form === "signup" && (record.smsConsent !== true || record.emailConsent !== true)) {
-    return json({ error: "Agree to the Privacy Policy and Messaging Terms & Conditions." }, 400);
+  if ((form === "tv" || form === "book") && !hearAbout) {
+    return json({ error: "Tell us how you heard about us." }, 400);
   }
   const details = asDetails(record.details);
   if (hearAbout) details.hearAbout = hearAbout;
   const serviceLabel = service || (form === "signup" ? "Sign up" : "TV");
-  await createApplication(env, { name, phone, email, zip, service: serviceLabel, photos: [], form, details });
+  const consents = resolveConsents({
+    provided: parseApplicationConsents(record.consents),
+    smsConsent: parseJsonConsentFlag(record.smsConsent),
+    emailConsent: parseJsonConsentFlag(record.emailConsent),
+  });
+  await createApplication(env, {
+    name,
+    phone,
+    email,
+    zip,
+    service: serviceLabel,
+    photos: [],
+    form,
+    details,
+    consents,
+  });
   return json({ ok: true });
 }
 
@@ -208,10 +238,12 @@ async function createApplication(
     form: ApplicationForm;
     details: Record<string, string>;
     photos: { name: string; type: string; bytes: Uint8Array }[];
+    consents: ApplicationConsents;
   },
 ) {
   const id = crypto.randomUUID();
-  const submittedAt = new Date().toISOString();
+  const submittedAt = input.consents.submittedAt || new Date().toISOString();
+  const consents: ApplicationConsents = { ...input.consents, submittedAt };
   const photos: StoredPhoto[] = [];
   for (let index = 0; index < input.photos.length; index += 1) {
     const photo = input.photos[index];
@@ -232,11 +264,12 @@ async function createApplication(
     form: input.form,
     details: input.details,
     photos,
+    consents,
   };
   if (env.CMS_DB) {
     await ensureTable(env);
     await env.CMS_DB.prepare(
-      "INSERT INTO applications (id, submitted_at, name, phone, email, zip, service, photos, status, form, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO applications (id, submitted_at, name, phone, email, zip, service, photos, status, form, details, consents) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     )
       .bind(
         id,
@@ -250,6 +283,7 @@ async function createApplication(
         row.status,
         row.form,
         JSON.stringify(row.details),
+        JSON.stringify(consents),
       )
       .run();
     return;
@@ -263,7 +297,7 @@ async function readApplications(env: CmsEnv): Promise<StoredApplication[]> {
   if (env.CMS_DB) {
     await ensureTable(env);
     const page = await env.CMS_DB.prepare(
-      "SELECT id, submitted_at, name, phone, email, zip, service, photos, status, form, details FROM applications ORDER BY submitted_at DESC",
+      "SELECT id, submitted_at, name, phone, email, zip, service, photos, status, form, details, consents FROM applications ORDER BY submitted_at DESC",
     )
       .bind()
       .all<Row>();
@@ -338,6 +372,11 @@ async function ensureTable(env: CmsEnv) {
   } catch {
     void 0;
   }
+  try {
+    await env.CMS_DB.prepare("ALTER TABLE applications ADD COLUMN consents TEXT").bind().run();
+  } catch {
+    void 0;
+  }
 }
 
 function toView(item: StoredApplication): ApplicationView {
@@ -353,6 +392,7 @@ function toView(item: StoredApplication): ApplicationView {
     form: item.form,
     details: item.details,
     photos: item.photos.map((photo, index) => ({ index, name: photo.name })),
+    consents: item.consents ?? null,
   };
 }
 
@@ -368,6 +408,7 @@ type Row = {
   status?: string;
   form?: string;
   details?: string;
+  consents?: string | null;
 };
 
 function fromRow(row: Row): StoredApplication {
@@ -390,6 +431,7 @@ function fromRow(row: Row): StoredApplication {
     form: storedForm(row.form),
     details: asDetails(row.details),
     photos,
+    consents: parseStoredConsents(row.consents),
   };
 }
 
@@ -405,7 +447,45 @@ function normalizeStored(item: StoredApplication): StoredApplication {
     form: storedForm(item.form),
     details: asDetails(item.details),
     photos: Array.isArray(item.photos) ? item.photos : [],
+    consents: parseApplicationConsents(item.consents),
   };
+}
+
+function parseStoredConsents(value: unknown): ApplicationConsents | null {
+  if (value == null || value === "") return null;
+  if (typeof value === "string") {
+    try {
+      return parseApplicationConsents(JSON.parse(value));
+    } catch {
+      return null;
+    }
+  }
+  return parseApplicationConsents(value);
+}
+
+function parseJsonConsentFlag(value: unknown): boolean | null {
+  if (value === true || value === "yes") return true;
+  if (value === false || value === "no") return false;
+  if (value === null) return null;
+  return null;
+}
+
+function resolveConsents(input: {
+  provided: ApplicationConsents | null;
+  smsConsent: boolean | null;
+  emailConsent: boolean | null;
+}): ApplicationConsents {
+  if (input.provided) {
+    return {
+      ...input.provided,
+      submittedAt: input.provided.submittedAt || new Date().toISOString(),
+    };
+  }
+  return buildApplicationConsents({
+    privacyPolicy: "accepted",
+    smsConsent: input.smsConsent,
+    emailConsent: input.emailConsent,
+  });
 }
 
 function asStatus(value: unknown): ApplicationStatus {

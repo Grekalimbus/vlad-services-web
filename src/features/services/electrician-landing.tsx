@@ -35,7 +35,7 @@ import { useQuote } from "@/features/quote";
 import { serviceLandingFrom } from "@/lib/cms/service-landing";
 import { useCms } from "@/lib/cms/use-cms";
 import { assetPath } from "@/lib/site";
-import { ProcessSteps } from "./process-steps";
+import { GetQuoteButton, ProcessSteps } from "./process-steps";
 import styles from "./electrician-landing.module.css";
 
 const glyphs: Record<string, LucideIcon> = {
@@ -126,9 +126,10 @@ export function ServiceLanding({
           <PriceGrid prices={landing.prices} label={category.name.trim()} base={copyBase} />
         </div>
       </section>
+      <GetQuoteButton serviceName={category.name} tight />
       <ProcessSteps
         steps={landing.steps}
-        serviceName={category.name}
+        tightTop
         pathFor={(index, field) => `${copyBase}.steps.${index}.${field}`}
       />
       <FaqSection

@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useId, useRef, useState, useSyncExternalStore, ty
 import { isDiscountCard, planDescriptions, planQuiz, planQuizForm, type TvQuizStep } from "@/lib/cms/tv-page";
 import { peekReveal, revealSurface, subscribeReveal } from "@/lib/cms/reveal";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
+import { PrivacyNotice } from "@/features/quote";
 import { hearAboutOptions } from "@/lib/hear-about";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { tvCounts } from "@/lib/services";
@@ -331,8 +332,8 @@ function QuizForm({
 					formId: "tv-quiz",
 					fields,
 					photos: [],
-					smsConsent: false,
-					emailConsent: false,
+					smsConsent: null,
+					emailConsent: null,
 				}),
 			);
 			setStatus("success");
@@ -433,6 +434,9 @@ function QuizForm({
 			<button type="submit" className={styles.quizSubmit} disabled={status === "loading"}>
 				<span data-cms="copy.plan.quiz.form.button">{status === "loading" ? "Sending…" : button}</span>
 			</button>
+			<div className={styles.quizPrivacy}>
+				<PrivacyNotice tone="onDark" />
+			</div>
 		</form>
 	);
 }

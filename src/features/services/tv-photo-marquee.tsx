@@ -24,6 +24,7 @@ export function TvPhotoMarquee({
 	heading = true,
 	direction = "left",
 	paired = false,
+	seamless = false,
 }: {
 	photos: Photo[];
 	label?: string;
@@ -31,12 +32,18 @@ export function TvPhotoMarquee({
 	heading?: boolean;
 	direction?: "left" | "right";
 	paired?: boolean;
+	seamless?: boolean;
 }) {
 	const loop = loopPhotos(photos);
 
 	if (photos.length === 0) return null;
 
-	const marqueeClass = [styles.marquee, roomy ? styles.marqueeRoom : "", paired ? styles.marqueePaired : ""]
+	const marqueeClass = [
+		styles.marquee,
+		roomy ? styles.marqueeRoom : "",
+		paired ? styles.marqueePaired : "",
+		seamless ? styles.marqueeSeamless : "",
+	]
 		.filter(Boolean)
 		.join(" ");
 	const viewportClass = [styles.viewport, roomy ? styles.viewportRoom : "", paired ? styles.viewportPaired : ""]

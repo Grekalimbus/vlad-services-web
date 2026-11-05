@@ -35,7 +35,7 @@ export function TvGallery() {
       galleryPath={index >= 0 ? `slides:copy.home.works.cards.${index}.photos` : "slides:copy.home.works.cards.0.photos"}
       body={copy.body}
       bodyPath="copy.tvGallery.body"
-      cta={{ label: copy.book, path: "copy.tvGallery.book", href: "#tv-deals" }}
+      cta={{ label: copy.book, path: "copy.tvGallery.book" }}
     />
   );
 }

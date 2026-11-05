@@ -8,6 +8,17 @@ type Status = "new" | "contacted" | "scheduled";
 
 type ApplicationForm = "book" | "signup" | "tv";
 
+type ApplicationConsents = {
+  privacyPolicy: "accepted" | "na";
+  smsMarketing: "yes" | "no" | "na";
+  emailMarketing: "yes" | "no" | "na";
+  submittedAt: string;
+  smsText: string | null;
+  emailText: string | null;
+  smsGrantedAt: string | null;
+  emailGrantedAt: string | null;
+};
+
 type Application = {
   id: string;
   submittedAt: string;
@@ -20,6 +31,7 @@ type Application = {
   form: ApplicationForm;
   details: Record<string, string>;
   photos: { index: number; name: string }[];
+  consents: ApplicationConsents | null;
 };
 
 const tabs: { id: ApplicationForm; label: string }[] = [
@@ -285,6 +297,10 @@ export default function ApplicationsPage() {
                       <span className={styles.cellLabel}>Service</span>
                       {item.service ? <span>{item.service}</span> : <span className={styles.muted}>Not specified</span>}
                       {formatDetails(item) ? <span className={styles.detail}>{formatDetails(item)}</span> : null}
+                    </div>
+                    <div className={`${styles.cell} ${styles.consentCell}`}>
+                      <span className={styles.cellLabel}>Consent & Agreements</span>
+                      <ConsentBlock consents={item.consents} submittedAt={item.submittedAt} />
                     </div>
                     <div className={styles.cell}>
                       <span className={styles.cellLabel}>Photos</span>
@@ -581,11 +597,118 @@ function normalize(item: Application): Application {
       if (typeof value === "string" && value.trim()) details[key] = value.trim();
     }
   }
-  return { ...item, status, form, details };
+  return { ...item, status, form, details, consents: parseConsents(item.consents) };
+}
+
+function parseConsents(value: unknown): ApplicationConsents | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const item = value as Record<string, unknown>;
+  const privacy =
+    item.privacyPolicy === "accepted" || item.privacyPolicy === "na" ? item.privacyPolicy : null;
+  const sms =
+    item.smsMarketing === "yes" || item.smsMarketing === "no" || item.smsMarketing === "na"
+      ? item.smsMarketing
+      : null;
+  const email =
+    item.emailMarketing === "yes" || item.emailMarketing === "no" || item.emailMarketing === "na"
+      ? item.emailMarketing
+      : null;
+  if (!privacy || !sms || !email || typeof item.submittedAt !== "string") return null;
+  return {
+    privacyPolicy: privacy,
+    smsMarketing: sms,
+    emailMarketing: email,
+    submittedAt: item.submittedAt,
+    smsText: typeof item.smsText === "string" ? item.smsText : null,
+    emailText: typeof item.emailText === "string" ? item.emailText : null,
+    smsGrantedAt: typeof item.smsGrantedAt === "string" ? item.smsGrantedAt : null,
+    emailGrantedAt: typeof item.emailGrantedAt === "string" ? item.emailGrantedAt : null,
+  };
+}
+
+function ConsentBlock({
+  consents,
+  submittedAt,
+}: {
+  consents: ApplicationConsents | null;
+  submittedAt: string;
+}) {
+  if (!consents) {
+    return (
+      <ul className={styles.consentList}>
+        <li>
+          <span>Privacy Policy</span>
+          <strong>Unknown</strong>
+        </li>
+        <li>
+          <span>SMS Marketing</span>
+          <strong>Unknown</strong>
+        </li>
+        <li>
+          <span>Email Marketing</span>
+          <strong>Unknown</strong>
+        </li>
+      </ul>
+    );
+  }
+
+  const when = formatWhen(consents.submittedAt || submittedAt);
+  const smsLabel = marketingLabel(consents.smsMarketing);
+  const emailLabel = marketingLabel(consents.emailMarketing);
+
+  return (
+    <div className={styles.consentBlock}>
+      <ul className={styles.consentList}>
+        <li>
+          <span>Privacy Policy</span>
+          <strong data-state={consents.privacyPolicy === "accepted" ? "yes" : "na"}>
+            {consents.privacyPolicy === "accepted" ? "Accepted" : "Not Applicable"}
+          </strong>
+        </li>
+        <li>
+          <span>SMS Marketing</span>
+          <strong data-state={consents.smsMarketing}>{smsLabel}</strong>
+        </li>
+        <li>
+          <span>Email Marketing</span>
+          <strong data-state={consents.emailMarketing}>{emailLabel}</strong>
+        </li>
+      </ul>
+      <p className={styles.consentMeta}>
+        Submitted {when.date}
+        {when.time ? ` · ${when.time}` : ""}
+      </p>
+      {consents.smsMarketing === "yes" && consents.smsGrantedAt ? (
+        <p className={styles.consentMeta}>SMS accepted {formatWhen(consents.smsGrantedAt).copy}</p>
+      ) : null}
+      {consents.emailMarketing === "yes" && consents.emailGrantedAt ? (
+        <p className={styles.consentMeta}>Email accepted {formatWhen(consents.emailGrantedAt).copy}</p>
+      ) : null}
+      {consents.smsText ? (
+        <details className={styles.consentText}>
+          <summary>SMS consent text</summary>
+          <p>{consents.smsText}</p>
+        </details>
+      ) : null}
+      {consents.emailText ? (
+        <details className={styles.consentText}>
+          <summary>Email consent text</summary>
+          <p>{consents.emailText}</p>
+        </details>
+      ) : null}
+    </div>
+  );
+}
+
+function marketingLabel(value: "yes" | "no" | "na") {
+  if (value === "yes") return "Accepted";
+  if (value === "no") return "Not Accepted";
+  return "Not Applicable";
 }
 
 const detailLabels: Record<string, string> = {
   hearAbout: "Heard via",
+  description: "Description",
   tvCount: "TVs",
   offer: "Offer",
   room: "Room",

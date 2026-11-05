@@ -1,21 +1,21 @@
 "use client";
 
 import { FormEvent, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import Link from "next/link";
-import { ArrowRight, Mail, MapPin, Phone, Upload, User, List, MessageCircle } from "lucide-react";
+import { Mail, MapPin, Phone, Upload, User, List, MessageCircle } from "lucide-react";
+import { PrivacyNotice } from "./consent-fields";
 import { useCms } from "@/lib/cms/use-cms";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { hearAboutOptions } from "@/lib/hear-about";
 import { quoteSuccessMessage } from "@/lib/leads";
 import { quoteServices } from "@/lib/services";
-import { routes } from "@/lib/site";
-import { Checkbox } from "@/shared/ui";
 import styles from "@/styles/forms.module.css";
 
 const MAX_PHOTOS = 5;
 const MAX_BYTES = 10 * 1024 * 1024;
+const MAX_DESCRIPTION = 450;
 
 type Status = "idle" | "loading" | "success" | "error";
+type FieldKey = "name" | "phone" | "email" | "zip" | "service" | "hearAbout";
 
 export function QuoteForm({ initialService = "" }: { initialService?: string }) {
   const ids = {
@@ -25,17 +25,20 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
     zip: useId(),
     hearAbout: useId(),
     service: useId(),
+    description: useId(),
     photos: useId(),
     error: useId(),
     photoHelp: useId(),
   };
   const [status, setStatus] = useState<Status>("idle");
   const [formError, setFormError] = useState("");
+  const [invalid, setInvalid] = useState<Partial<Record<FieldKey, boolean>>>({});
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [zip, setZip] = useState("");
   const [hearAbout, setHearAbout] = useState("");
+  const [description, setDescription] = useState("");
   const preset =
     quoteServices.find((item) => item.name === initialService)?.name ??
     quoteServices.find((item) => item.name.trim() === initialService.trim())?.name ??
@@ -45,28 +48,16 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
   const [previews, setPreviews] = useState<string[]>([]);
   const previewsRef = useRef<string[]>([]);
   const [photoError, setPhotoError] = useState("");
-  const [privacy, setPrivacy] = useState(false);
-  const [messaging, setMessaging] = useState(false);
-  const [phoneTouched, setPhoneTouched] = useState(false);
   const copy = useCms().copy.forms;
-  const emailError = email.trim() && !emailPattern.test(email.trim()) ? "Enter a valid email." : "";
-  const zipError = zip.trim() && !zipPattern.test(zip.trim()) ? "Enter a 5-digit ZIP code." : "";
-  const ready =
-    name.trim().length >= 2 &&
-    phonePattern.test(phone.trim()) &&
-    emailPattern.test(email.trim()) &&
-    zipPattern.test(zip.trim()) &&
-    privacy &&
-    messaging &&
-    !emailError &&
-    !zipError &&
-    !photoError &&
-    status !== "loading";
 
   useEffect(() => {
     const urls = previewsRef;
     return () => urls.current.forEach((url) => URL.revokeObjectURL(url));
   }, []);
+
+  function clearInvalid(key: FieldKey) {
+    setInvalid((current) => (current[key] ? { ...current, [key]: undefined } : current));
+  }
 
   function rememberPhotos(next: File[]) {
     previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
@@ -101,7 +92,34 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!ready) return;
+    if (status === "loading") return;
+
+    const next: Partial<Record<FieldKey, boolean>> = {};
+    if (name.trim().length < 2) next.name = true;
+    if (!phonePattern.test(phone.trim())) next.phone = true;
+    if (!emailPattern.test(email.trim())) next.email = true;
+    if (!zipPattern.test(zip.trim())) next.zip = true;
+    if (!service) next.service = true;
+    if (!hearAbout) next.hearAbout = true;
+    setInvalid(next);
+    if (Object.keys(next).length > 0 || photoError) {
+      setStatus("error");
+      setFormError("");
+      const focusId = next.name
+        ? ids.name
+        : next.phone
+          ? ids.phone
+          : next.email
+            ? ids.email
+            : next.zip
+              ? ids.zip
+              : next.service
+                ? ids.service
+                : ids.hearAbout;
+      document.getElementById(focusId)?.focus();
+      return;
+    }
+
     setStatus("loading");
     setFormError("");
     const body = new FormData();
@@ -111,8 +129,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
     body.set("zip", zip.trim());
     body.set("hearAbout", hearAbout);
     body.set("service", service);
-    body.set("privacy", "yes");
-    body.set("messaging", "yes");
+    body.set("description", description.trim().slice(0, MAX_DESCRIPTION));
     photos.forEach((file) => body.append("photos", file));
     try {
       const response = await fetch("/api/applications", { method: "POST", body });
@@ -135,7 +152,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
 
   return (
     <form onSubmit={onSubmit} noValidate className={styles.bookForm}>
-      {status === "error" ? (
+      {status === "error" && formError ? (
         <p id={ids.error} tabIndex={-1} role="alert" className={styles.alert}>
           {formError || copy.formError}
         </p>
@@ -147,57 +164,69 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
           name="name"
           label="Name"
           required
+          invalid={invalid.name}
           icon={<User size={16} aria-hidden="true" />}
           value={name}
           autoComplete="name"
           placeholder="Enter your name"
-          onChange={setName}
+          onChange={(value) => {
+            setName(value);
+            clearInvalid("name");
+          }}
         />
         <Field
           id={ids.phone}
           name="phone"
           label="Phone Number"
           required
+          invalid={invalid.phone}
           type="tel"
           inputMode="tel"
           icon={<Phone size={16} aria-hidden="true" />}
           value={phone}
           autoComplete="tel"
           placeholder="(619) 736-3016"
-          onChange={setPhone}
-          onBlur={() => setPhoneTouched(true)}
-          error={phoneTouched && phone.trim() && !phonePattern.test(phone.trim()) ? "Enter a phone number." : ""}
+          onChange={(value) => {
+            setPhone(value);
+            clearInvalid("phone");
+          }}
         />
         <Field
           id={ids.email}
           name="email"
           label="Email"
           required
+          invalid={invalid.email}
           type="email"
           icon={<Mail size={16} aria-hidden="true" />}
           value={email}
           autoComplete="email"
           placeholder="Enter your email"
-          onChange={setEmail}
-          error={emailError}
+          onChange={(value) => {
+            setEmail(value);
+            clearInvalid("email");
+          }}
         />
         <Field
           id={ids.zip}
           name="zip"
           label="ZIP Code"
           required
+          invalid={invalid.zip}
           inputMode="numeric"
           icon={<MapPin size={16} aria-hidden="true" />}
           value={zip}
           autoComplete="postal-code"
           placeholder="Enter ZIP code"
-          onChange={setZip}
-          error={zipError}
+          onChange={(value) => {
+            setZip(value);
+            clearInvalid("zip");
+          }}
         />
 
         <div className={styles.bookSpan}>
           <label htmlFor={ids.service} className={styles.bookLabel}>
-            Service Needed <span className={styles.bookOptional}>Optional</span>
+            Service Needed <span aria-hidden="true"> *</span>
           </label>
           <div className={styles.bookControl}>
             <List size={16} aria-hidden="true" className={styles.bookIcon} />
@@ -205,8 +234,13 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
               id={ids.service}
               name="service"
               value={service}
-              onChange={(event) => setService(event.target.value)}
-              className={styles.bookSelect}
+              required
+              aria-invalid={invalid.service || undefined}
+              onChange={(event) => {
+                setService(event.target.value);
+                clearInvalid("service");
+              }}
+              className={invalid.service ? `${styles.bookSelect} ${styles.bookInvalid}` : styles.bookSelect}
             >
               <option value="">Select a service</option>
               {quoteServices.map((item) => (
@@ -220,7 +254,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
 
         <div className={styles.bookSpan}>
           <label htmlFor={ids.hearAbout} className={styles.bookLabel}>
-            How did you hear about us? <span className={styles.bookOptional}>Optional</span>
+            How did you hear about us? <span aria-hidden="true"> *</span>
           </label>
           <div className={styles.bookControl}>
             <MessageCircle size={16} aria-hidden="true" className={styles.bookIcon} />
@@ -228,8 +262,13 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
               id={ids.hearAbout}
               name="hearAbout"
               value={hearAbout}
-              onChange={(event) => setHearAbout(event.target.value)}
-              className={styles.bookSelect}
+              required
+              aria-invalid={invalid.hearAbout || undefined}
+              onChange={(event) => {
+                setHearAbout(event.target.value);
+                clearInvalid("hearAbout");
+              }}
+              className={invalid.hearAbout ? `${styles.bookSelect} ${styles.bookInvalid}` : styles.bookSelect}
             >
               <option value="">How did you hear about us?</option>
               {hearAboutOptions.map((option) => (
@@ -239,6 +278,25 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
               ))}
             </select>
           </div>
+        </div>
+
+        <div className={styles.bookSpan}>
+          <label htmlFor={ids.description} className={styles.bookLabel}>
+            Describe <span className={styles.bookOptional}>Optional</span>
+          </label>
+          <textarea
+            id={ids.description}
+            name="description"
+            value={description}
+            maxLength={MAX_DESCRIPTION}
+            rows={4}
+            placeholder="Tell us about the job"
+            className={styles.bookTextarea}
+            onChange={(event) => setDescription(event.target.value.slice(0, MAX_DESCRIPTION))}
+          />
+          <p className={styles.bookHint}>
+            {description.length}/{MAX_DESCRIPTION}
+          </p>
         </div>
 
         <div className={styles.bookSpan}>
@@ -295,28 +353,10 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
         </div>
       </div>
 
-      <fieldset className={styles.bookChecks}>
-        <legend className={styles.srOnly}>Agreements</legend>
-        <Checkbox tone="dark" name="privacy" checked={privacy} onChange={(event) => setPrivacy(event.target.checked)}>
-          I agree to the{" "}
-          <Link href={routes.privacy} className={styles.consentLink} target="_blank" rel="noopener noreferrer">
-            Privacy Policy
-          </Link>
-          <span aria-hidden="true"> *</span>
-        </Checkbox>
-        <Checkbox tone="dark" name="messaging" checked={messaging} onChange={(event) => setMessaging(event.target.checked)}>
-          I agree to the{" "}
-          <Link href={routes.messagingTerms} className={styles.consentLink} target="_blank" rel="noopener noreferrer">
-            Messaging Terms & Conditions
-          </Link>
-          <span aria-hidden="true"> *</span>
-        </Checkbox>
-      </fieldset>
-
-      <button type="submit" className={styles.bookSubmit} disabled={!ready}>
+      <button type="submit" className={styles.bookSubmit}>
         {status === "loading" ? "Sending…" : "BOOK NOW"}
-        {status === "loading" ? null : <ArrowRight size={18} aria-hidden="true" />}
       </button>
+      <PrivacyNotice tone="onDark" />
     </form>
   );
 }
@@ -327,6 +367,7 @@ function Field({
   label,
   required = false,
   optional = false,
+  invalid = false,
   type = "text",
   inputMode,
   icon,
@@ -334,14 +375,13 @@ function Field({
   autoComplete,
   placeholder,
   onChange,
-  onBlur,
-  error,
 }: {
   id: string;
   name: string;
   label: string;
   required?: boolean;
   optional?: boolean;
+  invalid?: boolean;
   type?: string;
   inputMode?: "tel" | "numeric";
   icon: ReactNode;
@@ -349,8 +389,6 @@ function Field({
   autoComplete?: string;
   placeholder: string;
   onChange: (value: string) => void;
-  onBlur?: () => void;
-  error?: string;
 }) {
   return (
     <div>
@@ -369,14 +407,12 @@ function Field({
           autoComplete={autoComplete}
           placeholder={placeholder}
           value={value}
-          aria-invalid={Boolean(error)}
+          aria-invalid={invalid || undefined}
           required={required}
-          className={styles.bookInput}
+          className={invalid ? `${styles.bookInput} ${styles.bookInvalid}` : styles.bookInput}
           onChange={(event) => onChange(event.target.value)}
-          onBlur={onBlur}
         />
       </div>
-      {error ? <p className={styles.error}>{error}</p> : null}
     </div>
   );
 }

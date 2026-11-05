@@ -1,4 +1,9 @@
-import { buildConsentRecord, type ConsentRecord } from "@/lib/consent";
+import {
+  buildApplicationConsents,
+  buildConsentRecord,
+  type ApplicationConsents,
+  type ConsentRecord,
+} from "@/lib/consent";
 
 export type LeadFormId =
   | "general-quote"
@@ -28,8 +33,9 @@ export type LeadPayload = {
   fields: Record<string, string>;
   photos: LeadPhotoMeta[];
   consents: {
-    sms: ConsentRecord;
-    email: ConsentRecord;
+    sms: ConsentRecord | null;
+    email: ConsentRecord | null;
+    snapshot: ApplicationConsents;
   };
 };
 
@@ -55,8 +61,8 @@ export function buildLeadPayload(input: {
   formId: LeadFormId;
   fields: Record<string, string>;
   photos: File[];
-  smsConsent: boolean;
-  emailConsent: boolean;
+  smsConsent: boolean | null;
+  emailConsent: boolean | null;
   sourcePath?: string;
   href?: string;
 }): LeadPayload {
@@ -67,6 +73,13 @@ export function buildLeadPayload(input: {
     input.href ?? (typeof window !== "undefined" ? window.location.href : "");
   const phone = input.fields.phone ?? "";
   const email = input.fields.email ?? "";
+  const submittedAt = new Date().toISOString();
+  const snapshot = buildApplicationConsents({
+    privacyPolicy: "accepted",
+    smsConsent: input.smsConsent,
+    emailConsent: input.emailConsent,
+    submittedAt,
+  });
 
   return {
     id:
@@ -74,7 +87,7 @@ export function buildLeadPayload(input: {
         ? crypto.randomUUID()
         : `lead-${Date.now()}`,
     type: input.type,
-    submittedAt: new Date().toISOString(),
+    submittedAt,
     source: {
       path: sourcePath,
       href,
@@ -83,20 +96,27 @@ export function buildLeadPayload(input: {
     fields: input.fields,
     photos: photoMeta(input.photos),
     consents: {
-      sms: buildConsentRecord({
-        channel: "sms",
-        granted: input.smsConsent,
-        phone,
-        sourcePath,
-        formId: input.formId,
-      }),
-      email: buildConsentRecord({
-        channel: "email",
-        granted: input.emailConsent,
-        email,
-        sourcePath,
-        formId: input.formId,
-      }),
+      sms:
+        input.smsConsent === null
+          ? null
+          : buildConsentRecord({
+              channel: "sms",
+              granted: input.smsConsent,
+              phone,
+              sourcePath,
+              formId: input.formId,
+            }),
+      email:
+        input.emailConsent === null
+          ? null
+          : buildConsentRecord({
+              channel: "email",
+              granted: input.emailConsent,
+              email,
+              sourcePath,
+              formId: input.formId,
+            }),
+      snapshot,
     },
   };
 }
@@ -116,8 +136,11 @@ export async function submitLead(payload: LeadPayload) {
       service: fields.service ?? "",
       hearAbout: fields.hearAbout ?? "",
       formId: payload.source.formId,
-      smsConsent: payload.consents.sms.granted,
-      emailConsent: payload.consents.email.granted,
+      smsConsent:
+        payload.consents.sms === null ? null : payload.consents.sms.granted,
+      emailConsent:
+        payload.consents.email === null ? null : payload.consents.email.granted,
+      consents: payload.consents.snapshot,
       details: fields,
     }),
   });

@@ -9,11 +9,15 @@
   padding-bottom: 0;
 }
 
+.section .item {
+  filter: drop-shadow(0 2px 8px rgb(0 0 0 / 0.04));
+}
+
 .shade.shade {
   background: linear-gradient(
     to top,
-    rgb(0 0 0 / 0.62) 0%,
-    rgb(0 0 0 / 0.22) 34%,
+    rgb(0 0 0 / 0.2) 0%,
+    rgb(0 0 0 / 0.08) 34%,
     transparent 58%
   );
 }

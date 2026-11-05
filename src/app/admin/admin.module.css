@@ -143,6 +143,81 @@
   white-space: normal;
 }
 
+.consentCell {
+  padding-top: 0.15rem;
+}
+
+.consentBlock {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.consentList {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  list-style: none;
+  border: 1px solid #eeeae4;
+  border-radius: 0.75rem;
+  background: #faf9f7;
+}
+
+.consentList li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.consentList span {
+  color: #5c5a56;
+}
+
+.consentList strong {
+  font-weight: 700;
+  color: #171717;
+}
+
+.consentList strong[data-state="yes"] {
+  color: #0f7a43;
+}
+
+.consentList strong[data-state="no"] {
+  color: #9a3412;
+}
+
+.consentList strong[data-state="na"] {
+  color: #6b7280;
+}
+
+.consentMeta {
+  margin: 0;
+  color: #8a8782;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.consentText {
+  margin: 0;
+  color: #5c5a56;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.consentText summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.consentText p {
+  margin: 0.35rem 0 0;
+  white-space: pre-wrap;
+}
+
 .empty {
   margin: 0;
   color: #5c5a56;

@@ -107,7 +107,7 @@ export function PhotoFeature({
   compact?: boolean;
   body?: string;
   bodyPath?: string;
-  cta?: { label: string; path: string; href: string };
+  cta?: { label: string; path: string; href?: string };
 }) {
   const editing = useEditing();
   const offers = useCms().copy.offers;
@@ -147,13 +147,13 @@ export function PhotoFeature({
           ) : null}
         </>
       ) : null}
-      {cta ? (
+      {cta?.href ? (
         <a href={cta.href} className={styles.book}>
           <span data-cms={cta.path}>{cta.label}</span>
         </a>
       ) : (
         <QuoteCta className={styles.book}>
-          <span data-cms="copy.offers.book">{offers.book}</span>
+          <span data-cms={cta?.path ?? "copy.offers.book"}>{cta?.label ?? offers.book}</span>
         </QuoteCta>
       )}
     </section>
