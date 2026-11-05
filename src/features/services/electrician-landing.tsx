@@ -35,6 +35,7 @@ import { useQuote } from "@/features/quote";
 import { serviceLandingFrom } from "@/lib/cms/service-landing";
 import { useCms } from "@/lib/cms/use-cms";
 import { assetPath } from "@/lib/site";
+import { FeatureRows } from "./feature-rows";
 import { GetQuoteButton, ProcessSteps } from "./process-steps";
 import styles from "./electrician-landing.module.css";
 
@@ -76,6 +77,29 @@ export function ServiceLanding({
   const cover = coverIndex >= 0 ? cms.copy.home.serviceCovers[coverIndex] : undefined;
   const figureSrc = cover?.src || category.coverImage || "";
   const { openQuote } = useQuote();
+  const figureRef = useRef<HTMLElement>(null);
+  const [figureVisible, setFigureVisible] = useState(false);
+
+  useEffect(() => {
+    const node = figureRef.current;
+    if (!node) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setFigureVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setFigureVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.28, rootMargin: "0px 0px -10% 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [figureSrc]);
 
   return (
     <>
@@ -101,7 +125,11 @@ export function ServiceLanding({
         <div className={styles.storyLayout}>
           <div className={styles.storyStage}>
             {figureSrc ? (
-              <figure className={styles.figure}>
+              <figure
+                ref={figureRef}
+                className={styles.figure}
+                data-visible={figureVisible ? "" : undefined}
+              >
                 <Image
                   src={assetPath(figureSrc)}
                   alt={landing.description.imageAlt}
@@ -132,6 +160,14 @@ export function ServiceLanding({
         tightTop
         pathFor={(index, field) => `${copyBase}.steps.${index}.${field}`}
       />
+      {landing.featureRows?.length ? (
+        <FeatureRows
+          rows={landing.featureRows}
+          pathBase={`${copyBase}.featureRows`}
+          categoryId={category.id}
+          label={category.name.trim() || "Service"}
+        />
+      ) : null}
       <FaqSection
         id={`${category.slug}-faq`}
         headingId={`${category.slug}-faq-heading`}

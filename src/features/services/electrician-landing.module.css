@@ -86,11 +86,22 @@
   margin: 0;
   overflow: hidden;
   pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-2.75rem, 0, 0);
+  transition:
+    opacity 720ms cubic-bezier(0.22, 0.8, 0.28, 1),
+    transform 720ms cubic-bezier(0.22, 0.8, 0.28, 1);
 }
 
 .story[data-side="end"] .figure {
   right: auto;
   left: calc(50% + 300px + 1.25rem);
+  transform: translate3d(2.75rem, 0, 0);
+}
+
+.figure[data-visible] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
 .storyImage {
@@ -381,7 +392,9 @@
   }
 
   .figure,
-  .story[data-side="end"] .figure {
+  .story[data-side="end"] .figure,
+  .figure[data-visible],
+  .story[data-side="end"] .figure[data-visible] {
     position: absolute;
     top: -2.75rem;
     right: -14vw;
@@ -396,6 +409,7 @@
     transform: translateY(30px) scale(0.75);
     transform-origin: center center;
     opacity: 0.2;
+    transition: none;
     pointer-events: none;
   }
 
@@ -484,6 +498,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .iconImage {
+    transition: none;
+  }
+
+  .figure,
+  .story[data-side="end"] .figure {
+    opacity: 1;
+    transform: none;
     transition: none;
   }
 }

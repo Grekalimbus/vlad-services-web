@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Inter, Sora, Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import { Header, Providers } from "@/shared/layout";
 import { CmsBoundary } from "@/lib/cms/boundary";
@@ -19,6 +20,13 @@ const display = Archivo_Black({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-display",
+  display: "swap",
+});
+
+const technor = localFont({
+  src: "../fonts/Technor-Variable.woff2",
+  variable: "--font-technor",
+  weight: "200 900",
   display: "swap",
 });
 
@@ -90,7 +98,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const cms = await bindCms();
   const payload = JSON.stringify(cms).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable} ${sora.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${sans.variable} ${display.variable} ${technor.variable} ${sora.variable} ${spaceGrotesk.variable}`}>
       <body className={styles.body}>
         <script id="cms-data" dangerouslySetInnerHTML={{ __html: `window.__CMS__=${payload}` }} />
         <a

@@ -80,6 +80,10 @@
 }
 
 .kickerAccent {
+	font-family: var(--font-technor), var(--font-display), sans-serif;
+	font-size: calc(1em + 6px);
+	font-weight: 900;
+	font-synthesis: none;
 	color: #ff9f38;
 }
 

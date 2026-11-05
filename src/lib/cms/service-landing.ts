@@ -4,6 +4,7 @@ import {
   electricalLandingFrom,
   ensureElectricalLanding,
   type ElectricalLanding,
+  type LandingFeatureRow,
 } from "./electrical-landing";
 
 type LandingDocument = CmsDocument & {
@@ -39,6 +40,32 @@ const handymanLanding: ElectricalLanding = {
     { amount: 80, label: "Door Adjust" },
     { amount: 110, label: "Shelf Install" },
     { amount: 90, label: "General Repair" },
+  ],
+  featureRows: [
+    {
+      title: "Furniture assembled square",
+      body: "Beds, dressers, desks, and the flat boxes waiting in the garage get built the same visit. Pieces go together square, tall units are anchored when they need it, and packing leaves with us if you want it gone.",
+      photos: [
+        { src: "/works/furniture.jpg", alt: "Assembled furniture finished in a home" },
+        { src: "/works/furniture-pexels.jpg", alt: "Handyman completing furniture assembly" },
+      ],
+    },
+    {
+      title: "Doors, shelves, and anchors",
+      body: "A door that rubs, a latch that misses, a shelf that needs a stud — they stay on the same list. Hardware is set so the plate lies flat, and shelves are leveled before anything is loaded.",
+      photos: [
+        { src: "/works/pexels-sofa.jpg", alt: "Living room after furniture and shelf work" },
+        { src: "/works/handyman-tools.jpg", alt: "Handyman tools ready for a repair visit" },
+      ],
+    },
+    {
+      title: "Small repairs in one stop",
+      body: "Drywall patches, loose hardware, and the fixes that pile up fit one visit when they were priced on the call. Floors are covered, parts are packed, and the room is left swept before we leave.",
+      photos: [
+        { src: "/works/pexels-drywall.jpg", alt: "Wall repair finished during a handyman visit" },
+        { src: "/works/interior-styled.jpg", alt: "Finished room after small handyman repairs" },
+      ],
+    },
   ],
   faq: {
     headingLead: "QUESTIONS &",
@@ -214,6 +241,32 @@ const landscaperLanding: ElectricalLanding = {
     { amount: 100, label: "Irrigation Check" },
     { amount: 75, label: "Lawn Edge" },
   ],
+  featureRows: [
+    {
+      title: "Hedges and planting",
+      body: "Overgrown hedges are cut back to a clean line you can see from the street. New plants go in the bed you already have, set at the right depth and watered in before we leave. The shape of the yard stays yours — we finish the work that was priced on the call.",
+      photos: [
+        { src: "/works/landscaping-hedge.jpg", alt: "Freshly trimmed hedge along a front walk" },
+        { src: "/works/landscaping-plants.jpg", alt: "New plants set in a prepared garden bed" },
+      ],
+    },
+    {
+      title: "Beds cleaned and mulched",
+      body: "Beds are cleared of weeds and spent growth, then dressed with mulch so the edges read finished. Debris from the cleanup is piled for haul-off with the crew. You get a yard that looks tended, not redesigned.",
+      photos: [
+        { src: "/works/landscaping-mulch.jpg", alt: "Garden bed cleaned and covered with fresh mulch" },
+        { src: "/works/landscaping-cleanup.jpg", alt: "Yard debris piled after a cleanup visit" },
+      ],
+    },
+    {
+      title: "Edges and irrigation",
+      body: "Lawn edges are cut so the grass stops where the bed begins. A simple irrigation check confirms heads are aimed and running. Small adjustments stay in the visit; anything that needs parts or a deeper fix is quoted before we start it.",
+      photos: [
+        { src: "/works/landscaping-lawn.jpg", alt: "Clean lawn edge along a landscaped bed" },
+        { src: "/works/landscaping-beds.jpg", alt: "Landscaped yard beds with irrigation in place" },
+      ],
+    },
+  ],
   faq: {
     headingLead: "QUESTIONS &",
     headingAccent: "ANSWERS",
@@ -312,6 +365,47 @@ function priceList(saved: ElectricalLanding["prices"] | undefined, fallback: Ele
   }));
 }
 
+function mergeFeatureRows(
+  defaults: ElectricalLanding["featureRows"],
+  saved: ElectricalLanding["featureRows"],
+): ElectricalLanding["featureRows"] {
+  if (!defaults?.length) {
+    if (!saved?.length) return undefined;
+    return saved.map((row) => ({
+      title: row.title || "",
+      body: row.body || "",
+      photos: [
+        { src: row.photos?.[0]?.src || "", alt: row.photos?.[0]?.alt || "" },
+        { src: row.photos?.[1]?.src || "", alt: row.photos?.[1]?.alt || "" },
+      ] as LandingFeatureRow["photos"],
+    }));
+  }
+
+  return defaults.map((base, index) => {
+    const row = saved?.[index];
+    if (!row) return structuredClone(base);
+    return {
+      title: row.title || base.title,
+      body: row.body || base.body,
+      photos: [
+        {
+          src: row.photos?.[0]?.src || base.photos[0].src,
+          alt: row.photos?.[0]?.alt || base.photos[0].alt,
+        },
+        {
+          src: row.photos?.[1]?.src || base.photos[1].src,
+          alt: row.photos?.[1]?.alt || base.photos[1].alt,
+        },
+      ] as LandingFeatureRow["photos"],
+    };
+  });
+}
+
+function missingFeatureRows(landing: ElectricalLanding | undefined, defaults: ElectricalLanding) {
+  if (!defaults.featureRows?.length) return false;
+  return !landing?.featureRows?.length || landing.featureRows.length < defaults.featureRows.length;
+}
+
 function mergeLanding(defaults: ElectricalLanding, saved: ElectricalLanding | undefined): ElectricalLanding {
   const base = structuredClone(defaults);
   if (!saved) return base;
@@ -331,6 +425,7 @@ function mergeLanding(defaults: ElectricalLanding, saved: ElectricalLanding | un
     prices: priceList(saved.prices, base.prices),
     dealsBody: saved.dealsBody || base.dealsBody,
     stepsHeading: saved.stepsHeading || base.stepsHeading,
+    featureRows: mergeFeatureRows(base.featureRows, saved.featureRows),
     faq: saved.faq?.items?.length
       ? {
           headingLead: saved.faq.headingLead || base.faq.headingLead,
@@ -375,14 +470,18 @@ export function ensureServiceLandings(document: CmsDocument): CmsDocument {
   const pending = base.serviceCategories.filter(
     (category) => category.slug !== "tv-mounting" && category.id !== "tv-mounting" && category.slug !== "electrical" && category.id !== "electrical",
   );
-  if (pending.every((category) => isComplete(source.copy.serviceLanding?.[category.id]))) return base;
+  const needsWork = pending.some((category) => {
+    const current = source.copy.serviceLanding?.[category.id];
+    return !isComplete(current) || missingFeatureRows(current, landingPreset(category));
+  });
+  if (!needsWork) return base;
 
   const next = structuredClone(base) as LandingDocument;
   next.copy.serviceLanding = { ...next.copy.serviceLanding };
   for (const category of pending) {
     const current = next.copy.serviceLanding?.[category.id];
-    if (isComplete(current)) continue;
     const defaults = landingPreset(category);
+    if (isComplete(current) && !missingFeatureRows(current, defaults)) continue;
     next.copy.serviceLanding[category.id] = hasLandingBody(current) ? mergeLanding(defaults, current) : structuredClone(defaults);
   }
   return next;

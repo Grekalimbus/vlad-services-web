@@ -1,5 +1,11 @@
 import type { CmsDocument } from "./types";
 
+export type LandingFeatureRow = {
+  title: string;
+  body: string;
+  photos: [{ src: string; alt: string }, { src: string; alt: string }];
+};
+
 export type ElectricalLanding = {
   icons: { src: string; alt: string; text: string }[];
   description: {
@@ -12,6 +18,7 @@ export type ElectricalLanding = {
   steps: { title: string; text: string }[];
   dealsBody: string;
   prices: { amount: number; label: string }[];
+  featureRows?: LandingFeatureRow[];
   faq: {
     headingLead: string;
     headingAccent: string;

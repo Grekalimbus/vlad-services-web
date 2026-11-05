@@ -766,6 +766,40 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
       ],
     };
   }
+  if (kind === "featureRow") {
+    const separator = id.lastIndexOf(":");
+    const categoryId = separator > 0 ? id.slice(0, separator) : "";
+    const index = Number(separator > 0 ? id.slice(separator + 1) : "");
+    if (!categoryId || !Number.isInteger(index) || index < 0) return null;
+    return {
+      image: "",
+      remove: false,
+      texts: [
+        { path: `copy.serviceLanding.${categoryId}.featureRows.${index}.title`, label: "Title" },
+        { path: `copy.serviceLanding.${categoryId}.featureRows.${index}.body`, label: "Description", long: true },
+      ],
+    };
+  }
+  if (kind === "featurePhoto") {
+    const parts = id.split(":");
+    if (parts.length < 3) return null;
+    const photoIndex = Number(parts.at(-1));
+    const rowIndex = Number(parts.at(-2));
+    const categoryId = parts.slice(0, -2).join(":");
+    if (!categoryId || !Number.isInteger(rowIndex) || rowIndex < 0 || !Number.isInteger(photoIndex) || photoIndex < 0) {
+      return null;
+    }
+    return {
+      image: `copy.serviceLanding.${categoryId}.featureRows.${rowIndex}.photos.${photoIndex}.src`,
+      remove: false,
+      texts: [
+        {
+          path: `copy.serviceLanding.${categoryId}.featureRows.${rowIndex}.photos.${photoIndex}.alt`,
+          label: "Image description",
+        },
+      ],
+    };
+  }
   if (kind === "offer") {
     const separator = id.lastIndexOf(":");
     const categoryId = separator > 0 ? id.slice(0, separator) : "";

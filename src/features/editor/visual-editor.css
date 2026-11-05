@@ -26,6 +26,19 @@ html[data-editing] [data-cms-gallery][data-empty]::before {
   font-weight: 600;
 }
 
+html[data-editing] [data-cms-card^="featurePhoto:"][data-empty] {
+  min-height: 10rem;
+  display: grid;
+  place-items: center;
+}
+
+html[data-editing] [data-cms-card^="featurePhoto:"][data-empty]::before {
+  content: "Add photo";
+  color: #2580cd;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 .editorBar,
 .editorPopover,
 .editorModal,
