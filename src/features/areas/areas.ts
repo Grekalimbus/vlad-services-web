@@ -145,6 +145,32 @@ export const serviceAreas: AreaRegion[] = [
 
 export const defaultAreaRegionId = serviceAreas[0]?.id ?? "san-diego";
 
+export type AreaCityRef = AreaCity & { regionId: string };
+
+export function allServiceCities(): AreaCityRef[] {
+  return serviceAreas.flatMap((region) =>
+    region.cities.map((city) => ({
+      ...city,
+      regionId: region.id,
+    })),
+  );
+}
+
+export function findCityRef(cityId: string): AreaCityRef | null {
+  for (const region of serviceAreas) {
+    const city = region.cities.find((item) => item.id === cityId);
+    if (city) return { ...city, regionId: region.id };
+  }
+  return null;
+}
+
+export const AREA_SELECT_EVENT = "primefix:select-area";
+
+export type AreaSelectDetail = {
+  regionId: string;
+  cityId: string | null;
+};
+
 export function areaMapSrc(lat: number, lng: number, zoom: number) {
   const params = new URLSearchParams({
     ll: `${lat},${lng}`,

@@ -39,6 +39,14 @@ const defaultDeals: DealItem[] = [
     kind: "image",
     alt: "Handyman tools ready for a home repair",
   },
+  {
+    id: "landscaping",
+    title: "Landscaping",
+    text: "Yard cleanup, planting, irrigation checks, and outdoor refresh work quoted before we arrive. Tell us the beds, the lawn edges, and the plants you want moved or replaced. We bring the tools for a single visit or a short punch list and leave the yard ready for the weekend.\n\nTypical landscaping deals cover seasonal cleanup, mulch and plant installs, hedge trimming, irrigation head adjustments, and the outdoor details that make the front of the house look finished. If the job needs heavy equipment, a new hardscape, or tree work beyond a trim, we say so on the call and connect you to the right scope instead of guessing.\n\nSend photos of the yard, the beds, and anything that is already failing. We quote the visit before a crew drives out, and the price we agree is the price when the list matches the property.",
+    media: "/works/interior-styled.jpg",
+    kind: "image",
+    alt: "Landscaping and outdoor refresh work",
+  },
 ];
 
 function pageOf(document: CmsDocument) {
@@ -61,14 +69,23 @@ function normalize(item: Partial<DealItem> | undefined, index: number): DealItem
 export function ensureDealsPage(document: CmsDocument): CmsDocument {
   const page = pageOf(document);
   if (page && Array.isArray(page.items)) {
-    const complete = Boolean(page.title?.trim()) && page.items.every((item) => item?.id && item.title?.trim() && item.media?.trim() && item.text?.trim());
-    if (complete) return document;
     const next = structuredClone(document);
     const current = pageOf(next);
     if (!current) return document;
     if (!current.title?.trim()) current.title = "Deals";
     current.items = current.items.map((item, index) => normalize(item, index));
-    return next;
+    const ids = new Set(current.items.map((item) => item.id));
+    for (const deal of defaultDeals) {
+      if (!ids.has(deal.id)) current.items.push({ ...deal });
+    }
+    const before = pageOf(document);
+    const beforeIds = before?.items?.map((item) => item.id).join("|") ?? "";
+    const afterIds = current.items.map((item) => item.id).join("|");
+    const unchanged =
+      Boolean(before?.title?.trim()) &&
+      beforeIds === afterIds &&
+      before?.items?.every((item) => item?.id && item.title?.trim() && item.media?.trim() && item.text?.trim());
+    return unchanged ? document : next;
   }
   const next = structuredClone(document);
   (next.copy as unknown as { dealsPage: DealsPageCopy }).dealsPage = {

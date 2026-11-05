@@ -3,11 +3,14 @@
 import { ChevronRight, ExternalLink, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
+  AREA_SELECT_EVENT,
   areaMapSrc,
   areaMapsLink,
   defaultAreaRegionId,
+  findCityRef,
   serviceAreas,
   type AreaRegion,
+  type AreaSelectDetail,
 } from "./areas";
 import styles from "./areas.module.css";
 
@@ -55,10 +58,34 @@ export function AreasSection({
   selectionRef.current = selection;
 
   useEffect(() => {
-    const stored = readSelection(storageKey, regions);
-    if (stored) setSelection(stored);
+    const params = new URLSearchParams(window.location.search);
+    const area = params.get("area");
+    const regionFromUrl = area ? regions.find((item) => item.id === area) : null;
+    const cityFromUrl = area && !regionFromUrl ? findCityRef(area) : null;
+    if (regionFromUrl) {
+      setSelection({ regionId: regionFromUrl.id, cityId: null });
+    } else if (cityFromUrl) {
+      setSelection({ regionId: cityFromUrl.regionId, cityId: cityFromUrl.id });
+    } else {
+      const stored = readSelection(storageKey, regions);
+      if (stored) setSelection(stored);
+    }
     setReady(true);
   }, [regions, storageKey]);
+
+  useEffect(() => {
+    const onSelect = (event: Event) => {
+      const detail = (event as CustomEvent<AreaSelectDetail>).detail;
+      if (!detail?.regionId) return;
+      const region = regions.find((item) => item.id === detail.regionId);
+      if (!region) return;
+      const cityId = detail.cityId && region.cities.some((city) => city.id === detail.cityId) ? detail.cityId : null;
+      setSelection({ regionId: region.id, cityId });
+      setShowAll(true);
+    };
+    window.addEventListener(AREA_SELECT_EVENT, onSelect);
+    return () => window.removeEventListener(AREA_SELECT_EVENT, onSelect);
+  }, [regions]);
 
   useEffect(() => {
     if (!ready) return;

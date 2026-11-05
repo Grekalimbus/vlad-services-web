@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { addDeal } from "@/features/editor/deal-actions";
 import { dealsPage } from "@/lib/cms/deals-page";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
@@ -17,6 +17,18 @@ export function DealsPageView() {
   const index = page.items.length === 0 ? 0 : Math.min(active, page.items.length - 1);
   const deal = page.items[index];
 
+  useEffect(() => {
+    const sync = () => {
+      const id = window.location.hash.replace(/^#/, "");
+      if (!id) return;
+      const next = page.items.findIndex((item) => item.id === id);
+      if (next >= 0) setActive(next);
+    };
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, [page.items]);
+
   return (
     <PageFrame light flush eyebrow="Deals" title={page.title} hero={<></>}>
       <div className={styles.layout}>
@@ -31,7 +43,12 @@ export function DealsPageView() {
                   type="button"
                   className={styles.item}
                   aria-current={itemIndex === index ? "true" : undefined}
-                  onClick={() => setActive(itemIndex)}
+                  onClick={() => {
+                    setActive(itemIndex);
+                    const url = new URL(window.location.href);
+                    url.hash = item.id;
+                    window.history.replaceState(null, "", url);
+                  }}
                 >
                   {item.title}
                 </button>

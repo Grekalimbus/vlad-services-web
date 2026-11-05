@@ -5,8 +5,8 @@ import { fallbackDocument } from "./read";
 import type { CmsDocument, CmsEnv } from "./types";
 import { inspectMedia, mediaKey, publicMediaPath, validateDocument } from "./validate";
 
-const COMPANY_EMAIL = "info@primefix.com";
-const PREVIOUS_COMPANY_EMAILS = ["info@primefixpros.com", "info@primefixhandyman.com"];
+const COMPANY_EMAIL = "info@primefixpros.com";
+const PREVIOUS_COMPANY_EMAILS = ["info@primefix.com", "info@primefixhandyman.com"];
 
 export function withCompanyEmail(document: CmsDocument): CmsDocument {
   let json = JSON.stringify(document);

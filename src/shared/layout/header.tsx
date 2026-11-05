@@ -22,7 +22,9 @@ export function Header() {
 	const path = pathname.replace(/\/$/, "");
 	const admin = path === "/admin" || path.startsWith("/admin/");
 	const solid =
-		path === "/deals" || isServicePageSlug(path.startsWith("/services/") ? path.slice("/services/".length) : "");
+		path === "/deals" ||
+		path === "/blog" ||
+		isServicePageSlug(path.startsWith("/services/") ? path.slice("/services/".length) : "");
 
 	useEffect(() => {
 		const updateHeader = () => {

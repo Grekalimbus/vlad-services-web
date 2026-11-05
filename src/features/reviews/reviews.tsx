@@ -6,6 +6,7 @@ import { useCms } from "@/lib/cms/use-cms";
 import { angiListing, angiProfileUrl, angiReviews } from "@/lib/angi-reviews";
 import { googleListing, googleReviews } from "@/lib/google-reviews";
 import { yelpListing, yelpReviews } from "@/lib/yelp-reviews";
+import { socialLinks } from "@/lib/social";
 import { YelpIcon } from "@/shared/brand-icons";
 import shared from "@/styles/shared.module.css";
 import styles from "./reviews.module.css";
@@ -140,15 +141,15 @@ export function Reviews() {
                 <GoogleMark />
                 <span className={shared.visuallyHidden}>Google reviews</span>
               </button>
-              <button
-                type="button"
-                className={source === "yelp" ? styles.sourceActive : styles.source}
-                aria-pressed={source === "yelp"}
-                onClick={() => selectSource("yelp")}
+              <a
+                href={socialLinks.bbb}
+                className={styles.source}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <YelpIcon className={styles.yelpMark} />
-                <span className={shared.visuallyHidden}>Yelp reviews</span>
-              </button>
+                <BbbMark />
+                <span className={shared.visuallyHidden}>BBB reviews</span>
+              </a>
               <button
                 type="button"
                 className={source === "angi" ? styles.sourceActive : styles.source}
@@ -157,6 +158,15 @@ export function Reviews() {
               >
                 <AngiMark />
                 <span className={shared.visuallyHidden}>Angi reviews</span>
+              </button>
+              <button
+                type="button"
+                className={source === "yelp" ? styles.sourceActive : styles.source}
+                aria-pressed={source === "yelp"}
+                onClick={() => selectSource("yelp")}
+              >
+                <YelpIcon className={styles.yelpMark} />
+                <span className={shared.visuallyHidden}>Yelp reviews</span>
               </button>
             </span>
           </p>
@@ -285,6 +295,13 @@ function AngiMark() {
         d="M12 2.2 3.6 21h3.15l1.55-3.45h7.4L17.25 21H20.4L12 2.2Zm0 5.1 2.72 6.05H9.28L12 7.3Z"
       />
     </svg>
+  );
+}
+
+function BbbMark() {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/hero/badges/bbb.svg" alt="" className={styles.bbbMark} />
   );
 }
 
