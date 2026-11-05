@@ -14,20 +14,26 @@ export type TvOfferCopy = {
   note: string;
 };
 
-export type TvQuizOption = { id: string; title: string; text: string };
+export type TvQuizOption = { id: string; title: string; text: string; accentText?: string };
 
-export type TvQuizStep = { id: string; lead: string; accent: string; options: TvQuizOption[] };
+export type TvQuizStep = { id: string; lead: string; accent: string; options: TvQuizOption[]; multiple?: boolean };
 
 export type TvQuizFormCopy = { lead: string; accent: string; button: string };
 
-type SavedQuizStep = { lead?: string; accent?: string; options?: { title?: string; text?: string }[] };
+type SavedQuizStep = {
+  id?: string;
+  lead?: string;
+  accent?: string;
+  multiple?: boolean;
+  options?: { title?: string; text?: string; accentText?: string }[];
+};
 
 type TvDocument = CmsDocument & {
   copy: CmsDocument["copy"] & {
     plan: CmsDocument["copy"]["plan"] & {
       descriptions?: Record<string, string>;
       offers?: Record<string, Partial<TvOfferCopy>>;
-      quiz?: { steps?: SavedQuizStep[]; form?: Partial<TvQuizFormCopy> };
+      quiz?: { schemaVersion?: number; steps?: SavedQuizStep[]; form?: Partial<TvQuizFormCopy> };
     };
     additionals: CmsDocument["copy"]["additionals"] & { cards: AdditionalCard[] };
     tvShowcase?: { cards: TvShowcaseCard[] };
@@ -98,25 +104,14 @@ const defaultOffers: Record<(typeof offerIds)[number], TvOfferCopy> = {
 
 const defaultQuiz: TvQuizStep[] = [
   {
-    id: "room",
-    lead: "Where will",
-    accent: "the TV go?",
+    id: "size",
+    lead: "What size",
+    accent: "is the TV?",
     options: [
-      { id: "living", title: "Living room", text: "The main family wall." },
-      { id: "bedroom", title: "Bedroom", text: "Across from the bed." },
-      { id: "fireplace", title: "Fireplace", text: "Above the mantel." },
-      { id: "other", title: "Another room", text: "Office, kitchen, or garage." },
-    ],
-  },
-  {
-    id: "mount",
-    lead: "Which mount",
-    accent: "do you need?",
-    options: [
-      { id: "fixed", title: "Fixed mount", text: "Sits flush on the wall." },
-      { id: "tilt", title: "Tilting mount", text: "Tilts down toward you." },
-      { id: "motion", title: "Full-motion", text: "Pulls out and swivels." },
-      { id: "ceiling", title: "Ceiling mount", text: "Hangs from the ceiling." },
+      { id: "small", title: '43" or smaller', text: "$109" },
+      { id: "medium", title: '50–55"', text: "$149" },
+      { id: "popular", title: '60–65"', text: "$189", accentText: "MOST POPULAR" },
+      { id: "large", title: '70–75"', text: "$219" },
     ],
   },
   {
@@ -128,19 +123,43 @@ const defaultQuiz: TvQuizStep[] = [
       { id: "masonry", title: "Brick or stone", text: "Needs masonry anchors." },
       { id: "wood", title: "Wood panel", text: "Wood panel or feature." },
       { id: "unsure", title: "Not sure", text: "Checked on the visit." },
+      { id: "unsure-copy", title: "Not sure", text: "Checked on the visit." },
     ],
   },
   {
-    id: "size",
-    lead: "What size",
-    accent: "is the TV?",
+    id: "mount",
+    lead: "Which mount",
+    accent: "do you need?",
     options: [
-      { id: "43", title: '43" or smaller', text: "Compact bedroom or office." },
-      { id: "55", title: '50–55"', text: "Fits most living rooms." },
-      { id: "65", title: '65"', text: "Our most common size." },
-      { id: "75", title: '75"', text: "Needs a stronger mount." },
-      { id: "85", title: '85" or larger', text: "We confirm the wall." },
-      { id: "unsure", title: "Not sure yet", text: "Size checked on site." },
+      { id: "fixed", title: "Fixed mount", text: "+$39" },
+      { id: "tilt", title: "Tilting mount", text: "+$59" },
+      { id: "motion", title: "Full-motion", text: "+$79" },
+      { id: "ceiling", title: "Ceiling mount", text: "+$89" },
+    ],
+  },
+  {
+    id: "wires",
+    lead: "Would you like to",
+    accent: "hide the wires?",
+    options: [
+      { id: "in-wall", title: "In-wall", text: "+$149" },
+      { id: "external", title: "External cover", text: "+$79" },
+      { id: "no", title: "No, thank you", text: "+$0" },
+      { id: "unsure", title: "Not sure", text: "Checked on site" },
+    ],
+  },
+  {
+    id: "extras",
+    lead: "Choose any",
+    accent: "extras",
+    multiple: true,
+    options: [
+      { id: "extra-1", title: "Test title", text: "+$777" },
+      { id: "extra-2", title: "Test title", text: "+$777" },
+      { id: "extra-3", title: "Test title", text: "+$777" },
+      { id: "extra-4", title: "Test title", text: "+$777" },
+      { id: "extra-5", title: "Test title", text: "+$777" },
+      { id: "extra-6", title: "Test title", text: "+$777" },
     ],
   },
 ];
@@ -150,6 +169,8 @@ const defaultQuizForm: TvQuizFormCopy = {
   accent: "$30 quote",
   button: "Get my Quote & $30",
 };
+
+const quizSchemaVersion = 4;
 
 export function isDiscountCard(id: string): id is (typeof offerIds)[number] {
   return (offerIds as readonly string[]).includes(id);
@@ -198,11 +219,13 @@ function tvReady(document: CmsDocument) {
   );
   const quiz = copy.plan.quiz;
   const quizReady = Boolean(
+    quiz?.schemaVersion === quizSchemaVersion &&
     quiz?.form?.lead?.trim() &&
       quiz.form.accent?.trim() &&
       quiz.form.button?.trim() &&
+      (quiz.steps?.length ?? 0) >= defaultQuiz.length &&
       defaultQuiz.every((step, index) => {
-        const saved = quiz.steps?.[index];
+        const saved = quiz.steps?.find((item) => item.id === step.id) ?? quiz.steps?.[index];
         return Boolean(
           saved?.lead?.trim() && saved.accent?.trim() && (saved.options?.length ?? 0) >= step.options.length,
         );
@@ -268,6 +291,7 @@ export function ensureTvMounting(document: CmsDocument): CmsDocument {
   }
   next.copy.plan.offers = offers;
   next.copy.plan.quiz = {
+    schemaVersion: quizSchemaVersion,
     steps: planQuiz(next),
     form: planQuizForm(next),
   };
@@ -292,19 +316,35 @@ export function planOffers(document: CmsDocument) {
 }
 
 export function planQuiz(document: CmsDocument): TvQuizStep[] {
-  const saved = asTv(document).copy.plan.quiz?.steps ?? [];
+  const quiz = asTv(document).copy.plan.quiz;
+  const saved = quiz?.steps ?? [];
+  const currentSchema = quiz?.schemaVersion === quizSchemaVersion;
+  const hasIndependentWallCard = (quiz?.schemaVersion ?? 0) >= 2;
   return defaultQuiz.map((step, index) => {
-    const current = saved[index];
+    const candidate = saved.find((item) => item.id === step.id) ?? (
+      saved[index]?.id === step.id ? saved[index] : undefined
+    );
+    const heading = `${candidate?.lead ?? ""} ${candidate?.accent ?? ""}`.toLowerCase();
+    const expectedWord = step.id === "size" ? "size" : step.id === "wires" ? "wire" : step.id;
+    const current = currentSchema || hasIndependentWallCard || heading.includes(expectedWord) ? candidate : undefined;
     return {
       id: step.id,
       lead: current?.lead?.trim() || step.lead,
       accent: current?.accent?.trim() || step.accent,
+      multiple: step.multiple,
       options: step.options.map((option, optionIndex) => {
-        const savedOption = current?.options?.[optionIndex];
+        const savedOption = !hasIndependentWallCard && step.id === "wall" && optionIndex === 4
+          ? current?.options?.[3]
+          : current?.options?.[optionIndex];
+        const savedText = savedOption?.text?.trim();
+        const text = option.accentText && savedText
+          ? savedText.replace(/\s*most popular\s*/i, "").trim()
+          : savedText;
         return {
           id: option.id,
           title: savedOption?.title?.trim() || option.title,
-          text: savedOption?.text?.trim() || option.text,
+          text: text || option.text,
+          accentText: savedOption?.accentText?.trim() || option.accentText,
         };
       }),
     };

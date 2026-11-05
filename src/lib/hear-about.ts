@@ -10,4 +10,5 @@ export const hearAboutOptions = [
 	"Real Estate Agent",
 	"Offer-up",
 	"AI (GPT, GEMINI, others...)",
+	"Other",
 ] as const;

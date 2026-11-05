@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { FormEvent, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { isDiscountCard, planDescriptions, planQuiz, planQuizForm, type TvQuizStep } from "@/lib/cms/tv-page";
 import { peekReveal, revealSurface, subscribeReveal } from "@/lib/cms/reveal";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
@@ -26,6 +26,7 @@ export function Plan() {
 	const [offer, setOffer] = useState<"2" | "3" | "4plus" | null>(null);
 	const [step, setStep] = useState(0);
 	const [answers, setAnswers] = useState<Record<string, string>>({});
+	const [multiAnswers, setMultiAnswers] = useState<Record<string, string[]>>({});
 	const headingRef = useRef<HTMLHeadingElement>(null);
 	const revealedOffer = revealed?.startsWith("tv-offer:") ? revealed.slice("tv-offer:".length) : "";
 	const editingOffer = isDiscountCard(revealedOffer) ? revealedOffer : null;
@@ -50,7 +51,7 @@ export function Plan() {
 
 	useEffect(() => {
 		if (step === 0) return;
-		headingRef.current?.focus();
+		headingRef.current?.focus({ preventScroll: true });
 	}, [step]);
 
 	return (
@@ -64,24 +65,7 @@ export function Plan() {
 				<span className={`${styles.arc} ${styles.arcRightInner}`} />
 				<span className={styles.dots} />
 			</div>
-			<div className={question && question.options.length > 4 ? `${styles.inner} ${styles.innerWide}` : styles.inner}>
-				{step > 0 ? (
-					<>
-						<p className={styles.progress}>
-							Step {step + 1} of {total}
-						</p>
-						<ol className={styles.meter} aria-hidden="true">
-							{Array.from({ length: total }, (_, index) => (
-								<li key={index} className={index <= step ? styles.meterOn : undefined} />
-							))}
-						</ol>
-					</>
-				) : null}
-				{step > 0 ? (
-					<button type="button" className={styles.back} onClick={() => setStep((current) => Math.max(0, current - 1))}>
-						Back
-					</button>
-				) : null}
+			<div className={styles.inner}>
 				<h2 id="plan-heading" ref={headingRef} tabIndex={-1} className={styles.heading}>
 					<span data-cms={heading.leadPath}>{heading.lead}</span>{" "}
 					<span className={styles.accent} data-cms={heading.accentPath}>
@@ -89,8 +73,9 @@ export function Plan() {
 					</span>
 				</h2>
 				{step === 0 ? (
-				<ul className={styles.options} role="radiogroup" aria-labelledby="plan-heading">
-					{tvCounts.map((item) => {
+					<>
+						<ul className={styles.options} role="radiogroup" aria-labelledby="plan-heading">
+							{tvCounts.map((item) => {
 						const active = selected === item.id;
 						const discount = isDiscountCard(item.id) ? item.id : null;
 						return (
@@ -127,46 +112,69 @@ export function Plan() {
 										}}
 										className={shared.visuallyHidden}
 									/>
-									<span className={styles.radio} aria-hidden="true" />
-									<TvStack screens={item.screens} />
 									<span className={styles.caption}>
 										<span className={styles.label} data-cms={`copy.plan.labels.${item.id}`}>{labels[item.id] ?? item.count}</span>
+										<TvStack screens={item.screens} />
 										<span className={styles.note} data-cms={`copy.plan.descriptions.${item.id}`}>{notes[item.id]}</span>
 									</span>
 								</label>
 							</li>
 						);
-					})}
-				</ul>
+							})}
+						</ul>
+						<TrustIcons />
+					</>
 				) : question ? (
-					<ul className={question.options.length > 4 ? `${styles.choices} ${styles.choicesSix}` : styles.choices}>
-						{question.options.map((option, index) => (
-							<li key={option.id}>
-								<div
-									role="button"
-									tabIndex={0}
-									className={styles.choice}
-									onClick={(event) => {
-										if (editing && (event.target as HTMLElement).closest("[data-cms]")) return;
-										setAnswers((current) => ({ ...current, [question.id]: option.title }));
-										setStep((current) => current + 1);
-									}}
-									onKeyDown={(event) => {
-										if (event.key !== "Enter" && event.key !== " ") return;
-										event.preventDefault();
-										setAnswers((current) => ({ ...current, [question.id]: option.title }));
-										setStep((current) => current + 1);
-									}}
-								>
-									<span className={styles.choiceTitle} data-cms={`copy.plan.quiz.steps.${step - 1}.options.${index}.title`}>
-										{option.title}
-									</span>
-									<span className={styles.choiceText} data-cms={`copy.plan.quiz.steps.${step - 1}.options.${index}.text`}>
-										{option.text}
-									</span>
-								</div>
-							</li>
-						))}
+					<ul
+						className={styles.choices}
+						aria-label={question.multiple ? "Choose one or more options" : undefined}
+						style={{ "--choice-count": question.options.length } as CSSProperties}
+					>
+						{question.options.map((option, index) => {
+							const selectedOptions = multiAnswers[question.id] ?? [];
+							const active = question.multiple && selectedOptions.includes(option.id);
+							return (
+								<li key={option.id}>
+									<button
+										type="button"
+										aria-pressed={question.multiple ? active : undefined}
+										className={active ? `${styles.choice} ${styles.choiceActive}` : styles.choice}
+										onClick={(event) => {
+											if (editing && (event.target as HTMLElement).closest("[data-cms]")) return;
+											if (question.multiple) {
+												setMultiAnswers((current) => {
+													const values = current[question.id] ?? [];
+													const next = values.includes(option.id)
+														? values.filter((id) => id !== option.id)
+														: [...values, option.id];
+													return { ...current, [question.id]: next };
+												});
+												return;
+											}
+											setAnswers((current) => ({ ...current, [question.id]: option.title }));
+											setStep((current) => current + 1);
+										}}
+									>
+										<span className={styles.choiceTitle} data-cms={`copy.plan.quiz.steps.${step - 1}.options.${index}.title`}>
+											{option.title}
+										</span>
+										<span className={styles.choiceDescription}>
+											<span className={styles.choiceText} data-cms={`copy.plan.quiz.steps.${step - 1}.options.${index}.text`}>
+												{option.text}
+											</span>
+											{option.accentText ? (
+												<span
+													className={styles.choiceTextAccent}
+													data-cms={`copy.plan.quiz.steps.${step - 1}.options.${index}.accentText`}
+												>
+													{option.accentText}
+												</span>
+											) : null}
+										</span>
+									</button>
+								</li>
+							);
+						})}
 					</ul>
 				) : (
 					<QuizForm
@@ -175,6 +183,49 @@ export function Plan() {
 						steps={quiz}
 					/>
 				)}
+				{step > 0 ? (
+					<>
+						<ol
+							className={styles.meter}
+							aria-label={`Step ${step + 1} of ${total}`}
+						>
+							{Array.from({ length: total }, (_, index) => {
+								const active = index <= step;
+								const current = index === step;
+								return (
+									<li key={index} className={active ? styles.meterOn : undefined}>
+										{current ? (
+											<span className={styles.meterStep} aria-hidden="true">
+												{step + 1}
+											</span>
+										) : null}
+									</li>
+								);
+							})}
+						</ol>
+						<div className={question?.multiple ? styles.navActions : `${styles.navActions} ${styles.navActionsSingle}`}>
+							<button type="button" className={styles.back} onClick={() => setStep((current) => Math.max(0, current - 1))}>
+								Back
+							</button>
+							{question?.multiple ? (
+								<button
+									type="button"
+									className={styles.continue}
+									onClick={() => {
+										const selectedIds = multiAnswers[question.id] ?? [];
+										const selectedTitles = question.options
+											.filter((option) => selectedIds.includes(option.id))
+											.map((option) => option.title);
+										setAnswers((current) => ({ ...current, [question.id]: selectedTitles.join(", ") }));
+										setStep((current) => current + 1);
+									}}
+								>
+									Continue
+								</button>
+							) : null}
+						</div>
+					</>
+				) : null}
 			</div>
 			{activeOffer && isDiscountCard(activeOffer) ? (
 				<TvDiscountDialog
@@ -186,6 +237,44 @@ export function Plan() {
 				/>
 			) : null}
 		</section>
+	);
+}
+
+function TrustIcons() {
+	return (
+		<ul className={styles.trustIcons} aria-label="Quality, reliability, professionalism, safety, and value">
+			<li aria-label="Quality">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<path d="m12 3 2.1 2.2 3-.4.5 3 2.6 1.5-1.4 2.7 1.4 2.7-2.6 1.5-.5 3-3-.4L12 21l-2.1-2.2-3 .4-.5-3-2.6-1.5L5.2 12 3.8 9.3l2.6-1.5.5-3 3 .4L12 3Z" />
+					<path d="m8.8 12 2.1 2.1 4.5-4.5" />
+				</svg>
+			</li>
+			<li aria-label="Reliability">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<path d="M12 3.2 19 6v5.2c0 4.2-2.8 7.8-7 9.6-4.2-1.8-7-5.4-7-9.6V6l7-2.8Z" />
+					<path d="m8.8 12 2 2 4.5-4.5" />
+				</svg>
+			</li>
+			<li aria-label="Professionalism">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<path d="M8 7V5.7C8 4.8 8.8 4 9.7 4h4.6c.9 0 1.7.8 1.7 1.7V7" />
+					<rect x="3.5" y="7" width="17" height="12.5" rx="2.2" />
+					<path d="M3.8 11.5c5.3 2.2 11.1 2.2 16.4 0M10.2 12.8h3.6" />
+				</svg>
+			</li>
+			<li aria-label="Safety">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<rect x="5" y="10" width="14" height="10" rx="2.2" />
+					<path d="M8 10V7.5a4 4 0 0 1 8 0V10M12 14v2.5" />
+				</svg>
+			</li>
+			<li aria-label="Value">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<circle cx="12" cy="12" r="8.5" />
+					<path d="M14.8 8.7c-.7-.6-1.6-.9-2.7-.9-1.5 0-2.7.8-2.7 2s1.1 1.7 2.8 2.1 2.8.9 2.8 2.2-1.2 2.2-2.9 2.2c-1.1 0-2.2-.4-3-1.1M12 6.2v11.6" />
+				</svg>
+			</li>
+		</ul>
 	);
 }
 
@@ -207,20 +296,21 @@ function QuizForm({
 	const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 	const [formError, setFormError] = useState("");
 	const [hearAbout, setHearAbout] = useState("");
-	const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
+	const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; hearAbout?: boolean }>({});
 
 	async function onSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (editing) return;
 		const name = String(new FormData(event.currentTarget).get("name") ?? "").trim();
-		const next: { name?: string; phone?: string } = {};
-		if (name.length < 2) next.name = "Enter your name.";
-		if (nationalDigits(phoneField.phone).length !== 10) next.phone = "Enter a phone number.";
+		const next: { name?: boolean; phone?: boolean; hearAbout?: boolean } = {};
+		if (name.length < 2) next.name = true;
+		if (nationalDigits(phoneField.phone).length !== 10) next.phone = true;
+		if (!hearAbout) next.hearAbout = true;
 		setErrors(next);
 		setFormError("");
 		if (Object.keys(next).length > 0) {
 			setStatus("error");
-			document.getElementById(next.name ? nameId : phoneId)?.focus();
+			document.getElementById(next.name ? nameId : next.phone ? phoneId : hearId)?.focus();
 			return;
 		}
 		const fields: Record<string, string> = {
@@ -228,11 +318,11 @@ function QuizForm({
 			phone: phoneField.phone,
 			service: "1 TV quote",
 			tvCount: "1",
+			hearAbout,
 		};
 		for (const item of steps) {
 			if (answers[item.id]) fields[item.id] = answers[item.id];
 		}
-		if (hearAbout) fields.hearAbout = hearAbout;
 		setStatus("loading");
 		try {
 			await submitLead(
@@ -277,10 +367,13 @@ function QuizForm({
 					name="name"
 					autoComplete="name"
 					placeholder="Your name"
+					required
 					className={errors.name ? `${styles.quizInput} ${styles.quizInvalid}` : styles.quizInput}
 					aria-invalid={errors.name ? true : undefined}
+					onChange={() => {
+						if (errors.name) setErrors((current) => ({ ...current, name: undefined }));
+					}}
 				/>
-				{errors.name ? <p className={styles.quizError}>{errors.name}</p> : null}
 			</div>
 			<div className={styles.quizField}>
 				<label className={shared.visuallyHidden} htmlFor={phoneId}>
@@ -295,6 +388,7 @@ function QuizForm({
 					autoComplete="tel"
 					placeholder="+1 (___) ___-____"
 					value={phoneField.phone}
+					required
 					onChange={(event) => {
 						const count = phoneField.onPhoneChange(event);
 						if (errors.phone && count === 10) setErrors((current) => ({ ...current, phone: undefined }));
@@ -303,7 +397,6 @@ function QuizForm({
 					className={errors.phone ? `${styles.quizInput} ${styles.quizInvalid}` : styles.quizInput}
 					aria-invalid={errors.phone ? true : undefined}
 				/>
-				{errors.phone ? <p className={styles.quizError}>{errors.phone}</p> : null}
 			</div>
 			<div className={styles.quizField}>
 				<label className={shared.visuallyHidden} htmlFor={hearId}>
@@ -313,8 +406,21 @@ function QuizForm({
 					id={hearId}
 					name="hearAbout"
 					value={hearAbout}
-					onChange={(event) => setHearAbout(event.target.value)}
-					className={hearAbout ? styles.quizSelect : `${styles.quizSelect} ${styles.quizSelectEmpty}`}
+					required
+					onChange={(event) => {
+						setHearAbout(event.target.value);
+						if (errors.hearAbout && event.target.value) {
+							setErrors((current) => ({ ...current, hearAbout: undefined }));
+						}
+					}}
+					className={[
+						styles.quizSelect,
+						hearAbout ? undefined : styles.quizSelectEmpty,
+						errors.hearAbout ? styles.quizInvalid : undefined,
+					]
+						.filter(Boolean)
+						.join(" ")}
+					aria-invalid={errors.hearAbout ? true : undefined}
 				>
 					<option value="">How did you hear about us?</option>
 					{hearAboutOptions.map((option) => (

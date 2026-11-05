@@ -12,9 +12,9 @@
 .shade.shade {
   background: linear-gradient(
     to top,
-    rgb(0 0 0 / 0.82) 0%,
-    rgb(0 0 0 / 0.42) 42%,
-    transparent 68%
+    rgb(0 0 0 / 0.62) 0%,
+    rgb(0 0 0 / 0.22) 34%,
+    transparent 58%
   );
 }
 

@@ -25,7 +25,6 @@ export function ServicesOverview() {
         </h2>
         <div className={styles.rows}>
           {rows.map((row, rowIndex) => {
-            const startIndex = rows.slice(0, rowIndex).reduce((sum, item) => sum + item.length, 0);
             const compact = row.length > 3;
             const short = rowIndex > 0 && row.length < 4;
             return (
@@ -34,7 +33,7 @@ export function ServicesOverview() {
                 className={[styles.strip, compact ? styles.stripCompact : "", short ? styles.stripShort : ""].filter(Boolean).join(" ")}
                 style={{ "--count": compact ? 4 : 3 } as CSSProperties}
               >
-                {row.map((category, index) => {
+                {row.map((category) => {
                   const sourceIndex = cms.serviceCategories.findIndex((item) => item.id === category.id);
                   const coverIndex = cms.copy.home.serviceCovers.findIndex((item) => item.id === category.id);
                   const cover = covers[category.id];
@@ -61,9 +60,6 @@ export function ServicesOverview() {
                           />
                         ) : null}
                         <span className={styles.shade} aria-hidden="true" />
-                        <span className={styles.index} aria-hidden="true">
-                          {String(startIndex + index + 1).padStart(2, "0")}
-                        </span>
                         <span className={styles.footer}>
                           <span className={styles.title} data-cms={`serviceCategories.${sourceIndex}.name`}>
                             {category.name}

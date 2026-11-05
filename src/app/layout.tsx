@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo_Black, Inter } from "next/font/google";
+import { Archivo_Black, Inter, Sora, Space_Grotesk } from "next/font/google";
 import Script from "next/script";
 import { Header, Providers } from "@/shared/layout";
 import { CmsBoundary } from "@/lib/cms/boundary";
@@ -19,6 +19,18 @@ const display = Archivo_Black({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-display",
+  display: "swap",
+});
+
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-sora",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
   display: "swap",
 });
 
@@ -78,7 +90,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const cms = await bindCms();
   const payload = JSON.stringify(cms).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable}`}>
+    <html lang="en" className={`${sans.variable} ${display.variable} ${sora.variable} ${spaceGrotesk.variable}`}>
       <body className={styles.body}>
         <script id="cms-data" dangerouslySetInnerHTML={{ __html: `window.__CMS__=${payload}` }} />
         <a

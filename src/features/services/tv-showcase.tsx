@@ -36,9 +36,6 @@ export function TvShowcase() {
                   />
                 ) : null}
                 <span className={`${overview.shade} ${styles.shade}`} aria-hidden="true" />
-                <span className={overview.index} aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
                 <span className={overview.footer}>
                   <span className={styles.copy}>
                     <span className={overview.title} data-cms={`copy.tvShowcase.cards.${index}.title`}>
