@@ -28,12 +28,12 @@ export type ElectricalLanding = {
 
 export const electricalLanding: ElectricalLanding = {
   icons: [
-    { src: "/services/icons/chandelier.svg", alt: "Chandelier", text: "Chandeliers hung level" },
-    { src: "/services/icons/ceiling-light.svg", alt: "Ceiling light", text: "Ceiling lights, flush fit" },
-    { src: "/services/icons/ceiling-fan.svg", alt: "Ceiling fan", text: "Ceiling fans, braced" },
-    { src: "/services/icons/outlet.svg", alt: "Outlet", text: "Outlets set flat" },
-    { src: "/services/icons/dimmer-switch.svg", alt: "Dimmer switch", text: "Dimmers for the fixture" },
-    { src: "/services/icons/breaker-panel.svg", alt: "Breaker panel", text: "Panels checked on site" },
+    { src: "/services/icons/chandelier.webp", alt: "Chandelier", text: "Chandeliers hung level" },
+    { src: "/services/icons/ceiling-light.webp", alt: "Ceiling light", text: "Ceiling lights, flush fit" },
+    { src: "/services/icons/ceiling-fan.webp", alt: "Ceiling fan", text: "Ceiling fans, braced" },
+    { src: "/services/icons/outlet.webp", alt: "Outlet", text: "Outlets set flat" },
+    { src: "/services/icons/dimmer-switch.webp", alt: "Dimmer switch", text: "Dimmers for the fixture" },
+    { src: "/services/icons/breaker-panel.webp", alt: "Breaker panel", text: "Panels checked on site" },
   ],
   description: {
     title: "Electrician",
@@ -114,12 +114,16 @@ type LandingDocument = CmsDocument & {
   };
 };
 
+function normalizeIconSrc(src: string) {
+  return src.replace(/\/services\/icons\/([^/?#]+)\.svg\b/i, "/services/icons/$1.webp");
+}
+
 function mergeIcons(saved: ElectricalLanding["icons"] | undefined) {
   const source = saved?.length ? saved : electricalLanding.icons;
   return source.map((icon, index) => {
     const fallback = electricalLanding.icons[index];
     return {
-      src: icon.src || fallback?.src || "",
+      src: normalizeIconSrc(icon.src || fallback?.src || ""),
       alt: icon.alt || fallback?.alt || "",
       text: icon.text || fallback?.text || icon.alt || "",
     };

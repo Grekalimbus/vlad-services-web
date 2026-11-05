@@ -241,7 +241,18 @@ function LandingIcon({ src }: { src: string }) {
     const Icon = glyphs[src.slice("lucide:".length)] ?? Wrench;
     return <Icon className={styles.iconGlyph} strokeWidth={1.35} aria-hidden="true" />;
   }
-  return <img src={assetPath(src)} alt="" width={88} height={88} className={styles.iconImage} />;
+  return (
+    <Image
+      src={assetPath(src)}
+      alt=""
+      width={88}
+      height={88}
+      sizes="88px"
+      loading="lazy"
+      unoptimized={src.startsWith("/api/media/")}
+      className={styles.iconImage}
+    />
+  );
 }
 
 function PriceGrid({

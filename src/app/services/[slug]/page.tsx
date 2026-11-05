@@ -34,17 +34,22 @@ export default async function ServicePage({
   if (!landing) notFound();
   const data = <JsonLd data={pageMeta(`/services/${slug}`, cms).jsonLd} />;
 
+  const path = `/services/${slug}`;
+
   if (landing.id === "tv-mounting") {
+    const { PlanFontScope } = await import("@/features/services/plan-font-scope");
     return (
-      <CmsPage>
+      <CmsPage path={path}>
         {data}
-        <TvMountingPage />
+        <PlanFontScope>
+          <TvMountingPage />
+        </PlanFontScope>
       </CmsPage>
     );
   }
 
   return (
-    <CmsPage>
+    <CmsPage path={path}>
       {data}
       <CategoryLanding category={landing} />
     </CmsPage>

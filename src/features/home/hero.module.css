@@ -220,6 +220,7 @@
 }
 
 .builder {
+	aspect-ratio: 720 / 690;
 	width: auto;
 	height: 100%;
 	max-width: 100%;

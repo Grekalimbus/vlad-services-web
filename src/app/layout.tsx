@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo_Black, Inter, Sora, Space_Grotesk } from "next/font/google";
+import { Archivo_Black, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
-import { Header, Providers } from "@/shared/layout";
-import { CmsBoundary } from "@/lib/cms/boundary";
-import { bindCms, loadCms } from "@/lib/cms/load";
+import { loadCms } from "@/lib/cms/load";
 import { pageMeta, publicOrigin } from "@/lib/seo";
 import styles from "./layout.module.css";
 import "./globals.css";
 
 const sans = Inter({
   subsets: ["latin"],
+  // Variable font stays smaller than shipping 6 static weight files, and keeps
+  // next/font preload of the primary latin file.
   variable: "--font-sans",
   display: "swap",
   preload: true,
+  adjustFontFallback: true,
 });
 
 const display = Archivo_Black({
@@ -21,6 +22,7 @@ const display = Archivo_Black({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
+  preload: true,
 });
 
 const technor = localFont({
@@ -28,18 +30,7 @@ const technor = localFont({
   variable: "--font-technor",
   weight: "200 900",
   display: "swap",
-});
-
-const sora = Sora({
-  subsets: ["latin"],
-  variable: "--font-sora",
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  display: "swap",
+  preload: true,
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -94,25 +85,11 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const cms = await bindCms();
-  const payload = JSON.stringify(cms).replaceAll("<", "\\u003c").replaceAll("&", "\\u0026");
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable} ${technor.variable} ${sora.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${sans.variable} ${display.variable} ${technor.variable}`}>
       <body className={styles.body}>
-        <script id="cms-data" dangerouslySetInnerHTML={{ __html: `window.__CMS__=${payload}` }} />
-        <a
-          href="#content"
-          className={styles.skipLink}
-        >
-          Skip to content
-        </a>
-        <CmsBoundary document={cms}>
-          <Providers>
-            <Header />
-            {children}
-          </Providers>
-        </CmsBoundary>
+        {children}
         <Script id="mcjs" strategy="lazyOnload">
           {`!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/fd729067f80f2636fa3af1284/f7e51600948470605b7f2acd3.js");`}
         </Script>

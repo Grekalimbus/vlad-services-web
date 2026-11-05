@@ -12,7 +12,7 @@ export function generateMetadata() {
 export default async function PrivacyPolicyPage() {
   const cms = await bindCms();
   return (
-    <CmsPage>
+    <CmsPage path="/privacy-policy">
       <JsonLd data={pageMeta("/privacy-policy", cms).jsonLd} />
       <LegalPageView slug="privacy-policy" />
     </CmsPage>

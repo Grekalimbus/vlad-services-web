@@ -1,6 +1,5 @@
-import { AreasSection } from "@/features/areas";
-import { DealsSignup, Faq, Hero, ServicesOverview, Trust, Works } from "@/features/home";
-import { Reviews } from "@/features/reviews";
+import { Hero, ServicesOverview, Trust } from "@/features/home";
+import { HomeBelowFold } from "@/features/home/home-below-fold";
 import { CmsPage } from "@/lib/cms/cms-page";
 import { bindCms } from "@/lib/cms/load";
 import { metadataFor } from "@/lib/seo-metadata";
@@ -16,7 +15,7 @@ export function generateMetadata() {
 export default async function Home() {
   const cms = await bindCms();
   return (
-    <CmsPage>
+    <CmsPage path="/">
       <JsonLd data={pageMeta("/", cms).jsonLd} />
       <Hero />
       <div className={styles.homeContent}>
@@ -26,14 +25,7 @@ export default async function Home() {
             <ServicesOverview />
             <Trust />
           </div>
-          <Reviews />
-          <Works />
-          <div className={styles.introBand}>
-            <IntroAtmosphere />
-            <Faq />
-            <AreasSection id="areas" />
-            <DealsSignup />
-          </div>
+          <HomeBelowFold bandClassName={styles.introBand} atmosphere={<IntroAtmosphere />} />
         </main>
         <Footer />
       </div>

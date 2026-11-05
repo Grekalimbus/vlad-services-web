@@ -8,7 +8,7 @@ export function generateMetadata() {
 
 export default function NotFound() {
   return (
-    <CmsPage>
+    <CmsPage path="/">
       <NotFoundPage />
     </CmsPage>
   );

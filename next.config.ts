@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
         images: {
           formats: ["image/avif", "image/webp"],
           minimumCacheTTL: 60 * 60 * 24 * 30,
+          // Cap srcset for a marketing site; 3840w was bloating markup for logos/cards.
+          deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+          imageSizes: [48, 64, 96, 128, 256, 384],
         },
         async headers() {
           const security = [

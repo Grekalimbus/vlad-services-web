@@ -12,7 +12,7 @@ export function generateMetadata() {
 export default async function MessagingTermsPage() {
   const cms = await bindCms();
   return (
-    <CmsPage>
+    <CmsPage path="/messaging-terms">
       <JsonLd data={pageMeta("/messaging-terms", cms).jsonLd} />
       <LegalPageView slug="messaging-terms" />
     </CmsPage>

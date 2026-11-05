@@ -53,9 +53,26 @@ export function AreasSection({
   const [selection, setSelection] = useState<Selection>({ regionId: fallbackId, cityId: null });
   const [ready, setReady] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [mapActive, setMapActive] = useState(false);
   const cityPanelRef = useRef<HTMLDivElement>(null);
+  const mapCardRef = useRef<HTMLDivElement>(null);
   const selectionRef = useRef(selection);
   selectionRef.current = selection;
+
+  useEffect(() => {
+    const node = mapCardRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setMapActive(true);
+        observer.disconnect();
+      },
+      { rootMargin: "240px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -118,15 +135,19 @@ export function AreasSection({
           {headingLead} <span className={styles.accent}>{headingAccent}</span>
         </h2>
         <div className={styles.shell}>
-          <div className={styles.mapCard}>
-            <iframe
-              key={mapKey}
-              className={styles.map}
-              title={`Map of ${city?.label ?? region.label}`}
-              src={areaMapSrc(place.lat, place.lng, zoom)}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+          <div className={styles.mapCard} ref={mapCardRef}>
+            {mapActive ? (
+              <iframe
+                key={mapKey}
+                className={styles.map}
+                title={`Map of ${city?.label ?? region.label}`}
+                src={areaMapSrc(place.lat, place.lng, zoom)}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            ) : (
+              <div className={styles.map} aria-hidden="true" />
+            )}
             <a className={styles.mapLink} href={areaMapsLink(city?.query ?? region.query)} target="_blank" rel="noreferrer">
               <ExternalLink size={14} aria-hidden="true" />
               Open in Maps

@@ -68,9 +68,11 @@ export function TvPhotoMarquee({
 										src={assetPath(photo.src)}
 										alt={copy === 0 && index < photos.length ? photo.alt : ""}
 										fill
-										priority={copy === 0 && index < 3}
+										priority={copy === 0 && index === 0}
+										loading={copy === 0 && index < 2 ? "eager" : "lazy"}
 										unoptimized={photo.src.startsWith("/api/media/")}
 										sizes="226px"
+										quality={70}
 										className={styles.image}
 									/>
 								</li>

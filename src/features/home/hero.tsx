@@ -115,10 +115,12 @@ export function Hero() {
   return (
     <section id="top" aria-labelledby="hero-heading" className={styles.section}>
       <Image
-        src={assetPath("/hero/tools-background.jpg")}
+        src={assetPath("/hero/tools-background.webp")}
         alt=""
         fill
         priority
+        fetchPriority="high"
+        quality={70}
         sizes="100vw"
         className={styles.backdrop}
       />
@@ -163,9 +165,10 @@ export function Hero() {
               src={assetPath(builderSrc)}
               data-cms-src="copy.home.hero.builder"
               alt=""
-              width={1006}
-              height={964}
+              width={720}
+              height={690}
               priority
+              // Tuned static WebP — optimizer resized decode caused hero CLS on mobile.
               unoptimized
               className={styles.builder}
             />
@@ -233,6 +236,9 @@ function HeroBadges({
           <img
             src={assetPath(badge.src)}
             alt={slot ? badgeLabels[slot] : badge.alt || ""}
+            width={120}
+            height={40}
+            decoding="async"
             data-cms-src={`copy.home.hero.badges.${index}.src`}
             className={styles.badgeImage}
           />

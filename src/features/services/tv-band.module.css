@@ -31,40 +31,38 @@
 
 .wash {
   position: absolute;
-  inset: 0;
+  inset: -3rem;
   background:
     radial-gradient(
-      ellipse 46rem 36rem at -8rem 15rem,
-      rgb(112 192 236 / 0.95) 0%,
-      rgb(168 214 242 / 0.55) 40%,
+      ellipse 52rem 42rem at -8rem 15rem,
+      rgb(112 192 236 / 0.72) 0%,
+      rgb(168 214 242 / 0.38) 42%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 46rem 40rem at calc(100% + 6rem) 8rem,
+      rgb(102 186 232 / 0.68) 0%,
+      rgb(174 216 242 / 0.34) 40%,
       transparent 70%
     ),
     radial-gradient(
-      ellipse 40rem 34rem at calc(100% + 6rem) 8rem,
-      rgb(102 186 232 / 0.9) 0%,
-      rgb(174 216 242 / 0.5) 38%,
-      transparent 68%
+      ellipse 50rem 40rem at calc(100% + 5rem) calc(100% - 10rem),
+      rgb(90 178 228 / 0.6) 0%,
+      rgb(170 214 240 / 0.3) 42%,
+      transparent 70%
     ),
     radial-gradient(
-      ellipse 44rem 34rem at calc(100% + 5rem) calc(100% - 10rem),
-      rgb(90 178 228 / 0.82) 0%,
-      rgb(170 214 240 / 0.46) 40%,
-      transparent 68%
-    ),
-    radial-gradient(
-      ellipse 38rem 32rem at -7rem calc(100% - 8rem),
-      rgb(124 200 238 / 0.9) 0%,
-      rgb(184 220 244 / 0.48) 40%,
-      transparent 68%
+      ellipse 44rem 38rem at -7rem calc(100% - 8rem),
+      rgb(124 200 238 / 0.66) 0%,
+      rgb(184 220 244 / 0.32) 42%,
+      transparent 70%
     );
-  filter: blur(20px);
 }
 
 .arc {
   position: absolute;
   border-radius: 50%;
-  border: 1.35px solid rgb(92 170 220 / 0.62);
-  filter: blur(0.8px);
+  border: 1.35px solid rgb(92 170 220 / 0.5);
 }
 
 .arcTl {
@@ -80,8 +78,7 @@
   top: -8vw;
   left: -14vw;
   border-width: 1px;
-  border-color: rgb(140 198 232 / 0.55);
-  filter: blur(1px);
+  border-color: rgb(140 198 232 / 0.45);
 }
 
 .arcTr {
@@ -120,8 +117,7 @@
   right: -6vw;
   bottom: -8vw;
   border-width: 1px;
-  border-color: rgb(130 196 232 / 0.48);
-  filter: blur(1.1px);
+  border-color: rgb(130 196 232 / 0.4);
 }
 
 .bandBlend .backdrop {

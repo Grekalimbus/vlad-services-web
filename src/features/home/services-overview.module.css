@@ -74,7 +74,6 @@
 	flex: none;
 	min-width: 0;
 	pointer-events: none;
-	filter: drop-shadow(0 0 10px rgb(0 0 0 / 0.18));
 }
 
 .item + .item {
@@ -184,8 +183,7 @@
 	justify-content: center;
 	border: 1px solid rgb(255 255 255 / 0.45);
 	border-radius: 9999px;
-	background: rgb(255 255 255 / 0.16);
-	backdrop-filter: blur(8px);
+	background: rgb(255 255 255 / 0.22);
 	transition:
 		background-color 200ms,
 		color 200ms;
@@ -241,7 +239,6 @@
 		margin-left: 0;
 		overflow: hidden;
 		border-radius: 0.7rem;
-		filter: none;
 	}
 
 	.card,

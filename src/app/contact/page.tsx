@@ -1,3 +1,4 @@
+import { CmsPage } from "@/lib/cms/cms-page";
 import { RedirectHash } from "@/shared/layout/redirect-hash";
 import { metadataFor } from "@/lib/seo-metadata";
 
@@ -6,5 +7,9 @@ export function generateMetadata() {
 }
 
 export default function ContactPage() {
-  return <RedirectHash hash="footer" label="Contact" />;
+  return (
+    <CmsPage path="/">
+      <RedirectHash hash="footer" label="Contact" />
+    </CmsPage>
+  );
 }

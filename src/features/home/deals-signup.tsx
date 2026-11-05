@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCms } from "@/lib/cms/use-cms";
 import { dealsBackground, dealsHeading } from "@/lib/cms/deals-copy";
 import { ConsentFields, HoneypotField, PrivacyNotice } from "@/features/quote";
@@ -92,11 +93,18 @@ export function DealsSignup({
 		>
 			<div className={styles.container}>
 				<div className={styles.panel}>
-					<div
-						className={styles.photo}
-						style={{ backgroundImage: `url("${assetPath(background)}")` }}
-						aria-hidden="true"
-					/>
+					<div className={styles.photo} aria-hidden="true">
+						<Image
+							src={assetPath(background)}
+							alt=""
+							fill
+							sizes="(min-width: 900px) 72rem, 100vw"
+							quality={65}
+							loading="lazy"
+							unoptimized={background.startsWith("/api/media/")}
+							className={styles.photoImage}
+						/>
+					</div>
 					<span className={styles.backgroundHit} data-cms-photo="copy.home.deals.background">
 						Background
 					</span>

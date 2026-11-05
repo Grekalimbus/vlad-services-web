@@ -415,8 +415,9 @@ function mergeLanding(defaults: ElectricalLanding, saved: ElectricalLanding | un
     description: { ...base.description, ...saved.description },
     icons: (saved.icons?.length ? saved.icons : base.icons).map((icon, index) => {
       const fallback = base.icons[index];
+      const src = icon.src || fallback?.src || "";
       return {
-        src: icon.src || fallback?.src || "",
+        src: src.replace(/\/services\/icons\/([^/?#]+)\.svg\b/i, "/services/icons/$1.webp"),
         alt: icon.alt || fallback?.alt || "",
         text: icon.text || fallback?.text || icon.alt || "",
       };

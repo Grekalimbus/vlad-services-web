@@ -85,18 +85,20 @@ export function Works() {
                     data-cms-gallery={`slides:copy.home.works.cards.${index}.photos`}
                     data-empty={photos.length === 0 ? "" : undefined}
                   >
-                    {photos.map((photo, photoIndex) => (
+                    {photos.length ? (
                       <Image
-                        key={`${photo.image}-${photoIndex}`}
-                        src={assetPath(photo.image)}
+                        key={`${photos[currentIndex].image}-${currentIndex}`}
+                        src={assetPath(photos[currentIndex].image)}
                         alt=""
                         fill
-                        unoptimized={photo.image.startsWith("/api/media/")}
+                        loading="lazy"
+                        quality={70}
+                        unoptimized={photos[currentIndex].image.startsWith("/api/media/")}
                         sizes="(min-width: 1024px) 22rem, (min-width: 720px) 45vw, 92vw"
-                        className={photoIndex === currentIndex ? `${styles.cardImage} ${styles.cardImageOn}` : styles.cardImage}
-                        style={{ objectPosition: photo.position || card.position }}
+                        className={`${styles.cardImage} ${styles.cardImageOn}`}
+                        style={{ objectPosition: photos[currentIndex].position || card.position }}
                       />
-                    ))}
+                    ) : null}
                     <span className={styles.cardShade} aria-hidden="true" />
                   </div>
                   {photos.length > 1 ? (

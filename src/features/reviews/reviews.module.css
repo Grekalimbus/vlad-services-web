@@ -17,27 +17,25 @@
 
 .wash {
   position: absolute;
-  inset: -8%;
+  inset: -10%;
   background:
     radial-gradient(
-      ellipse 34rem 26rem at -6rem 8rem,
-      rgb(255 206 110 / 0.72) 0%,
-      rgb(255 224 160 / 0.28) 42%,
-      transparent 70%
+      ellipse 40rem 32rem at -6rem 8rem,
+      rgb(255 206 110 / 0.55) 0%,
+      rgb(255 224 160 / 0.2) 44%,
+      transparent 72%
     ),
     radial-gradient(
-      ellipse 36rem 24rem at -4rem calc(100% - 2rem),
-      rgb(255 214 130 / 0.5) 0%,
-      transparent 70%
+      ellipse 42rem 30rem at -4rem calc(100% - 2rem),
+      rgb(255 214 130 / 0.38) 0%,
+      transparent 72%
     );
-  filter: blur(18px);
 }
 
 .arc {
   position: absolute;
   border-radius: 50%;
-  border: 1.25px solid rgb(214 158 42 / 0.45);
-  filter: blur(0.6px);
+  border: 1.25px solid rgb(214 158 42 / 0.38);
 }
 
 .arcTl {
@@ -63,12 +61,11 @@
   width: 46%;
   height: 136%;
   background: radial-gradient(
-    ellipse 78% 62% at 74% 38%,
-    rgb(255 196 78 / 0.66) 0%,
-    rgb(255 214 140 / 0.16) 44%,
-    transparent 70%
+    ellipse 86% 70% at 74% 38%,
+    rgb(255 196 78 / 0.5) 0%,
+    rgb(255 214 140 / 0.12) 46%,
+    transparent 72%
   );
-  filter: blur(18px);
 }
 
 .arcTr {

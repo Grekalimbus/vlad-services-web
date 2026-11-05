@@ -12,7 +12,7 @@ export function generateMetadata() {
 export default async function BlogPage() {
   const cms = await bindCms();
   return (
-    <CmsPage>
+    <CmsPage path="/blog">
       <JsonLd data={pageMeta("/blog", cms).jsonLd} />
       <BlogPageView />
     </CmsPage>
