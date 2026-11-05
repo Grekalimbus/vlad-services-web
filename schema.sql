@@ -15,3 +15,9 @@ CREATE TABLE IF NOT EXISTS applications (
   photos TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'new'
 );
+
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id TEXT PRIMARY KEY,
+  count INTEGER NOT NULL,
+  reset_at INTEGER NOT NULL
+);

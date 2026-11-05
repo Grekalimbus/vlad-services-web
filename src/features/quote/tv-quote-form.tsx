@@ -2,6 +2,7 @@
 
 import { FormEvent, useId, useState } from "react";
 import { ConsentFields, PrivacyNotice } from "./consent-fields";
+import { HoneypotField } from "./honeypot-field";
 import { useCms } from "@/lib/cms/use-cms";
 import { fieldClass, phonePattern } from "@/lib/forms";
 import { tvSizes } from "@/lib/services";
@@ -111,7 +112,7 @@ export function TvQuoteForm({
     });
 
     try {
-      await submitLead(payload);
+      await submitLead(payload, { companyUrl: String(data.get("company_url") ?? "") });
       setStatus("success");
       form.reset();
       setPhotoName("");
@@ -133,6 +134,7 @@ export function TvQuoteForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className={styles.form}>
+      <HoneypotField />
       {status === "error" ? (
         <p
           id={ids.error}

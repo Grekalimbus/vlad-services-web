@@ -121,7 +121,7 @@ export function buildLeadPayload(input: {
   };
 }
 
-export async function submitLead(payload: LeadPayload) {
+export async function submitLead(payload: LeadPayload, trap: { companyUrl?: string } = {}) {
   const form = payload.type === "deals" ? "signup" : payload.type === "tv-mounting" ? "tv" : "book";
   const fields = payload.fields;
   const response = await fetch("/api/applications", {
@@ -136,11 +136,11 @@ export async function submitLead(payload: LeadPayload) {
       service: fields.service ?? "",
       hearAbout: fields.hearAbout ?? "",
       formId: payload.source.formId,
+      company_url: trap.companyUrl ?? "",
       smsConsent:
         payload.consents.sms === null ? null : payload.consents.sms.granted,
       emailConsent:
         payload.consents.email === null ? null : payload.consents.email.granted,
-      consents: payload.consents.snapshot,
       details: fields,
     }),
   });

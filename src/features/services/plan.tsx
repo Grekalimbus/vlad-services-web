@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useId, useRef, useState, useSyncExternalStore, ty
 import { isDiscountCard, planDescriptions, planQuiz, planQuizForm, type TvQuizStep } from "@/lib/cms/tv-page";
 import { peekReveal, revealSurface, subscribeReveal } from "@/lib/cms/reveal";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
-import { PrivacyNotice } from "@/features/quote";
+import { HoneypotField, PrivacyNotice } from "@/features/quote";
 import { hearAboutOptions } from "@/lib/hear-about";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { tvCounts } from "@/lib/services";
@@ -302,7 +302,8 @@ function QuizForm({
 	async function onSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (editing) return;
-		const name = String(new FormData(event.currentTarget).get("name") ?? "").trim();
+		const data = new FormData(event.currentTarget);
+		const name = String(data.get("name") ?? "").trim();
 		const next: { name?: boolean; phone?: boolean; hearAbout?: boolean } = {};
 		if (name.length < 2) next.name = true;
 		if (nationalDigits(phoneField.phone).length !== 10) next.phone = true;
@@ -335,6 +336,7 @@ function QuizForm({
 					smsConsent: null,
 					emailConsent: null,
 				}),
+				{ companyUrl: String(data.get("company_url") ?? "") },
 			);
 			setStatus("success");
 		} catch (error) {
@@ -354,6 +356,7 @@ function QuizForm({
 
 	return (
 		<form className={styles.quizForm} noValidate onSubmit={onSubmit}>
+			<HoneypotField />
 			{formError ? (
 				<p id={errorId} tabIndex={-1} role="alert" className={styles.quizAlert}>
 					{formError}

@@ -2,7 +2,7 @@
 
 import { useCms } from "@/lib/cms/use-cms";
 import { dealsBackground, dealsHeading } from "@/lib/cms/deals-copy";
-import { ConsentFields, PrivacyNotice } from "@/features/quote";
+import { ConsentFields, HoneypotField, PrivacyNotice } from "@/features/quote";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { assetPath } from "@/lib/site";
@@ -73,6 +73,7 @@ export function DealsSignup({
 					smsConsent: data.get("smsConsent") === "yes",
 					emailConsent: data.get("emailConsent") === "yes",
 				}),
+				{ companyUrl: String(data.get("company_url") ?? "") },
 			);
 			form.reset();
 			setStatus("success");
@@ -124,6 +125,7 @@ export function DealsSignup({
 									setErrors((current) => clearFixedErrors(current, data));
 								}}
 							>
+								<HoneypotField />
 								{status === "error" && Object.keys(errors).length > 0 ? (
 									<p
 										id={ids.error}

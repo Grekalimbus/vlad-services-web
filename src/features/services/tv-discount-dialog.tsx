@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { planOffers } from "@/lib/cms/tv-page";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { hearAboutOptions } from "@/lib/hear-about";
-import { PrivacyNotice } from "@/features/quote";
+import { HoneypotField, PrivacyNotice } from "@/features/quote";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { nationalDigits, useUsPhone } from "@/lib/use-us-phone";
 import shared from "@/styles/shared.module.css";
@@ -85,6 +85,7 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 					smsConsent: null,
 					emailConsent: null,
 				}),
+				{ companyUrl: String(data.get("company_url") ?? "") },
 			);
 			setStatus("success");
 		} catch (error) {
@@ -129,6 +130,7 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 				</p>
 				{status === "success" ? null : (
 					<form className={styles.form} noValidate onSubmit={onSubmit}>
+						<HoneypotField />
 						{formError ? (
 							<p id={errorId} tabIndex={-1} role="alert" className={styles.alert}>
 								{formError}

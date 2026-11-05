@@ -5,7 +5,15 @@ import {
   parseApplicationConsents,
   type ApplicationConsents,
 } from "./consent";
-import { applySecurityHeaders, clientIp, plainText, rateLimit, sameOrigin } from "./form-guard";
+import {
+  APPLICATION_RATE,
+  applySecurityHeaders,
+  clientIp,
+  honeypotTripped,
+  plainText,
+  rateLimit,
+  sameOrigin,
+} from "./form-guard";
 import type { CmsEnv } from "./cms/types";
 
 const MAX_PHOTOS = 5;
@@ -53,14 +61,17 @@ export type ApplicationView = {
 export async function handleApplicationPost(request: Request, env: CmsEnv) {
   try {
     if (!sameOrigin(request)) return json({ error: "Request was rejected." }, 403);
-    if (!rateLimit(`application:${clientIp(request)}`, 20, 10 * 60 * 1000)) {
-      return json({ error: "Too many requests. Try again later." }, 429);
+    if (
+      !(await rateLimit(env, `application:${clientIp(request)}`, APPLICATION_RATE.limit, APPLICATION_RATE.windowMs))
+    ) {
+      return json({ error: "Too many requests. Try again later." }, 429, APPLICATION_RATE.windowMs);
     }
     const length = Number(request.headers.get("content-length") || 0);
-    if (length > 52 * 1024 * 1024) return json({ error: "Upload is too large." }, 413);
+    if (Number.isFinite(length) && length > 52 * 1024 * 1024) return json({ error: "Upload is too large." }, 413);
     const contentType = request.headers.get("content-type") ?? "";
     if (contentType.includes("application/json")) return handleJsonApplication(request, env);
     const form = await request.formData();
+    if (honeypotTripped(form)) return json({ ok: true });
     const name = plainText(form.get("name"), 120);
     const phone = plainText(form.get("phone"), 40);
     const email = plainText(form.get("email"), 200);
@@ -117,8 +128,8 @@ export async function handleApplicationList(request: Request, env: CmsEnv) {
   try {
     const items = (await readApplications(env)).map(toView);
     return json({ items });
-  } catch (error) {
-    return json({ error: error instanceof Error ? error.message : "Could not load applications." }, 500);
+  } catch {
+    return json({ error: "Could not load applications." }, 500);
   }
 }
 
@@ -187,6 +198,7 @@ async function handleJsonApplication(request: Request, env: CmsEnv) {
   } catch {
     return json({ error: "Could not save the request." }, 400);
   }
+  if (honeypotTripped(record)) return json({ ok: true });
   const form = parseForm(record.form);
   if (!form) return json({ error: "Unknown form." }, 400);
   const name = plainText(record.name, 120);
@@ -208,8 +220,8 @@ async function handleJsonApplication(request: Request, env: CmsEnv) {
   const details = asDetails(record.details);
   if (hearAbout) details.hearAbout = hearAbout;
   const serviceLabel = service || (form === "signup" ? "Sign up" : "TV");
-  const consents = resolveConsents({
-    provided: parseApplicationConsents(record.consents),
+  const consents = buildApplicationConsents({
+    privacyPolicy: "accepted",
     smsConsent: parseJsonConsentFlag(record.smsConsent),
     emailConsent: parseJsonConsentFlag(record.emailConsent),
   });
@@ -470,24 +482,6 @@ function parseJsonConsentFlag(value: unknown): boolean | null {
   return null;
 }
 
-function resolveConsents(input: {
-  provided: ApplicationConsents | null;
-  smsConsent: boolean | null;
-  emailConsent: boolean | null;
-}): ApplicationConsents {
-  if (input.provided) {
-    return {
-      ...input.provided,
-      submittedAt: input.provided.submittedAt || new Date().toISOString(),
-    };
-  }
-  return buildApplicationConsents({
-    privacyPolicy: "accepted",
-    smsConsent: input.smsConsent,
-    emailConsent: input.emailConsent,
-  });
-}
-
 function asStatus(value: unknown): ApplicationStatus {
   return value === "contacted" || value === "scheduled" || value === "new" ? value : "new";
 }
@@ -511,8 +505,9 @@ function asDetails(value: unknown): Record<string, string> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   const details: Record<string, string> = {};
   for (const [key, item] of Object.entries(value)) {
+    if (key === "company_url" || key === "website" || key === "fax_number") continue;
     if (!/^[a-zA-Z0-9_-]{1,40}$/.test(key) || typeof item !== "string") continue;
-    const text = item.trim().slice(0, 300);
+    const text = plainText(item, 300);
     if (!text) continue;
     details[key] = text;
     if (Object.keys(details).length >= 24) break;
@@ -561,8 +556,11 @@ function typeFor(key: string) {
   return key.endsWith(".png") ? "image/png" : "image/jpeg";
 }
 
-function json(body: unknown, status = 200) {
+function json(body: unknown, status = 200, retryAfterMs?: number) {
   const headers = new Headers({ "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
   applySecurityHeaders(headers);
+  if (status === 429 && retryAfterMs) {
+    headers.set("retry-after", String(Math.ceil(retryAfterMs / 1000)));
+  }
   return new Response(JSON.stringify(body), { status, headers });
 }

@@ -1,16 +1,18 @@
 import { isAuthorized, login, logout } from "./auth";
 import { listMedia, loadDocument, readMedia, removeMedia, saveDocument, saveMedia } from "./content-store";
+import { applySecurityHeaders, sameOrigin } from "../form-guard";
 import type { CmsEnv } from "./types";
 
 export async function handleContentGet(env: CmsEnv) {
   try {
     return json(await loadDocument(env));
-  } catch (error) {
-    return json({ error: message(error) }, 500);
+  } catch {
+    return json({ error: "Could not load content." }, 500);
   }
 }
 
 export async function handleContentPut(request: Request, env: CmsEnv) {
+  if (!sameOrigin(request)) return json({ error: "Request was rejected." }, 403);
   if (!(await isAuthorized(request, env))) return json({ error: "Unauthorized" }, 401);
   try {
     const document = await saveDocument(env, await request.json());
@@ -33,6 +35,7 @@ export async function handleSession(request: Request, env: CmsEnv) {
 }
 
 export async function handleMediaPost(request: Request, env: CmsEnv) {
+  if (!sameOrigin(request)) return json({ error: "Request was rejected." }, 403);
   if (!(await isAuthorized(request, env))) return json({ error: "Unauthorized" }, 401);
   try {
     const form = await request.formData();
@@ -48,12 +51,13 @@ export async function handleMediaList(request: Request, env: CmsEnv) {
   if (!(await isAuthorized(request, env))) return json({ error: "Unauthorized" }, 401);
   try {
     return json({ items: await listMedia(env) });
-  } catch (error) {
-    return json({ error: message(error) }, 500);
+  } catch {
+    return json({ error: "Could not load media." }, 500);
   }
 }
 
 export async function handleMediaDelete(request: Request, env: CmsEnv) {
+  if (!sameOrigin(request)) return json({ error: "Request was rejected." }, 403);
   if (!(await isAuthorized(request, env))) return json({ error: "Unauthorized" }, 401);
   try {
     const key = new URL(request.url).searchParams.get("key") ?? "";
@@ -83,10 +87,12 @@ export async function handleMediaGet(env: CmsEnv, key: string) {
 }
 
 function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+  const headers = new Headers({
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": "no-store",
   });
+  applySecurityHeaders(headers);
+  return new Response(JSON.stringify(body), { status, headers });
 }
 
 function message(error: unknown) {

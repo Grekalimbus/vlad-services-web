@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Mail, MapPin, Phone, Upload, User, List, MessageCircle } from "lucide-react";
 import { PrivacyNotice } from "./consent-fields";
+import { HoneypotField } from "./honeypot-field";
 import { useCms } from "@/lib/cms/use-cms";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { hearAboutOptions } from "@/lib/hear-about";
@@ -47,6 +48,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
   const [photos, setPhotos] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const previewsRef = useRef<string[]>([]);
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const [photoError, setPhotoError] = useState("");
   const copy = useCms().copy.forms;
 
@@ -130,6 +132,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
     body.set("hearAbout", hearAbout);
     body.set("service", service);
     body.set("description", description.trim().slice(0, MAX_DESCRIPTION));
+    body.set("company_url", honeypotRef.current?.value ?? "");
     photos.forEach((file) => body.append("photos", file));
     try {
       const response = await fetch("/api/applications", { method: "POST", body });
@@ -152,6 +155,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
 
   return (
     <form onSubmit={onSubmit} noValidate className={styles.bookForm}>
+      <HoneypotField inputRef={honeypotRef} />
       {status === "error" && formError ? (
         <p id={ids.error} tabIndex={-1} role="alert" className={styles.alert}>
           {formError || copy.formError}
