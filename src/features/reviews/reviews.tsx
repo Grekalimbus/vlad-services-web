@@ -4,9 +4,9 @@ import { useId, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { useCms } from "@/lib/cms/use-cms";
 import { angiListing, angiProfileUrl, angiReviews } from "@/lib/angi-reviews";
+import { bbbListing, bbbReviews } from "@/lib/bbb-reviews";
 import { googleListing, googleReviews } from "@/lib/google-reviews";
 import { yelpListing, yelpReviews } from "@/lib/yelp-reviews";
-import { socialLinks } from "@/lib/social";
 import { YelpIcon } from "@/shared/brand-icons";
 import shared from "@/styles/shared.module.css";
 import styles from "./reviews.module.css";
@@ -14,7 +14,7 @@ import styles from "./reviews.module.css";
 const PREVIEW_LENGTH = 168;
 const DESKTOP_PAGE_SIZE = 3;
 
-type SourceId = "google" | "yelp" | "angi";
+type SourceId = "google" | "bbb" | "yelp" | "angi";
 
 export function Reviews() {
   const heading = useCms().copy.home.reviews;
@@ -33,6 +33,16 @@ export function Reviews() {
       empty: "No Google reviews yet",
       emptyCta: "View the Google page",
       emptyHref: googleListing.mapsUrl,
+    },
+    bbb: {
+      listing: bbbListing,
+      reviews: bbbReviews,
+      label: "BBB",
+      countLabel: "BBB Reviews",
+      writeLabel: "Review us on BBB",
+      empty: "No BBB reviews yet",
+      emptyCta: "View the BBB page",
+      emptyHref: bbbListing.profileUrl,
     },
     yelp: {
       listing: yelpListing,
@@ -141,15 +151,15 @@ export function Reviews() {
                 <GoogleMark />
                 <span className={shared.visuallyHidden}>Google reviews</span>
               </button>
-              <a
-                href={socialLinks.bbb}
-                className={styles.source}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                className={source === "bbb" ? styles.sourceActive : styles.source}
+                aria-pressed={source === "bbb"}
+                onClick={() => selectSource("bbb")}
               >
                 <BbbMark />
                 <span className={shared.visuallyHidden}>BBB reviews</span>
-              </a>
+              </button>
               <button
                 type="button"
                 className={source === "angi" ? styles.sourceActive : styles.source}
