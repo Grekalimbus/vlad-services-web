@@ -103,7 +103,7 @@ export function Hero() {
   const cms = useCms();
   const hero = cms.copy.home.hero;
   const builderSrc = hero.builder || "/hero/builder.webp";
-  const kicker = hero.kicker || "HIRE a PRO";
+  const kicker = hero.kicker || "HIRE a Pro";
   const badges = hero.badges?.length
     ? hero.badges
     : [
@@ -188,10 +188,13 @@ function KickerText({ text }: { text: string }) {
   const trimmed = text.trim();
   const splitAt = trimmed.lastIndexOf(" ");
   if (splitAt <= 0) return trimmed;
+  const lead = trimmed.slice(0, splitAt);
+  const accent = trimmed.slice(splitAt + 1);
+  const accentLabel = accent === "PRO" ? "Pro" : accent;
   return (
     <>
-      {trimmed.slice(0, splitAt)}{" "}
-      <span className={styles.kickerAccent}>{trimmed.slice(splitAt + 1)}</span>
+      {lead}{" "}
+      <span className={styles.kickerAccent}>{accentLabel}</span>
     </>
   );
 }

@@ -33,6 +33,15 @@ const technor = localFont({
   preload: true,
 });
 
+/** Hero “Pro” accent — Bespoke Stencil (Fontshare / Indian Type Foundry). */
+const bespokeStencil = localFont({
+  src: "../fonts/BespokeStencil-Variable.woff2",
+  variable: "--font-bespoke-stencil",
+  weight: "300 800",
+  display: "swap",
+  preload: true,
+});
+
 export async function generateMetadata(): Promise<Metadata> {
   const cms = await loadCms();
   const meta = pageMeta("/", cms);
@@ -79,7 +88,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable} ${technor.variable}`}>
+    <html lang="en" className={`${sans.variable} ${display.variable} ${technor.variable} ${bespokeStencil.variable}`}>
       <body className={styles.body}>
         {children}
         <Script id="mcjs" strategy="lazyOnload">

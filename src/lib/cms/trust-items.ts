@@ -11,8 +11,8 @@ const businessYears = {
   label: "in Business",
 } as const;
 
-const defaultKicker = "HIRE a PRO";
-const previousKicker = "HIRE YOUR PRO";
+const defaultKicker = "HIRE a Pro";
+const previousKickers = new Set(["HIRE YOUR PRO", "HIRE a PRO"]);
 
 const defaultBadges = [
   { id: "bbb", src: "/hero/badges/bbb.svg", alt: "BBB" },
@@ -43,13 +43,13 @@ function ensureHeroAndReviews(document: CmsDocument): CmsDocument {
   const hero = document.copy?.home?.hero;
   if (!hero) return document;
 
-  const needsKicker = !hero.kicker || hero.kicker === previousKicker;
+  const needsKicker = !hero.kicker || previousKickers.has(hero.kicker);
   const needsBadges = !Array.isArray(hero.badges) || hero.badges.length === 0;
   const needsAngi = document.angiListing == null;
   if (!needsKicker && !needsBadges && !needsAngi) return document;
 
   const next = structuredClone(document);
-  if (!next.copy.home.hero.kicker || next.copy.home.hero.kicker === previousKicker) {
+  if (!next.copy.home.hero.kicker || previousKickers.has(next.copy.home.hero.kicker)) {
     next.copy.home.hero.kicker = defaultKicker;
   }
   if (!Array.isArray(next.copy.home.hero.badges) || next.copy.home.hero.badges.length === 0) {
