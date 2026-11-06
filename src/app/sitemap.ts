@@ -8,7 +8,8 @@ export const dynamic = "force-static";
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: { path: string; changeFrequency: "weekly" | "monthly" | "yearly"; priority: number }[] = [
     { path: "/", changeFrequency: "weekly", priority: 1 },
-    { path: "/deals", changeFrequency: "weekly", priority: 0.8 },
+    { path: "/areas", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/deals", changeFrequency: "weekly", priority: 0.7 },
     ...serviceRouteSlugs.map((slug) => ({
       path: `/services/${slug}`,
       changeFrequency: "monthly" as const,

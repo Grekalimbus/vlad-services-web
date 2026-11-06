@@ -18,10 +18,19 @@ export async function metadataFor(path: string): Promise<Metadata> {
       }
     : { index: false, follow: meta.follow, googleBot: { index: false, follow: meta.follow } };
 
+  const image = {
+    url: meta.image,
+    secureUrl: meta.image,
+    width: 1024,
+    height: 576,
+    alt: meta.imageAlt,
+    type: "image/jpeg" as const,
+  };
+
   return {
     title: { absolute: meta.title },
     description: meta.description,
-    keywords: meta.keywords,
+    keywords: meta.keywords.length ? meta.keywords : undefined,
     ...(meta.canonical ? { alternates: { canonical: meta.canonical } } : {}),
     robots,
     openGraph: {
@@ -31,16 +40,7 @@ export async function metadataFor(path: string): Promise<Metadata> {
       siteName: meta.siteName,
       title: meta.title,
       description: meta.description,
-      images: [
-        {
-          url: meta.image,
-          secureUrl: meta.image,
-          width: 1024,
-          height: 576,
-          alt: meta.imageAlt,
-          type: "image/jpeg",
-        },
-      ],
+      images: [image],
     },
     twitter: {
       card: "summary_large_image",

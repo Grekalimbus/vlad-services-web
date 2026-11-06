@@ -89,15 +89,14 @@ export function Works() {
                       <Image
                         key={`${photos[currentIndex].image}-${currentIndex}`}
                         src={assetPath(photos[currentIndex].image)}
-                        alt=""
+                        alt={photos[currentIndex].alt || card.alt || card.title}
                         fill
                         loading="lazy"
                         quality={70}
                         unoptimized={photos[currentIndex].image.startsWith("/api/media/")}
                         sizes="(min-width: 1024px) 22rem, (min-width: 720px) 45vw, 92vw"
                         className={`${styles.cardImage} ${styles.cardImageOn}`}
-                        style={{ objectPosition: photos[currentIndex].position || card.position }}
-                      />
+                        style={{ objectPosition: photos[currentIndex].position || card.position }}                      />
                     ) : null}
                     <span className={styles.cardShade} aria-hidden="true" />
                   </div>

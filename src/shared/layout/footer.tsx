@@ -133,6 +133,11 @@ export function Footer() {
 					<nav className={styles.col} aria-label="Areas">
 						<p className={styles.colTitle}>Areas</p>
 						<ul className={styles.colList}>
+							<li>
+								<Link href="/areas" className={styles.colLink}>
+									Service Areas
+								</Link>
+							</li>
 							{regions.map((region) => (
 								<li key={region.id}>
 									<HashLink
@@ -205,7 +210,11 @@ export function Footer() {
 						<span data-cms="site.legalName">{cms.site.legalName || cms.site.name}</span>, All Rights Reserved
 					</p>
 					<div className={styles.bottomAside}>
-						<p className={styles.meta}>South California · Available 24/7</p>
+						<p className={styles.meta}>
+							<span data-cms="site.areaServedShort">{cms.site.areaServedShort || "San Diego"}</span>
+							{" · "}
+							<span data-cms="site.availability">{cms.site.availability || "Available 24/7"}</span>
+						</p>
 						<a
 							href={socialLinks.bbb}
 							className={styles.bbbSeal}

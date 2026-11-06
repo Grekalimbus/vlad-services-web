@@ -47,12 +47,11 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: meta.keywords,
     authors: [{ name: cms.site.legalName }],
     category: "Home services",
+    // Page-level generateMetadata / metadataFor owns canonical, robots, and OG URL.
     openGraph: {
       type: "website",
       locale: "en_US",
       siteName: meta.siteName,
-      title: meta.title,
-      description: meta.description,
       images: [
         {
           url: "/og.jpg",
@@ -65,14 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: meta.title,
-      description: meta.description,
       images: ["/og.jpg"],
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
     },
     formatDetection: { telephone: false },
   };

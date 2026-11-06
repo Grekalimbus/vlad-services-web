@@ -41,32 +41,7 @@ const handymanLanding: ElectricalLanding = {
     { amount: 110, label: "Shelf Install" },
     { amount: 90, label: "General Repair" },
   ],
-  featureRows: [
-    {
-      title: "Furniture assembled square",
-      body: "Beds, dressers, desks, and the flat boxes waiting in the garage get built the same visit. Pieces go together square, tall units are anchored when they need it, and packing leaves with us if you want it gone.",
-      photos: [
-        { src: "/works/furniture.jpg", alt: "Assembled furniture finished in a home" },
-        { src: "/works/furniture-pexels.jpg", alt: "Handyman completing furniture assembly" },
-      ],
-    },
-    {
-      title: "Doors, shelves, and anchors",
-      body: "A door that rubs, a latch that misses, a shelf that needs a stud — they stay on the same list. Hardware is set so the plate lies flat, and shelves are leveled before anything is loaded.",
-      photos: [
-        { src: "/works/pexels-sofa.jpg", alt: "Living room after furniture and shelf work" },
-        { src: "/works/handyman-tools.jpg", alt: "Handyman tools ready for a repair visit" },
-      ],
-    },
-    {
-      title: "Small repairs in one stop",
-      body: "Drywall patches, loose hardware, and the fixes that pile up fit one visit when they were priced on the call. Floors are covered, parts are packed, and the room is left swept before we leave.",
-      photos: [
-        { src: "/works/pexels-drywall.jpg", alt: "Wall repair finished during a handyman visit" },
-        { src: "/works/interior-styled.jpg", alt: "Finished room after small handyman repairs" },
-      ],
-    },
-  ],
+  featureRows: [],
   faq: {
     headingLead: "QUESTIONS &",
     headingAccent: "ANSWERS",

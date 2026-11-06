@@ -12,11 +12,14 @@ export function BlogPageView() {
       description="Guides and project notes from PrimeFix will live here."
       crumbs={[
         { href: "/", label: "Home" },
-        { href: "/blog", label: "Blog" },
+        { label: "Blog" },
       ]}
     >
       <div className={styles.body}>
-        <p>Articles are coming soon.</p>
+        <p>
+          Articles are coming soon. In the meantime, browse our{" "}
+          <a href="/#services">home services</a> or request a quote from the footer.
+        </p>
       </div>
     </PageFrame>
   );

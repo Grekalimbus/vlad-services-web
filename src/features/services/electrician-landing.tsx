@@ -160,7 +160,7 @@ export function ServiceLanding({
         tightTop
         pathFor={(index, field) => `${copyBase}.steps.${index}.${field}`}
       />
-      {landing.featureRows?.length ? (
+      {category.slug !== "handyman" && landing.featureRows?.length ? (
         <FeatureRows
           rows={landing.featureRows}
           pathBase={`${copyBase}.featureRows`}

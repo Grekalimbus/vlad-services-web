@@ -8,6 +8,20 @@
   line-height: 1.75rem;
 }
 
+.body p {
+  margin: 0 0 1.25rem;
+}
+
+.subheading {
+  margin: 1.75rem 0 0.75rem;
+  color: var(--foreground);
+  font-family: var(--font-technor), sans-serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+}
+
 .list {
   margin: 0;
   padding-left: 1.2rem;
@@ -15,4 +29,14 @@
 
 .list li + li {
   margin-top: 0.5rem;
+}
+
+.list a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.list a:hover {
+  color: var(--foreground);
 }

@@ -7,10 +7,14 @@ import {
 } from "./service-pages";
 
 export const PRODUCTION_ORIGIN = "https://primefixpros.com";
-const GENERIC_AREA = /^(california|southern california|ca|socal|so cal)$/i;
+const GENERIC_AREA =
+  /^(california|southern california|south california|south cal|so\.?\s*cal|socal|ca)$/i;
+const BROAD_AREA_PHRASE =
+  /\b(?:southern|south)\s+california\b|\bsocal\b|\bso\.?\s*cal\b/gi;
 const OLD_HERO_TAGLINE = "Fast Response • Same-Day Availability • High Quality Service";
 const OLD_PORTFOLIO_TITLE = "Project gallery";
 const OLD_PORTFOLIO_DESCRIPTION = "TV mounting, electrical, and general handyman work. Browse by category.";
+const PLACEHOLDER_SUMMARY = /^(describe this service\.?|tbd|todo|coming soon\.?)$/i;
 
 export const LANDING_SLUGS = ["tv-mounting", "electrical", "handyman"] as const;
 
@@ -26,6 +30,12 @@ const LEGACY_SERVICE_REDIRECTS: Record<string, string> = {
   "/services/service1": "/services/painter",
   "/services/service2": "/services/appliance-expert",
   "/services/service3": "/services/landscaper",
+  "/services/service4": "/services/landscaper",
+  "/services/service-44da8977": "/services/painter",
+  "/services/service-0ed47ac2": "/services/appliance-expert",
+  "/services/service-b7cb3d8a": "/services/landscaper",
+  "/services/service-3dbbdaa1": "/services/handyman",
+  "/portfolio/before-after": "/",
 };
 
 type Area = { short: string; full: string };
@@ -77,22 +87,38 @@ export function phoneE164(display: string) {
   return digits ? `+${digits}` : "";
 }
 
+const BROAD_AREA_TEST = /\b(?:southern|south)\s+california\b|\bsocal\b|\bso\.?\s*cal\b/i;
+
 export function areaLabel(site: { areaServed?: string; areaServedShort?: string }): Area {
   const full = site.areaServed?.trim() ?? "";
   const short = site.areaServedShort?.trim() ?? "";
-  if (full && !GENERIC_AREA.test(full)) {
-    return { short: short && !GENERIC_AREA.test(short) ? short : full, full };
+  const fullIsBroad = !full || GENERIC_AREA.test(full) || BROAD_AREA_TEST.test(full);
+  const shortIsBroad = !short || GENERIC_AREA.test(short) || BROAD_AREA_TEST.test(short);
+  if (!fullIsBroad) {
+    return { short: shortIsBroad ? full : short, full };
   }
-  return { short: "San Diego", full: "San Diego and surrounding areas" };
+  return {
+    short: shortIsBroad ? "San Diego" : short,
+    full: "San Diego and surrounding areas",
+  };
+}
+
+function localizeText(value: string, area: Area) {
+  return value
+    .replace(BROAD_AREA_PHRASE, area.full)
+    .replace(/\bSouth California\b/gi, area.full)
+    .replace(/\bSouthern California\b/gi, area.full);
+}
+
+function sentenceCase(value: string) {
+  const clean = value.replace(/\s+/g, " ").trim();
+  if (!clean) return clean;
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
 }
 
 function absolute(origin: string, path: string) {
   if (/^https?:\/\//i.test(path)) return path;
   return `${origin}${path.startsWith("/") ? path : `/${path}`}`;
-}
-
-function isLandingSlug(slug: string) {
-  return (LANDING_SLUGS as readonly string[]).includes(slug);
 }
 
 export function normalizePath(pathname: string) {
@@ -116,21 +142,35 @@ export function normalizeCms(document: CmsDocument): CmsDocument {
     prepared.copy.portfolio.description,
     ...prepared.faqs.map((item) => item.a),
     ...prepared.services.map((item) => item.summary),
+    ...prepared.serviceCategories.map((item) => item.summary),
   ].join("\n");
   const stockHero = prepared.copy.home.hero.tagline === OLD_HERO_TAGLINE;
   const stockPortfolio =
     prepared.copy.portfolio.title === OLD_PORTFOLIO_TITLE ||
     prepared.copy.portfolio.description === OLD_PORTFOLIO_DESCRIPTION;
-  if (!/southern california/i.test(blob) && !GENERIC_AREA.test(prepared.site.areaServed) && !GENERIC_AREA.test(prepared.site.areaServedShort) && !stockHero && !stockPortfolio) {
-    return prepared;
-  }
+  const needsAreaFix =
+    BROAD_AREA_TEST.test(blob) ||
+    GENERIC_AREA.test(prepared.site.areaServed) ||
+    GENERIC_AREA.test(prepared.site.areaServedShort) ||
+    stockHero ||
+    stockPortfolio;
+  if (!needsAreaFix) return prepared;
 
   const next = structuredClone(prepared);
-  if (GENERIC_AREA.test(next.site.areaServed) || /southern california/i.test(next.site.areaServed)) {
-    next.site.areaServed = area.full;
+  const resolved = areaLabel(next.site);
+  if (
+    GENERIC_AREA.test(next.site.areaServed) ||
+    BROAD_AREA_TEST.test(next.site.areaServed) ||
+    !next.site.areaServed.trim()
+  ) {
+    next.site.areaServed = resolved.full;
+  } else {
+    next.site.areaServed = localizeText(next.site.areaServed, resolved);
   }
-  if (GENERIC_AREA.test(next.site.areaServedShort)) next.site.areaServedShort = area.short;
-  const phrase = (value: string) => value.replace(/Southern California/gi, area.full);
+  if (GENERIC_AREA.test(next.site.areaServedShort) || BROAD_AREA_TEST.test(next.site.areaServedShort)) {
+    next.site.areaServedShort = resolved.short;
+  }
+  const phrase = (value: string) => localizeText(value, resolved);
   next.site.tagline = phrase(next.site.tagline);
   next.site.description = phrase(next.site.description);
   next.site.keywords = phrase(next.site.keywords);
@@ -138,12 +178,20 @@ export function normalizeCms(document: CmsDocument): CmsDocument {
   next.site.seoDescription = phrase(next.site.seoDescription);
   next.faqs = next.faqs.map((item) => ({ ...item, q: phrase(item.q), a: phrase(item.a) }));
   next.services = next.services.map((item) => ({ ...item, summary: phrase(item.summary) }));
-  if (next.copy.home.hero.tagline === OLD_HERO_TAGLINE) {
-    next.copy.home.hero.tagline = `${area.short} and nearby • Same-day availability • High quality service`;
+  next.serviceCategories = next.serviceCategories.map((item) => ({
+    ...item,
+    summary: phrase(item.summary),
+  }));
+  next.copy.home.hero.tagline = phrase(next.copy.home.hero.tagline);
+  if (next.copy.home.hero.tagline === OLD_HERO_TAGLINE || !next.copy.home.hero.tagline.trim()) {
+    next.copy.home.hero.tagline = `${resolved.short} and nearby • Same-day availability • High quality service`;
   }
-  if (next.copy.portfolio.title === OLD_PORTFOLIO_TITLE) next.copy.portfolio.title = `Projects in ${area.short}`;
+  if (next.copy.portfolio.title === OLD_PORTFOLIO_TITLE) next.copy.portfolio.title = `Projects in ${resolved.short}`;
   if (next.copy.portfolio.description === OLD_PORTFOLIO_DESCRIPTION) {
-    next.copy.portfolio.description = `TV mounting, electrical, and handyman projects in ${area.full}.`;
+    next.copy.portfolio.description = `TV mounting, electrical, and handyman projects in ${resolved.full}.`;
+  } else {
+    next.copy.portfolio.title = phrase(next.copy.portfolio.title);
+    next.copy.portfolio.description = phrase(next.copy.portfolio.description);
   }
   return next;
 }
@@ -235,8 +283,13 @@ function homeDescription(site: CmsDocument["site"], area: Area) {
   );
 }
 
-function serviceDescription(summary: string, brand: string, area: Area) {
-  const sentence = summary.trim().replace(/\s+/g, " ").replace(/\.?$/, ".");
+function serviceDescription(summary: string, brand: string, area: Area, serviceName?: string) {
+  const raw = localizeText(summary.replace(/\s+/g, " ").trim(), area);
+  if (!raw || PLACEHOLDER_SUMMARY.test(raw)) {
+    const label = serviceName?.trim() || "This service";
+    return clip(`${label} from ${brand} in ${area.full}. Request a free quote for pricing and availability.`, 160);
+  }
+  const sentence = sentenceCase(raw).replace(/\.?$/, ".");
   if (sentence.toLowerCase().includes(area.short.toLowerCase())) return clip(sentence, 160);
   const branded = `${sentence} ${brand} serves ${area.full}.`;
   if (branded.length <= 160) return branded;
@@ -288,15 +341,16 @@ function businessNode(document: CmsDocument, origin: string, area: Area, descrip
     .filter((service) => service.status === "active")
     .flatMap((service) => {
       const parent = document.serviceCategories.find((item) => item.id === service.categoryId);
-      if (!parent || !isLandingSlug(parent.slug)) return [];
+      const page = parent ? pageSlugForCategory(parent, document.serviceCategories) : null;
+      if (!page) return [];
       return [
         {
           "@type": "Offer",
           itemOffered: {
             "@type": "Service",
             name: service.name,
-            description: service.summary,
-            url: publicUrl(`/services/${parent.slug}`),
+            description: localizeText(service.summary, area),
+            url: publicUrl(`/services/${page}`),
             areaServed: areaServed(area),
             provider: { "@id": `${origin}/#business` },
           },
@@ -304,8 +358,10 @@ function businessNode(document: CmsDocument, origin: string, area: Area, descrip
       ];
     });
 
+  const sameAs = /^https:\/\//.test(maps) ? [maps] : undefined;
+
   return {
-    "@type": "HomeAndConstructionBusiness",
+    "@type": ["HomeAndConstructionBusiness", "LocalBusiness", "Organization"],
     "@id": `${origin}/#business`,
     name: document.site.legalName,
     alternateName: document.googleListing.name || document.site.shortName,
@@ -318,10 +374,19 @@ function businessNode(document: CmsDocument, origin: string, area: Area, descrip
     slogan: document.site.tagline,
     areaServed: areaServed(area),
     hasMap: /^https:\/\//.test(maps) ? maps : undefined,
-    sameAs: /^https:\/\//.test(maps) ? [maps] : undefined,
+    sameAs,
     currenciesAccepted: "USD",
     knowsAbout: Array.from(new Set(document.services.filter((item) => item.status === "active").map((item) => item.name))),
     openingHoursSpecification: hours,
+    contactPoint: phone
+      ? {
+          "@type": "ContactPoint",
+          telephone: phone,
+          contactType: "customer service",
+          areaServed: area.full,
+          availableLanguage: ["English"],
+        }
+      : undefined,
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Home services",
@@ -446,23 +511,31 @@ export function pageMeta(pathname: string, source: CmsDocument): PageMeta {
     if (!landing) return hiddenPage(document, "Page not found", "/");
     const pathSlug = pageSlugForCategory(landing, document.serviceCategories) ?? requested;
     const title = serviceTitle(pathSlug, landing.name, area.short, document.site.shortName);
-    const summary = serviceDescription(landing.summary, document.site.shortName, area);
+    const summary = serviceDescription(landing.summary, document.site.shortName, area, landing.name);
     const canonical = publicUrl(`/services/${pathSlug}`);
+    const serviceCopy = localizeText(landing.summary || landing.name, area);
     return {
       ...base,
       title,
       description: summary,
       canonical,
       index: true,
+      keywords: Array.from(
+        new Set([
+          `${landing.name.trim()} ${area.short}`,
+          `${landing.name.trim()} near me`,
+          ...keywords.slice(0, 10),
+        ]),
+      ).slice(0, 12),
       jsonLd: graph([
         business,
         website,
         {
           "@type": "Service",
           "@id": `${canonical}#service`,
-          name: landing.name,
-          serviceType: landing.name,
-          description: landing.summary,
+          name: landing.name.trim(),
+          serviceType: landing.name.trim(),
+          description: sentenceCase(serviceCopy),
           url: canonical,
           provider: { "@id": `${origin}/#business` },
           areaServed: areaServed(area),
@@ -480,9 +553,82 @@ export function pageMeta(pathname: string, source: CmsDocument): PageMeta {
         },
         crumbNode(origin, [
           { name: "Home", path: "/" },
-          { name: landing.name, path: `/services/${landing.slug}` },
+          { name: landing.name.trim(), path: `/services/${pathSlug}` },
         ]),
       ]),
+    };
+  }
+
+  if (path === "/areas") {
+    const title = clip(`Service Areas in ${area.short} | ${document.site.shortName}`, 60);
+    const summary = clip(
+      `${document.site.shortName} provides TV mounting, electrical, handyman, and related home services in ${area.full}. See the cities we cover and request a quote.`,
+      160,
+    );
+    const canonical = publicUrl("/areas");
+    const activeLocations = document.locations.filter((item) => item.status === "active");
+    return {
+      ...base,
+      title,
+      description: summary,
+      canonical,
+      index: true,
+      keywords: Array.from(
+        new Set([
+          `home services ${area.short}`,
+          `TV mounting ${area.short}`,
+          `handyman ${area.short}`,
+          ...keywords,
+        ]),
+      ).slice(0, 12),
+      jsonLd: graph([
+        business,
+        website,
+        {
+          "@type": "WebPage",
+          "@id": `${canonical}#webpage`,
+          url: canonical,
+          name: title,
+          description: summary,
+          inLanguage: "en-US",
+          isPartOf: { "@id": `${origin}/#website` },
+          about: { "@id": `${origin}/#business` },
+        },
+        crumbNode(origin, [
+          { name: "Home", path: "/" },
+          { name: "Service Areas", path: "/areas" },
+        ]),
+        ...(activeLocations.length
+          ? [
+              {
+                "@type": "ItemList",
+                name: `Areas served by ${document.site.shortName}`,
+                itemListElement: activeLocations.map((location, index) => ({
+                  "@type": "ListItem",
+                  position: index + 1,
+                  name: location.label || location.city,
+                })),
+              },
+            ]
+          : []),
+      ]),
+    };
+  }
+
+  if (path === "/blog") {
+    const title = clip(`Blog | ${document.site.shortName}`, 60);
+    const summary = clip(
+      `Guides and project notes from ${document.site.shortName}. Articles for homeowners in ${area.full} are coming soon.`,
+      160,
+    );
+    return {
+      ...hiddenPage(document, "Blog", "/blog"),
+      title,
+      description: summary,
+      canonical: publicUrl("/blog"),
+      index: false,
+      follow: true,
+      imageAlt: `${document.site.shortName} blog`,
     };
   }
 
@@ -540,7 +686,10 @@ export function pageMeta(pathname: string, source: CmsDocument): PageMeta {
     const title = clip(`${legal.title} | ${document.site.shortName}`, 60);
     const summary =
       legal.slug === "privacy-policy"
-        ? clip(`Privacy Policy for ${siteName}. How we collect, use, and share information for customers in ${area.full}.`, 160)
+        ? clip(
+            `Privacy Policy for ${siteName}. How we collect, use, and share information for customers in ${area.full}.`,
+            160,
+          )
         : clip(`Messaging terms for ${siteName}: text messages and email, including how to opt out.`, 160);
     const canonical = publicUrl(legal.href);
     return {
@@ -571,8 +720,11 @@ export function pageMeta(pathname: string, source: CmsDocument): PageMeta {
   }
 
   if (path === "/deals") {
-    const title = clip(`Deals | ${document.site.shortName}`, 60);
-    const summary = clip(`Current PrimeFix deals for TV mounting, electrical, and handyman work in ${area.short}.`, 160);
+    const title = clip(`Deals & Offers in ${area.short} | ${document.site.shortName}`, 60);
+    const summary = clip(
+      `Current ${document.site.shortName} deals for TV mounting, electrical, and handyman work in ${area.full}.`,
+      160,
+    );
     const canonical = publicUrl("/deals");
     return {
       ...base,
