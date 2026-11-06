@@ -1,5 +1,4 @@
 import type { CmsDocument } from "./types";
-import { electricalLanding } from "./electrical-landing";
 
 export type TvSlide = { image: string; alt: string; position: string };
 
@@ -170,6 +169,26 @@ const defaultQuizForm: TvQuizFormCopy = {
   button: "Get my Quote & $30",
 };
 
+/** TV-only steps. Never borrow electrical landing copy as a fallback. */
+const defaultTvSteps = [
+  {
+    title: "Take the 1-minute quiz",
+    text: "Pick your setup and see each item priced. The $30 quiz discount is included.",
+  },
+  {
+    title: "We call and agree on the price",
+    text: "Your price is set on the call, before a technician drives out. Calls daily 8am–10pm local time.",
+  },
+  {
+    title: "We show up on time",
+    text: "Same day when slots are open. About an hour on site: leveled, load-tested, cleaned up.",
+  },
+  {
+    title: "Then you pay",
+    text: "After the job, no deposit. Insured, with a 3-year warranty on our work.",
+  },
+] as const;
+
 const quizSchemaVersion = 4;
 
 export function isDiscountCard(id: string): id is (typeof offerIds)[number] {
@@ -275,7 +294,7 @@ export function ensureTvMounting(document: CmsDocument): CmsDocument {
   }
 
   if (!next.copy.tvPage.steps || next.copy.tvPage.steps.length < 4) {
-    next.copy.tvPage.steps = electricalLanding.steps.map((step) => ({ title: step.title, text: step.text }));
+    next.copy.tvPage.steps = defaultTvSteps.map((step) => ({ title: step.title, text: step.text }));
   }
 
   const offers = { ...next.copy.plan.offers };
@@ -397,7 +416,7 @@ export function tvShowcaseCards(document: CmsDocument) {
 export function tvSteps(document: CmsDocument) {
   const steps = asTv(document).copy.tvPage.steps;
   if (steps && steps.length >= 4) return steps;
-  return electricalLanding.steps.map((step) => ({ title: step.title, text: step.text }));
+  return defaultTvSteps.map((step) => ({ title: step.title, text: step.text }));
 }
 
 export function tvPhotoCopy(document: CmsDocument) {

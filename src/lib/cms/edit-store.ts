@@ -27,6 +27,11 @@ function emit() {
   listeners.forEach((listener) => listener());
 }
 
+/** Notify React subscribers that window.__CMS__ / published snapshot changed. */
+export function notifyPublished() {
+  emit();
+}
+
 const EDITING_TAB = "primefix.admin.editing";
 
 export function allowEditingTab() {

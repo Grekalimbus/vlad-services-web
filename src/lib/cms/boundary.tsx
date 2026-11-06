@@ -1,16 +1,30 @@
 "use client";
 
-import { createContext, type ReactNode } from "react";
-import { readPublished } from "./read";
+import { createContext, useLayoutEffect, useMemo, type ReactNode } from "react";
+import { notifyPublished } from "./edit-store";
 import type { CmsDocument } from "./types";
 
 export const CmsContext = createContext<CmsDocument | null>(null);
 
 /**
- * Seeds CMS context without accepting the document as a Client Component prop.
- * That avoids serializing the full CMS payload a second time into the RSC flight
- * (it is already available via window.__CMS__ / request ALS).
+ * Path-projected CMS for the active route.
+ *
+ * Soft navigations do not re-execute <script id="cms-data">, so the document must
+ * arrive as a Client Component prop (RSC payload) and be applied here. Otherwise
+ * window.__CMS__ stays on the previous page's lean projection and TV/service
+ * landings render empty or fallback content.
  */
-export function CmsBoundary({ children }: { children: ReactNode }) {
-  return <CmsContext.Provider value={readPublished()}>{children}</CmsContext.Provider>;
+export function CmsBoundary({ payload, children }: { payload: string; children: ReactNode }) {
+  const document = useMemo(() => JSON.parse(payload) as CmsDocument, [payload]);
+
+  if (typeof window !== "undefined" && window.__CMS__ !== document) {
+    window.__CMS__ = document;
+  }
+
+  useLayoutEffect(() => {
+    window.__CMS__ = document;
+    notifyPublished();
+  }, [document]);
+
+  return <CmsContext.Provider value={document}>{children}</CmsContext.Provider>;
 }

@@ -18,7 +18,8 @@ export function useCms(): CmsDocument {
   const provided = useContext(CmsContext);
   const override = useSyncExternalStore(subscribe, peekOverride, noOverride);
   const published = useSyncExternalStore(subscribe, publishedSnapshot, noOverride);
-  return override ?? published ?? provided ?? readPublished();
+  // Prefer route context over window.__CMS__: soft nav leaves the script stale.
+  return override ?? provided ?? published ?? readPublished();
 }
 
 export function useEditing() {
