@@ -16,6 +16,12 @@
 	padding-bottom: calc(0.4rem + 150px);
 }
 
+@media (max-width: 1023px) {
+	.viewportRoom {
+		padding-bottom: 26px;
+	}
+}
+
 .marqueeRoom,
 .marqueePaired,
 .marqueeSeamless {
