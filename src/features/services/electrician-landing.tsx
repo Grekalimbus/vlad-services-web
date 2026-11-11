@@ -218,27 +218,36 @@ function useCountUp(target: number, active: boolean) {
 
 function PriceCard({
   amount,
+  suffix,
   label,
   amountPath,
+  suffixPath,
   labelPath,
   cardId,
   active,
 }: {
   amount: number;
+  suffix: string;
   label: string;
   amountPath: string;
+  suffixPath: string;
   labelPath: string;
   cardId: string;
   active: boolean;
 }) {
   const current = useCountUp(amount, active);
+  const mark = suffix.trim();
   return (
     <li className={styles.priceCard} data-cms-card={cardId}>
       <p className={styles.priceValue}>
         <span aria-hidden="true">
           $<span data-cms={amountPath}>{current}</span>
+          <span data-cms={suffixPath}>{mark}</span>
         </span>
-        <span className={styles.priceFinal}>${amount}</span>
+        <span className={styles.priceFinal}>
+          ${amount}
+          {mark}
+        </span>
       </p>
       <p className={styles.priceLabel} data-cms={labelPath}>
         {label}
@@ -272,7 +281,7 @@ function PriceGrid({
   categoryId,
   base,
 }: {
-  prices: { amount: number; label: string }[];
+  prices: { amount: number; label: string; suffix?: string }[];
   label: string;
   categoryId: string;
   base: string;
@@ -302,8 +311,10 @@ function PriceGrid({
         <PriceCard
           key={`${item.label}-${index}`}
           amount={Number(item.amount) || 0}
+          suffix={item.suffix || ""}
           label={item.label}
           amountPath={`${base}.prices.${index}.amount`}
+          suffixPath={`${base}.prices.${index}.suffix`}
           labelPath={`${base}.prices.${index}.label`}
           cardId={`price:${categoryId}:${index}`}
           active={active}

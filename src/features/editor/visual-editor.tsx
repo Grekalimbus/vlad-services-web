@@ -871,6 +871,14 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
       remove: false,
       texts: [
         { path: `copy.serviceLanding.${categoryId}.prices.${index}.amount`, label: "Price", numeric: true },
+        {
+          path: `copy.serviceLanding.${categoryId}.prices.${index}.suffix`,
+          label: "Suffix",
+          options: [
+            { value: "", label: "None" },
+            { value: "+", label: "+" },
+          ],
+        },
         { path: `copy.serviceLanding.${categoryId}.prices.${index}.label`, label: "Description" },
       ],
     };

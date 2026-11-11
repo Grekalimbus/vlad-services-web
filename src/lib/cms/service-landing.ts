@@ -340,23 +340,30 @@ function landingPreset(category: { id: string; slug: string; name: string }) {
   return presets[category.slug] ?? presets[category.id] ?? genericLanding(category.name);
 }
 
+function normalizePriceSuffix(value: unknown, fallback = "") {
+  if (typeof value !== "string") return fallback;
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  return trimmed.slice(0, 8);
+}
+
+function priceItem(
+  current: ElectricalLanding["prices"][number] | undefined,
+  fallback?: ElectricalLanding["prices"][number],
+) {
+  return {
+    amount: Number(current?.amount) || Number(fallback?.amount) || 0,
+    label: current?.label || fallback?.label || "",
+    suffix: normalizePriceSuffix(current?.suffix, fallback?.suffix || ""),
+  };
+}
+
 function priceList(saved: ElectricalLanding["prices"] | undefined, fallback: ElectricalLanding["prices"]) {
-  if (!saved?.length) return fallback.map((item) => ({ ...item }));
-  const merged = fallback.map((item, index) => {
-    const current = saved[index];
-    if (!current) return { ...item };
-    return {
-      amount: Number(current.amount) || 0,
-      label: current.label || item.label || "",
-    };
-  });
+  if (!saved?.length) return fallback.map((item) => ({ ...item, suffix: item.suffix || "" }));
+  const merged = fallback.map((item, index) => priceItem(saved[index], item));
   if (saved.length > fallback.length) {
     for (let index = fallback.length; index < saved.length; index += 1) {
-      const current = saved[index];
-      merged.push({
-        amount: Number(current?.amount) || 0,
-        label: current?.label || "",
-      });
+      merged.push(priceItem(saved[index]));
     }
   }
   return merged;
