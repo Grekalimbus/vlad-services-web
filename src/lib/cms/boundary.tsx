@@ -45,8 +45,9 @@ function clientBoot(fallback: CmsDocument): CmsDocument {
 }
 
 /**
- * Prefer the live #cms-data payload Cloudflare injects over the static-export
- * RSC fallback, and only hit /api/content when that script is missing.
+ * Boot from the Cloudflare-injected #cms-data payload (never the stale static-export
+ * fallback when a script exists), then reconcile with /api/content so the published
+ * CMS document always wins without a late fallback flash.
  */
 export function CmsBoundary({
   payload,
@@ -68,12 +69,9 @@ export function CmsBoundary({
 
     if (fromScript) {
       if (!sameCms(fromScript, window.__CMS__)) publish(fromScript, setDoc);
-      return () => {
-        cancelled = true;
-      };
+    } else {
+      publish(boot, setDoc);
     }
-
-    publish(boot, setDoc);
 
     (async () => {
       try {
@@ -85,7 +83,7 @@ export function CmsBoundary({
         if (sameCms(projected, window.__CMS__)) return;
         publish(projected, setDoc);
       } catch {
-        /* keep bootstrap snapshot */
+        /* keep bootstrap / script snapshot */
       }
     })();
 

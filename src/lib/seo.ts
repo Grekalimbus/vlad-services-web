@@ -182,7 +182,6 @@ export function normalizeCms(document: CmsDocument): CmsDocument {
     ...item,
     summary: phrase(item.summary),
   }));
-  next.copy.home.hero.tagline = phrase(next.copy.home.hero.tagline);
   if (next.copy.home.hero.tagline === OLD_HERO_TAGLINE || !next.copy.home.hero.tagline.trim()) {
     next.copy.home.hero.tagline = `${resolved.short} and nearby • Same-day availability • High quality service`;
   }
