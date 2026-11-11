@@ -62,3 +62,42 @@ export function setGoogleAnalyticsDisabled(
   if (typeof window === "undefined") return;
   Object.assign(window, { [`ga-disable-${measurementId}`]: disabled });
 }
+
+function isGoogleAnalyticsCookieName(name: string) {
+  return name === "_ga" || name.startsWith("_ga_");
+}
+
+function cookieDomainsForHost(hostname: string) {
+  const bare = hostname.replace(/^www\./i, "");
+  const domains = new Set<string | undefined>([undefined, hostname, `.${hostname}`]);
+  if (bare && bare !== hostname) {
+    domains.add(bare);
+    domains.add(`.${bare}`);
+  }
+  return [...domains];
+}
+
+/** Remove first-party GA cookies this origin can expire (not HttpOnly/server-only cookies). */
+export function clearGoogleAnalyticsCookies() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  const names = document.cookie
+    .split(";")
+    .map((part) => part.split("=")[0]?.trim())
+    .filter((name): name is string => Boolean(name) && isGoogleAnalyticsCookieName(name));
+
+  if (!names.length) return;
+
+  const domains = cookieDomainsForHost(window.location.hostname);
+  const paths = ["/", window.location.pathname || "/"];
+  const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
+
+  for (const name of names) {
+    for (const path of paths) {
+      for (const domain of domains) {
+        const domainPart = domain ? `; domain=${domain}` : "";
+        document.cookie = `${name}=; expires=${expire}; path=${path}${domainPart}`;
+      }
+    }
+  }
+}

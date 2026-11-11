@@ -1,7 +1,7 @@
 {
   "privacy-policy": {
     "title": "Privacy Policy",
-    "effective": "October 23, 2026",
+    "effective": "November 12, 2026",
     "email": "info@primefixpros.com",
     "phone": "(619) 736-3016",
     "intro": "This Privacy Policy explains how PrimeFix Home & Handyman Services LLC (“PrimeFix,” “we,” “us”) collects, uses, and shares personal information when you visit primefixpros.com, request a quote, book a service, or communicate with us. It applies to customers and prospective customers in our service area: San Diego and surrounding areas, California.",
@@ -121,11 +121,27 @@
       },
       {
         "id": "cookies",
-        "heading": "Cookies and advertising tools",
+        "heading": "Cookies, analytics, and advertising tools",
         "blocks": [
           {
             "type": "p",
-            "text": "This website does not use the Meta Pixel, Google Ads tags, or other advertising pixels, and it does not use those tools to follow you across other websites. The public pages do not set analytics or advertising cookies. A session cookie is used only for the private admin sign-in and is not used to track customers."
+            "text": "This website does not use the Meta Pixel, Google Ads tags, or other advertising pixels, and it does not use those tools to follow you across other websites. A session cookie is used only for the private admin sign-in and is not used to track customers."
+          },
+          {
+            "type": "p",
+            "text": "If you choose Accept on our cookie banner, we load Google Analytics 4 (measurement ID G-R1EWB8T76C) to understand how visitors use the site—for example which pages are viewed and how people navigate. That helps us improve content, usability, and service information. Analytics is not loaded until you Accept."
+          },
+          {
+            "type": "p",
+            "text": "When analytics is enabled, Google may set cookies such as _ga and _ga_* (including a property-specific cookie for G-R1EWB8T76C). We also store your Accept or Reject choice in your browser’s localStorage under the key primefix-cookie-consent so we remember it on later visits."
+          },
+          {
+            "type": "p",
+            "text": "You can change your choice at any time with Cookie settings in the website footer. If you Reject or withdraw a previous Accept, we stop loading analytics for new visits and remove Google Analytics cookies that this site can access (_ga and _ga_*). Reject does not remove the admin sign-in cookie or other cookies needed for basic site operation."
+          },
+          {
+            "type": "p",
+            "text": "Google’s processing of analytics data is also described in Google’s policies, including https://policies.google.com/privacy. You can learn more about Google Analytics cookies at https://support.google.com/analytics/answer/11397207."
           }
         ]
       },

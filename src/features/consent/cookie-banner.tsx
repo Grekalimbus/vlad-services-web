@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import {
+  clearGoogleAnalyticsCookies,
   COOKIE_CONSENT_EVENT,
   COOKIE_CONSENT_OPEN_EVENT,
   readCookieConsent,
@@ -45,6 +46,7 @@ export function CookieBanner() {
 
   const choose = (value: CookieConsentValue) => {
     setGoogleAnalyticsDisabled(value === "rejected");
+    if (value === "rejected") clearGoogleAnalyticsCookies();
     writeCookieConsent(value);
     setForced(false);
   };
