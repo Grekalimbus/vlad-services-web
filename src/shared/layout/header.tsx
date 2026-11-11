@@ -2,7 +2,6 @@
 
 import { BrandLogo } from "@/shared/ui";
 import { QuoteCta } from "@/features/quote";
-import { isServicePageSlug } from "@/lib/service-pages";
 import { phoneHref } from "@/lib/site";
 import { useCms } from "@/lib/cms/use-cms";
 import { Menu, Phone, X } from "lucide-react";
@@ -21,10 +20,8 @@ export function Header() {
 	const pathname = usePathname();
 	const path = pathname.replace(/\/$/, "");
 	const admin = path === "/admin" || path.startsWith("/admin/");
-	const solid =
-		path === "/deals" ||
-		path === "/blog" ||
-		isServicePageSlug(path.startsWith("/services/") ? path.slice("/services/".length) : "");
+	// Light pages need dark nav from first paint; only the home hero stays transparent.
+	const solid = path !== "/";
 
 	useEffect(() => {
 		const updateHeader = () => {
