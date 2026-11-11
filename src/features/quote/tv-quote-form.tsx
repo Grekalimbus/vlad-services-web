@@ -4,7 +4,7 @@ import { FormEvent, useId, useState } from "react";
 import { ConsentFields, PrivacyNotice } from "./consent-fields";
 import { HoneypotField } from "./honeypot-field";
 import { useCms } from "@/lib/cms/use-cms";
-import { fieldClass, phonePattern } from "@/lib/forms";
+import { fieldClass, phonePattern, zipPattern } from "@/lib/forms";
 import { tvSizes } from "@/lib/services";
 import {
   buildLeadPayload,
@@ -27,6 +27,7 @@ type TvQuoteFormProps = {
 type FieldErrors = {
   name?: string;
   phone?: string;
+  zip?: string;
   tvCount?: string;
   tvSize?: string;
   wallType?: string;
@@ -47,6 +48,7 @@ export function TvQuoteForm({
     photos: useId(),
     name: useId(),
     phone: useId(),
+    zip: useId(),
     error: useId(),
   };
   const [status, setStatus] = useState<Status>("idle");
@@ -59,6 +61,7 @@ export function TvQuoteForm({
     const next: FieldErrors = {};
     const name = String(data.get("name") ?? "");
     const phone = String(data.get("phone") ?? "");
+    const zip = String(data.get("zip") ?? "");
     const count = String(data.get("tvCount") ?? "");
     const size = String(data.get("tvSize") ?? "");
     const wallType = String(data.get("wallType") ?? "");
@@ -76,6 +79,7 @@ export function TvQuoteForm({
     if (photos.length === 0) next.photos = "Upload a photo of the wall.";
     if (name.trim().length < 2) next.name = "Enter your name.";
     if (!phonePattern.test(phone.trim())) next.phone = "Enter a phone number.";
+    if (!zipPattern.test(zip.trim())) next.zip = "Enter a 5-digit ZIP code.";
     return next;
   }
 
@@ -98,6 +102,7 @@ export function TvQuoteForm({
       fields: {
         name: String(data.get("name") ?? ""),
         phone: String(data.get("phone") ?? ""),
+        zip: String(data.get("zip") ?? "").trim(),
         tvCount: String(data.get("tvCount") ?? ""),
         tvSize: String(data.get("tvSize") ?? ""),
         wallType: String(data.get("wallType") ?? ""),
@@ -281,6 +286,22 @@ export function TvQuoteForm({
             className={fieldClass}
           />
           {errors.phone ? <p className={styles.error}>{errors.phone}</p> : null}
+        </div>
+        <div>
+          <label htmlFor={ids.zip} className={styles.label}>
+            ZIP Code
+            <span aria-hidden="true"> *</span>
+          </label>
+          <input
+            id={ids.zip}
+            name="zip"
+            inputMode="numeric"
+            autoComplete="postal-code"
+            required
+            className={fieldClass}
+            placeholder="Enter ZIP code"
+          />
+          {errors.zip ? <p className={styles.error}>{errors.zip}</p> : null}
         </div>
       </div>
 

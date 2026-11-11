@@ -22,8 +22,8 @@ export default async function Home() {
         <main id="content">
           <div className={styles.introBand}>
             <IntroAtmosphere />
-            <ServicesOverview />
             <Trust />
+            <ServicesOverview />
           </div>
           <HomeBelowFold bandClassName={styles.introBand} atmosphere={<IntroAtmosphere />} />
         </main>

@@ -259,6 +259,41 @@
 	box-shadow: 0 12px 24px rgb(0 40 90 / 0.28);
 }
 
+.chooseOption {
+	margin: calc(2rem - 10px) auto 0;
+	width: fit-content;
+	text-align: center;
+	color: #8ad4ff;
+	font-size: 0.95rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-shadow:
+		0 0 8px rgb(28 156 255 / 0.95),
+		0 0 18px rgb(28 156 255 / 0.55),
+		0 0 32px rgb(0 118 254 / 0.35);
+	animation: choosePulse 3.2s ease-in-out infinite;
+}
+
+@keyframes choosePulse {
+	0%,
+	100% {
+		transform: scale(1);
+		text-shadow:
+			0 0 8px rgb(28 156 255 / 0.95),
+			0 0 18px rgb(28 156 255 / 0.55),
+			0 0 32px rgb(0 118 254 / 0.35);
+	}
+
+	50% {
+		transform: scale(1.1);
+		text-shadow:
+			0 0 12px rgb(90 186 255 / 1),
+			0 0 24px rgb(28 156 255 / 0.75),
+			0 0 40px rgb(0 118 254 / 0.5);
+	}
+}
+
 .trustIcons {
 	display: flex;
 	align-items: center;
@@ -716,7 +751,8 @@
 	.choice:hover,
 	.choiceActive,
 	.choiceActive:hover,
-	.trustIcons li {
+	.trustIcons li,
+	.chooseOption {
 		transform: none;
 		transition: none;
 		animation: none;

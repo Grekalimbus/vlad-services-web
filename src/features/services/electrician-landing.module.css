@@ -254,11 +254,11 @@
 }
 
 .quoteTight {
-  margin: 20px auto 0;
+  margin: 36px auto;
 }
 
 .quizTightTop {
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 .quote:hover {
@@ -367,6 +367,10 @@
 }
 
 @media (max-width: 800px) {
+  .quoteTight {
+    margin: 24px auto;
+  }
+
   .storyLayout {
     display: block;
   }

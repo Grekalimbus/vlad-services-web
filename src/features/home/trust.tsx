@@ -97,13 +97,10 @@ export function Trust() {
     <section
       id="trust"
       ref={sectionRef}
-      aria-labelledby="trust-heading"
+      aria-label={cms.copy.home.trustHeading || "Why us"}
       className={styles.section}
     >
       <div className={styles.container}>
-        <h2 id="trust-heading" className={styles.heading}>
-          <span data-cms="copy.home.trustHeading">{cms.copy.home.trustHeading}</span>
-        </h2>
         <ul className={styles.grid}>
           {cms.trustItems.map((item, index) => (
             <TrustStat

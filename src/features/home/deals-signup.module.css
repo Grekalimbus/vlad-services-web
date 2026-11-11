@@ -4,7 +4,7 @@
 	margin-top: 0;
 	border: 0;
 	background: transparent;
-	padding-block: 20px;
+	padding-block: 24px;
 	scroll-margin-top: 5.5rem;
 }
 
@@ -286,7 +286,7 @@
 @media (min-width: 768px) {
 	.section {
 		margin-top: 0;
-		padding-block: 20px;
+		padding-block: 32px;
 	}
 
 	.content {

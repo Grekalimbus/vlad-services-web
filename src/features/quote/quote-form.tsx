@@ -99,7 +99,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
     const next: Partial<Record<FieldKey, boolean>> = {};
     if (name.trim().length < 2) next.name = true;
     if (!phonePattern.test(phone.trim())) next.phone = true;
-    if (!emailPattern.test(email.trim())) next.email = true;
+    if (email.trim() && !emailPattern.test(email.trim())) next.email = true;
     if (!zipPattern.test(zip.trim())) next.zip = true;
     if (!service) next.service = true;
     if (!hearAbout) next.hearAbout = true;
@@ -199,7 +199,6 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
           id={ids.email}
           name="email"
           label="Email"
-          required
           invalid={invalid.email}
           type="email"
           icon={<Mail size={16} aria-hidden="true" />}
@@ -358,7 +357,7 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
       </div>
 
       <button type="submit" className={styles.bookSubmit}>
-        {status === "loading" ? "Sending…" : "BOOK NOW"}
+        {status === "loading" ? "Sending…" : "GET A QUOTE"}
       </button>
       <PrivacyNotice tone="onDark" />
     </form>

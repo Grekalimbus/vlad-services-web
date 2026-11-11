@@ -6,6 +6,7 @@ import { peekReveal, revealSurface, subscribeReveal } from "@/lib/cms/reveal";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { HoneypotField, PrivacyNotice } from "@/features/quote";
 import { hearAboutOptions } from "@/lib/hear-about";
+import { zipPattern } from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { tvCounts } from "@/lib/services";
 import { nationalDigits, useUsPhone } from "@/lib/use-us-phone";
@@ -123,7 +124,7 @@ export function Plan() {
 						);
 							})}
 						</ul>
-						<TrustIcons />
+						<p className={styles.chooseOption}>Choose Option</p>
 					</>
 				) : question ? (
 					<ul
@@ -241,44 +242,6 @@ export function Plan() {
 	);
 }
 
-function TrustIcons() {
-	return (
-		<ul className={styles.trustIcons} aria-label="Quality, reliability, professionalism, safety, and value">
-			<li aria-label="Quality">
-				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<path d="m12 3 2.1 2.2 3-.4.5 3 2.6 1.5-1.4 2.7 1.4 2.7-2.6 1.5-.5 3-3-.4L12 21l-2.1-2.2-3 .4-.5-3-2.6-1.5L5.2 12 3.8 9.3l2.6-1.5.5-3 3 .4L12 3Z" />
-					<path d="m8.8 12 2.1 2.1 4.5-4.5" />
-				</svg>
-			</li>
-			<li aria-label="Reliability">
-				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<path d="M12 3.2 19 6v5.2c0 4.2-2.8 7.8-7 9.6-4.2-1.8-7-5.4-7-9.6V6l7-2.8Z" />
-					<path d="m8.8 12 2 2 4.5-4.5" />
-				</svg>
-			</li>
-			<li aria-label="Professionalism">
-				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<path d="M8 7V5.7C8 4.8 8.8 4 9.7 4h4.6c.9 0 1.7.8 1.7 1.7V7" />
-					<rect x="3.5" y="7" width="17" height="12.5" rx="2.2" />
-					<path d="M3.8 11.5c5.3 2.2 11.1 2.2 16.4 0M10.2 12.8h3.6" />
-				</svg>
-			</li>
-			<li aria-label="Safety">
-				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<rect x="5" y="10" width="14" height="10" rx="2.2" />
-					<path d="M8 10V7.5a4 4 0 0 1 8 0V10M12 14v2.5" />
-				</svg>
-			</li>
-			<li aria-label="Value">
-				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<circle cx="12" cy="12" r="8.5" />
-					<path d="M14.8 8.7c-.7-.6-1.6-.9-2.7-.9-1.5 0-2.7.8-2.7 2s1.1 1.7 2.8 2.1 2.8.9 2.8 2.2-1.2 2.2-2.9 2.2c-1.1 0-2.2-.4-3-1.1M12 6.2v11.6" />
-				</svg>
-			</li>
-		</ul>
-	);
-}
-
 function QuizForm({
 	button,
 	answers,
@@ -291,33 +254,39 @@ function QuizForm({
 	const editing = useEditing();
 	const nameId = useId();
 	const phoneId = useId();
+	const zipId = useId();
 	const hearId = useId();
 	const errorId = useId();
 	const phoneField = useUsPhone();
 	const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 	const [formError, setFormError] = useState("");
 	const [hearAbout, setHearAbout] = useState("");
-	const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; hearAbout?: boolean }>({});
+	const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; zip?: boolean; hearAbout?: boolean }>({});
 
 	async function onSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (editing) return;
 		const data = new FormData(event.currentTarget);
 		const name = String(data.get("name") ?? "").trim();
-		const next: { name?: boolean; phone?: boolean; hearAbout?: boolean } = {};
+		const zip = String(data.get("zip") ?? "").trim();
+		const next: { name?: boolean; phone?: boolean; zip?: boolean; hearAbout?: boolean } = {};
 		if (name.length < 2) next.name = true;
 		if (nationalDigits(phoneField.phone).length !== 10) next.phone = true;
+		if (!zipPattern.test(zip)) next.zip = true;
 		if (!hearAbout) next.hearAbout = true;
 		setErrors(next);
 		setFormError("");
 		if (Object.keys(next).length > 0) {
 			setStatus("error");
-			document.getElementById(next.name ? nameId : next.phone ? phoneId : hearId)?.focus();
+			document
+				.getElementById(next.name ? nameId : next.phone ? phoneId : next.zip ? zipId : hearId)
+				?.focus();
 			return;
 		}
 		const fields: Record<string, string> = {
 			name,
 			phone: phoneField.phone,
+			zip,
 			service: "1 TV quote",
 			tvCount: "1",
 			hearAbout,
@@ -400,6 +369,24 @@ function QuizForm({
 					onBeforeInput={phoneField.onBeforeInput}
 					className={errors.phone ? `${styles.quizInput} ${styles.quizInvalid}` : styles.quizInput}
 					aria-invalid={errors.phone ? true : undefined}
+				/>
+			</div>
+			<div className={styles.quizField}>
+				<label className={shared.visuallyHidden} htmlFor={zipId}>
+					ZIP code
+				</label>
+				<input
+					id={zipId}
+					name="zip"
+					inputMode="numeric"
+					autoComplete="postal-code"
+					placeholder="ZIP code"
+					required
+					className={errors.zip ? `${styles.quizInput} ${styles.quizInvalid}` : styles.quizInput}
+					aria-invalid={errors.zip ? true : undefined}
+					onChange={() => {
+						if (errors.zip) setErrors((current) => ({ ...current, zip: undefined }));
+					}}
 				/>
 			</div>
 			<div className={styles.quizField}>

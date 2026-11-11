@@ -32,8 +32,8 @@ const DealsSignup = dynamic(() => import("./deals-signup").then((mod) => mod.Dea
 export function HomeBelowFold({ bandClassName, atmosphere }: { bandClassName: string; atmosphere: ReactNode }) {
   return (
     <div className={styles.belowFold}>
-      <Reviews />
       <Works />
+      <Reviews />
       <div className={bandClassName}>
         {atmosphere}
         <Faq />

@@ -13,10 +13,13 @@ export function TvShowcase() {
   const cards = tvShowcaseCards(cms);
 
   return (
-    <section className={styles.section} aria-label="TV mounting scenes">
+    <section className={styles.section} aria-labelledby="mount-types-heading">
       <div className={`${overview.container} ${styles.frame}`}>
+        <h2 id="mount-types-heading" className={styles.heading}>
+          Mount Types We Install
+        </h2>
         <ul
-          className={`${overview.strip} ${overview.stripCompact}`}
+          className={`${overview.strip} ${overview.stripCompact} ${styles.grid}`}
           style={{ "--count": cards.length } as CSSProperties}
         >
           {cards.map((card, index) => (

@@ -14,7 +14,9 @@ import styles from "./reviews.module.css";
 const PREVIEW_LENGTH = 168;
 const DESKTOP_PAGE_SIZE = 3;
 
-type SourceId = "google" | "bbb" | "yelp" | "angi";
+type SourceId = "google" | "yelp" | "angi" | "bbb";
+
+const SOURCE_ORDER: SourceId[] = ["google", "yelp", "angi", "bbb"];
 
 export function Reviews() {
   const heading = useCms().copy.home.reviews;
@@ -33,16 +35,6 @@ export function Reviews() {
       empty: "No Google reviews yet",
       emptyCta: "View the Google page",
       emptyHref: googleListing.mapsUrl,
-    },
-    bbb: {
-      listing: bbbListing,
-      reviews: bbbReviews,
-      label: "BBB",
-      countLabel: "BBB Reviews",
-      writeLabel: "Review us on BBB",
-      empty: "No BBB reviews yet",
-      emptyCta: "View the BBB page",
-      emptyHref: bbbListing.profileUrl,
     },
     yelp: {
       listing: yelpListing,
@@ -64,6 +56,16 @@ export function Reviews() {
       emptyCta: "View the Angi page",
       emptyHref: angiListing.profileUrl || angiProfileUrl,
     },
+    bbb: {
+      listing: bbbListing,
+      reviews: bbbReviews,
+      label: "BBB",
+      countLabel: "BBB Reviews",
+      writeLabel: "Review us on BBB",
+      empty: "No BBB reviews yet",
+      emptyCta: "View the BBB page",
+      emptyHref: bbbListing.profileUrl,
+    },
   } as const;
   const current = catalog[source];
   const listing = current.listing;
@@ -77,7 +79,9 @@ export function Reviews() {
           return reviews[(start + index) % reviews.length];
         });
 
-  function selectSource(next: SourceId) {
+  function selectSource(next: SourceId, event?: { preventDefault(): void; stopPropagation(): void }) {
+    event?.preventDefault();
+    event?.stopPropagation();
     setSource(next);
     setStart(0);
     setExpanded(false);
@@ -142,42 +146,22 @@ export function Reviews() {
               )}
             </span>
             <span className={styles.sources} role="group" aria-label="Review source">
-              <button
-                type="button"
-                className={source === "google" ? styles.sourceActive : styles.source}
-                aria-pressed={source === "google"}
-                onClick={() => selectSource("google")}
-              >
-                <GoogleMark />
-                <span className={shared.visuallyHidden}>Google reviews</span>
-              </button>
-              <button
-                type="button"
-                className={source === "bbb" ? styles.sourceActive : styles.source}
-                aria-pressed={source === "bbb"}
-                onClick={() => selectSource("bbb")}
-              >
-                <BbbMark />
-                <span className={shared.visuallyHidden}>BBB reviews</span>
-              </button>
-              <button
-                type="button"
-                className={source === "angi" ? styles.sourceActive : styles.source}
-                aria-pressed={source === "angi"}
-                onClick={() => selectSource("angi")}
-              >
-                <AngiMark />
-                <span className={shared.visuallyHidden}>Angi reviews</span>
-              </button>
-              <button
-                type="button"
-                className={source === "yelp" ? styles.sourceActive : styles.source}
-                aria-pressed={source === "yelp"}
-                onClick={() => selectSource("yelp")}
-              >
-                <YelpIcon className={styles.yelpMark} />
-                <span className={shared.visuallyHidden}>Yelp reviews</span>
-              </button>
+              {SOURCE_ORDER.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={source === id ? styles.sourceActive : styles.source}
+                  aria-pressed={source === id}
+                  onClick={(event) => selectSource(id, event)}
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
+                  {id === "google" ? <GoogleMark /> : null}
+                  {id === "yelp" ? <YelpIcon className={styles.yelpMark} /> : null}
+                  {id === "angi" ? <AngiMark /> : null}
+                  {id === "bbb" ? <BbbMark /> : null}
+                  <span className={shared.visuallyHidden}>{catalog[id].label} reviews</span>
+                </button>
+              ))}
             </span>
           </p>
           <a

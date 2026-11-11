@@ -107,14 +107,21 @@
 	composes: container from "../../styles/shared.module.css";
 	position: relative;
 	z-index: 1;
-	max-width: 90rem;
-	padding-block: 2.75rem 2rem;
+	max-width: none;
+	margin-inline: 0;
+	padding-block: 2.75rem 0;
+	padding-inline: 40px;
+}
+
+.cluster {
+	position: relative;
+	width: 100%;
 }
 
 .columns {
 	display: grid;
-	grid-template-columns: 1fr;
-	gap: 2.5rem 2.25rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 2.25rem 1.5rem;
 }
 
 .brandCol {
@@ -122,12 +129,13 @@
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 0.55rem;
+	grid-column: 1 / -1;
 }
 
 .brandLink {
 	display: inline-flex;
 	margin-bottom: 0.35rem;
-	margin-left: -22px;
+	margin-left: -18px;
 }
 
 .email,
@@ -190,7 +198,6 @@
 }
 
 .socialIconBbb {
-	/* Tall BBB torch — slightly inset inside the circle */
 	width: 0.88rem;
 	height: 1.55rem;
 }
@@ -235,10 +242,9 @@
 }
 
 .bottom {
-	composes: container from "../../styles/shared.module.css";
 	position: relative;
 	z-index: 1;
-	max-width: 90rem;
+	width: 100%;
 	border-top: 1px solid rgb(250 250 250 / 0.15);
 	padding-block: 1.15rem 1.35rem;
 }
@@ -278,17 +284,34 @@
 
 .bbbSealImage {
 	width: auto;
-	height: 50px;
+	height: 58px;
 	object-fit: contain;
+	border-radius: 8px;
+}
+
+.bbbSealDesktop {
+	display: none;
+}
+
+.bbbSealMobile {
+	display: inline-flex;
+}
+
+@media (max-width: 719px) {
+	.infoCol {
+		margin-bottom: 2rem;
+	}
+}
+
+@media (min-width: 768px) {
+	.inner {
+		padding-inline: 40px;
+	}
 }
 
 @media (min-width: 720px) {
 	.columns {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.brandCol {
-		grid-column: 1 / -1;
+		gap: 2.5rem 2rem;
 	}
 
 	.bottomRow {
@@ -306,18 +329,40 @@
 
 @media (min-width: 1100px) {
 	.columns {
-		grid-template-columns:
-			minmax(12.5rem, 1.2fr)
-			minmax(8rem, 0.9fr)
-			minmax(9rem, 1.05fr)
-			minmax(7.5rem, 0.85fr)
-			minmax(7rem, 0.75fr)
-			minmax(8rem, 0.85fr);
-		gap: 2.75rem 2.5rem;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: flex-start;
+		gap: 0;
+		padding-bottom: 3.75rem;
 	}
 
 	.brandCol {
 		grid-column: auto;
+		flex: none;
+		margin-right: 60px;
+	}
+
+	.col {
+		flex: none;
+		width: max-content;
+		margin-right: 60px;
+	}
+
+	.col:last-child {
+		margin-right: 0;
+	}
+
+	.bbbSealDesktop {
+		display: inline-flex;
+		position: absolute;
+		right: 0;
+		bottom: calc(1.15rem + 1.35rem + 1.25rem - 8px + 14px);
+		z-index: 2;
+	}
+
+	.bbbSealMobile {
+		display: none;
 	}
 }
 

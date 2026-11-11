@@ -28,6 +28,16 @@
   align-items: center;
 }
 
+.section .container {
+  padding-block: 24px;
+}
+
+@media (min-width: 768px) {
+  .section .container {
+    padding-block: 32px;
+  }
+}
+
 .heading {
   composes: heading from "../../styles/shared.module.css";
   width: 100%;
@@ -45,7 +55,7 @@
   display: grid;
   width: 100%;
   gap: 0.9rem;
-  margin: 2.25rem 0 0;
+  margin: calc(2.25rem - 12px) 0 0;
   padding: 0;
   list-style: none;
 }

@@ -121,8 +121,13 @@
 }
 
 .section .container {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-block: 24px;
+}
+
+@media (min-width: 768px) {
+  .section .container {
+    padding-block: 32px;
+  }
 }
 
 .heading {

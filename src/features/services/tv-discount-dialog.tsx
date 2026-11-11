@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { planOffers } from "@/lib/cms/tv-page";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { hearAboutOptions } from "@/lib/hear-about";
+import { zipPattern } from "@/lib/forms";
 import { HoneypotField, PrivacyNotice } from "@/features/quote";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { nationalDigits, useUsPhone } from "@/lib/use-us-phone";
@@ -21,13 +22,14 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 	const titleId = useId();
 	const nameId = useId();
 	const phoneId = useId();
+	const zipId = useId();
 	const hearId = useId();
 	const errorId = useId();
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const phoneField = useUsPhone();
 	const [mounted, setMounted] = useState(false);
 	const [status, setStatus] = useState<Status>("idle");
-	const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; hearAbout?: boolean }>({});
+	const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; zip?: boolean; hearAbout?: boolean }>({});
 	const [formError, setFormError] = useState("");
 	const [hearAbout, setHearAbout] = useState("");
 
@@ -55,15 +57,19 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 		const form = event.currentTarget;
 		const data = new FormData(form);
 		const name = String(data.get("name") ?? "").trim();
-		const next: { name?: boolean; phone?: boolean; hearAbout?: boolean } = {};
+		const zip = String(data.get("zip") ?? "").trim();
+		const next: { name?: boolean; phone?: boolean; zip?: boolean; hearAbout?: boolean } = {};
 		if (name.length < 2) next.name = true;
 		if (nationalDigits(phoneField.phone).length !== 10) next.phone = true;
+		if (!zipPattern.test(zip)) next.zip = true;
 		if (!hearAbout) next.hearAbout = true;
 		setErrors(next);
 		setFormError("");
 		if (Object.keys(next).length > 0) {
 			setStatus("error");
-			document.getElementById(next.name ? nameId : next.phone ? phoneId : hearId)?.focus();
+			document
+				.getElementById(next.name ? nameId : next.phone ? phoneId : next.zip ? zipId : hearId)
+				?.focus();
 			return;
 		}
 
@@ -76,6 +82,7 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 					fields: {
 						name,
 						phone: phoneField.phone,
+						zip,
 						tvCount: id,
 						offer: offer.title,
 						service: offer.title,
@@ -169,6 +176,24 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 								onBeforeInput={phoneField.onBeforeInput}
 								className={errors.phone ? `${styles.input} ${styles.inputInvalid}` : styles.input}
 								aria-invalid={errors.phone ? true : undefined}
+							/>
+						</div>
+						<div className={styles.field}>
+							<label className={shared.visuallyHidden} htmlFor={zipId}>
+								ZIP code
+							</label>
+							<input
+								id={zipId}
+								name="zip"
+								inputMode="numeric"
+								autoComplete="postal-code"
+								placeholder="ZIP code"
+								required
+								className={errors.zip ? `${styles.input} ${styles.inputInvalid}` : styles.input}
+								aria-invalid={errors.zip ? true : undefined}
+								onChange={() => {
+									if (errors.zip) setErrors((current) => ({ ...current, zip: undefined }));
+								}}
 							/>
 						</div>
 						<div className={styles.field}>

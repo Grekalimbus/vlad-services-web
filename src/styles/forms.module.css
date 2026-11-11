@@ -357,6 +357,10 @@
 }
 
 .bookTitle span {
+  font-family: var(--font-bespoke-stencil), var(--font-sans), system-ui, sans-serif;
+  font-weight: 800;
+  font-synthesis: none;
+  letter-spacing: -0.02em;
   color: #3aa0ff;
 }
 

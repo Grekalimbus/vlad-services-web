@@ -14,8 +14,13 @@
 }
 
 .section .container {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-block: 24px;
+}
+
+@media (min-width: 768px) {
+  .section .container {
+    padding-block: 32px;
+  }
 }
 
 @media (min-width: 900px) {
@@ -26,17 +31,10 @@
   }
 }
 
-.heading {
-  composes: heading from "../../styles/shared.module.css";
-  width: 100%;
-  letter-spacing: 0.04em;
-  font-weight: 800;
-}
-
 .grid {
   display: grid;
   gap: 1rem;
-  margin: 2.5rem 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -50,9 +48,7 @@
   border-radius: 1.25rem;
   background: #fff;
   padding: 1.15rem 1.15rem;
-  box-shadow:
-    0 1px 2px rgb(23 23 23 / 0.04),
-    0 12px 28px rgb(37 128 205 / 0.08);
+  box-shadow: none;
   text-align: left;
 }
 
