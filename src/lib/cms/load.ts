@@ -23,22 +23,30 @@ export async function bindCms(): Promise<CmsDocument> {
   return document;
 }
 
-async function readSavedDocument(): Promise<CmsDocument> {
-  if (process.env.NEXT_PHASE === "phase-production-build" || process.env.STATIC_EXPORT === "true") {
-    return ensureTrustItems(ensureServiceTemplates(fallbackDocument));
-  }
-  if (process.env.NODE_ENV === "development") {
-    const remote = await readProductionDocument();
-    if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
-  }
+async function readLocalDocument(): Promise<CmsDocument | null> {
   try {
     const { readFile } = await import("node:fs/promises");
     const path = await import("node:path");
     const raw = await readFile(path.join(process.cwd(), ".cms", "content.json"), "utf8");
     return ensureTrustItems(ensureServiceTemplates(validateDocument(JSON.parse(raw))));
   } catch {
-    return ensureTrustItems(ensureServiceTemplates(readCms()));
+    return null;
   }
+}
+
+async function readSavedDocument(): Promise<CmsDocument> {
+  if (process.env.NEXT_PHASE === "phase-production-build" || process.env.STATIC_EXPORT === "true") {
+    const local = await readLocalDocument();
+    if (local) return local;
+    const remote = await readProductionDocument();
+    if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
+    return ensureTrustItems(ensureServiceTemplates(fallbackDocument));
+  }
+  if (process.env.NODE_ENV === "development") {
+    const remote = await readProductionDocument();
+    if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
+  }
+  return (await readLocalDocument()) ?? ensureTrustItems(ensureServiceTemplates(readCms()));
 }
 
 async function readProductionDocument(): Promise<CmsDocument | null> {

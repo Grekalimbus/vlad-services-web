@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { notifyPublished } from "./edit-store";
 import { toPublicCms } from "./public-projection";
@@ -39,15 +39,25 @@ function publish(document: CmsDocument, setDoc: (doc: CmsDocument) => void) {
   notifyPublished();
 }
 
-function clientBoot(fallback: CmsDocument): CmsDocument {
-  if (typeof window === "undefined") return fallback;
-  return newestCmsScript() ?? window.__CMS__ ?? fallback;
+/**
+ * Cloudflare middleware rewrites #cms-data to the live document and the browser
+ * executes it into window.__CMS__. React hydration can later restore the RSC
+ * fallback into that same script tag. Prefer the already-executed window value
+ * when the script was clearly reset back to the boot/fallback payload.
+ */
+function resolveHardBoot(boot: CmsDocument): CmsDocument {
+  if (typeof window === "undefined") return boot;
+  const fromScript = newestCmsScript();
+  const fromWindow = window.__CMS__;
+  if (fromWindow && fromScript && sameCms(fromScript, boot) && !sameCms(fromWindow, boot)) {
+    return fromWindow;
+  }
+  if (fromScript && !sameCms(fromScript, boot)) return fromScript;
+  return fromWindow ?? fromScript ?? boot;
 }
 
 /**
- * Boot from the Cloudflare-injected #cms-data payload (never the stale static-export
- * fallback when a script exists), then reconcile with /api/content so the published
- * CMS document always wins without a late fallback flash.
+ * Keep route CMS in sync without flashing the static-export fallback on refresh.
  */
 export function CmsBoundary({
   payload,
@@ -60,15 +70,23 @@ export function CmsBoundary({
 }) {
   const pathname = usePathname() || path;
   const boot = useMemo(() => JSON.parse(payload) as CmsDocument, [payload]);
-  const [doc, setDoc] = useState(() => clientBoot(boot));
+  const [doc, setDoc] = useState(() => resolveHardBoot(boot));
+  const hardBooted = useRef(false);
 
   useLayoutEffect(() => {
     let cancelled = false;
     const route = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
     const fromScript = newestCmsScript();
+    const fromWindow = window.__CMS__;
+    const scriptIsBoot = Boolean(fromScript && sameCms(fromScript, boot));
 
-    if (fromScript) {
-      if (!sameCms(fromScript, window.__CMS__)) publish(fromScript, setDoc);
+    if (!hardBooted.current) {
+      hardBooted.current = true;
+      const resolved = resolveHardBoot(boot);
+      if (!sameCms(resolved, fromWindow)) publish(resolved, setDoc);
+      else setDoc(resolved);
+    } else if (fromScript && !scriptIsBoot) {
+      publish(fromScript, setDoc);
     } else {
       publish(boot, setDoc);
     }
