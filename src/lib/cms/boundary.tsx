@@ -24,19 +24,29 @@ function newestCmsScript(): CmsDocument | null {
   return parseCmsScript(last instanceof HTMLScriptElement ? last : null);
 }
 
+function sameCms(a: CmsDocument | null | undefined, b: CmsDocument | null | undefined) {
+  if (!a || !b) return false;
+  try {
+    return JSON.stringify(a) === JSON.stringify(b);
+  } catch {
+    return false;
+  }
+}
+
 function publish(document: CmsDocument, setDoc: (doc: CmsDocument) => void) {
   window.__CMS__ = document;
   setDoc(document);
   notifyPublished();
 }
 
+function clientBoot(fallback: CmsDocument): CmsDocument {
+  if (typeof window === "undefined") return fallback;
+  return newestCmsScript() ?? window.__CMS__ ?? fallback;
+}
+
 /**
- * Keeps route-projected CMS in sync for soft navigations.
- *
- * On Cloudflare static Pages, client transitions inject a new <script id="cms-data">
- * without executing it, so window.__CMS__ can stay on the previous page's lean
- * payload (empty TV fields). Soft-nav can also reuse this boundary instance, so we
- * key off pathname, adopt the newest script, then refresh from /api/content.
+ * Prefer the live #cms-data payload Cloudflare injects over the static-export
+ * RSC fallback, and only hit /api/content when that script is missing.
  */
 export function CmsBoundary({
   payload,
@@ -49,18 +59,21 @@ export function CmsBoundary({
 }) {
   const pathname = usePathname() || path;
   const boot = useMemo(() => JSON.parse(payload) as CmsDocument, [payload]);
-  const [doc, setDoc] = useState(boot);
-
-  useLayoutEffect(() => {
-    publish(boot, setDoc);
-  }, [boot]);
+  const [doc, setDoc] = useState(() => clientBoot(boot));
 
   useLayoutEffect(() => {
     let cancelled = false;
     const route = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
-
     const fromScript = newestCmsScript();
-    if (fromScript) publish(fromScript, setDoc);
+
+    if (fromScript) {
+      if (!sameCms(fromScript, window.__CMS__)) publish(fromScript, setDoc);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    publish(boot, setDoc);
 
     (async () => {
       try {
@@ -68,16 +81,18 @@ export function CmsBoundary({
         if (!response.ok || cancelled) return;
         const full = (await response.json()) as CmsDocument;
         if (cancelled) return;
-        publish(toPublicCms(full, route || path), setDoc);
+        const projected = toPublicCms(full, route || path);
+        if (sameCms(projected, window.__CMS__)) return;
+        publish(projected, setDoc);
       } catch {
-        /* keep bootstrap / script snapshot */
+        /* keep bootstrap snapshot */
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [pathname, path]);
+  }, [pathname, path, boot]);
 
   return <CmsContext.Provider value={doc}>{children}</CmsContext.Provider>;
 }
