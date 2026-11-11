@@ -281,16 +281,28 @@ export function VisualEditor() {
 }
 
 function TextPopover({ panel, onClose }: { panel: Extract<Panel, { kind: "text" }>; onClose: () => void }) {
-  const value = textAt(panel.path);
-  const multiline = value.length > 80 || value.includes("\n");
+  const raw = getPath(readCms(), panel.path);
+  const numeric = panel.path.endsWith(".amount") || typeof raw === "number";
+  const value = numeric ? String(raw ?? "") : textAt(panel.path);
+  const multiline = !numeric && (value.length > 80 || value.includes("\n"));
   return (
     <form className="editorPopover" style={anchor(panel.top, panel.left)} data-editor-ui onSubmit={(event) => event.preventDefault()}>
       <label className="editorLabel">
-        Text
+        {numeric ? "Price" : "Text"}
         {multiline ? (
           <textarea autoFocus value={value} onChange={(event) => setAt(panel.path, event.target.value)} />
         ) : (
-          <input autoFocus value={value} onChange={(event) => setAt(panel.path, event.target.value)} />
+          <input
+            autoFocus
+            inputMode={numeric ? "numeric" : undefined}
+            value={value}
+            onChange={(event) =>
+              setAt(
+                panel.path,
+                numeric ? Number(event.target.value.replace(/[^\d]/g, "")) || 0 : event.target.value,
+              )
+            }
+          />
         )}
       </label>
       <button type="button" className="editorPrimary" onClick={onClose}>
@@ -846,6 +858,20 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
       texts: [
         { path: `copy.dealsPage.items.${index}.title`, label: "Title" },
         { path: `copy.dealsPage.items.${index}.text`, label: "Description", long: true },
+      ],
+    };
+  }
+  if (kind === "price") {
+    const separator = id.lastIndexOf(":");
+    const categoryId = separator > 0 ? id.slice(0, separator) : "";
+    const index = Number(separator > 0 ? id.slice(separator + 1) : "");
+    if (!categoryId || !Number.isInteger(index) || index < 0) return null;
+    return {
+      image: "",
+      remove: false,
+      texts: [
+        { path: `copy.serviceLanding.${categoryId}.prices.${index}.amount`, label: "Price", numeric: true },
+        { path: `copy.serviceLanding.${categoryId}.prices.${index}.label`, label: "Description" },
       ],
     };
   }

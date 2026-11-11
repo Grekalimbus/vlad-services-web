@@ -70,6 +70,14 @@ const handymanLanding: ElectricalLanding = {
         q: "What should I have ready before you arrive?",
         a: "Clear a path to the room, unbox what you can, and have the hardware bag where we can see it.",
       },
+      {
+        q: "Can you handle several small fixes in one visit?",
+        a: "Yes. If the items fit one stop and were priced on the call, we complete them in the same visit.",
+      },
+      {
+        q: "How long does a handyman visit usually take?",
+        a: "Most lists finish in about one to two hours, depending on how many items are on the job and whether parts are already on site.",
+      },
     ],
   },
 };
@@ -334,10 +342,42 @@ function landingPreset(category: { id: string; slug: string; name: string }) {
 
 function priceList(saved: ElectricalLanding["prices"] | undefined, fallback: ElectricalLanding["prices"]) {
   if (!saved?.length) return fallback.map((item) => ({ ...item }));
-  return saved.map((item) => ({
-    amount: Number(item.amount) || 0,
-    label: item.label || "",
-  }));
+  const merged = fallback.map((item, index) => {
+    const current = saved[index];
+    if (!current) return { ...item };
+    return {
+      amount: Number(current.amount) || 0,
+      label: current.label || item.label || "",
+    };
+  });
+  if (saved.length > fallback.length) {
+    for (let index = fallback.length; index < saved.length; index += 1) {
+      const current = saved[index];
+      merged.push({
+        amount: Number(current?.amount) || 0,
+        label: current?.label || "",
+      });
+    }
+  }
+  return merged;
+}
+
+function mergeFaq(
+  defaults: ElectricalLanding["faq"],
+  saved: ElectricalLanding["faq"] | undefined,
+): ElectricalLanding["faq"] {
+  if (!saved?.items?.length) return structuredClone(defaults);
+  const items = saved.items.map((item) => ({ q: item.q || "", a: item.a || "" }));
+  if (items.length < defaults.items.length) {
+    for (let index = items.length; index < defaults.items.length; index += 1) {
+      items.push({ ...defaults.items[index] });
+    }
+  }
+  return {
+    headingLead: saved.headingLead || defaults.headingLead,
+    headingAccent: saved.headingAccent || defaults.headingAccent,
+    items,
+  };
 }
 
 function mergeFeatureRows(
@@ -402,13 +442,7 @@ function mergeLanding(defaults: ElectricalLanding, saved: ElectricalLanding | un
     dealsBody: saved.dealsBody || base.dealsBody,
     stepsHeading: saved.stepsHeading || base.stepsHeading,
     featureRows: mergeFeatureRows(base.featureRows, saved.featureRows),
-    faq: saved.faq?.items?.length
-      ? {
-          headingLead: saved.faq.headingLead || base.faq.headingLead,
-          headingAccent: saved.faq.headingAccent || base.faq.headingAccent,
-          items: saved.faq.items.map((item) => ({ q: item.q || "", a: item.a || "" })),
-        }
-      : base.faq,
+    faq: mergeFaq(base.faq, saved.faq),
   };
 }
 
@@ -425,8 +459,13 @@ function hasLandingBody(landing: ElectricalLanding | undefined): landing is Elec
   );
 }
 
-function isComplete(landing: ElectricalLanding | undefined) {
-  return hasLandingBody(landing) && Boolean(landing.faq?.headingLead && landing.faq.items?.length);
+function isComplete(landing: ElectricalLanding | undefined, defaults: ElectricalLanding) {
+  return (
+    hasLandingBody(landing) &&
+    Boolean(landing.faq?.headingLead && landing.faq.items?.length) &&
+    (landing.prices?.length ?? 0) >= Math.min(6, defaults.prices.length) &&
+    (landing.faq?.items?.length ?? 0) >= defaults.faq.items.length
+  );
 }
 
 export function serviceLandingFrom(
@@ -447,8 +486,9 @@ export function ensureServiceLandings(document: CmsDocument): CmsDocument {
     (category) => category.slug !== "tv-mounting" && category.id !== "tv-mounting" && category.slug !== "electrical" && category.id !== "electrical",
   );
   const needsWork = pending.some((category) => {
+    const defaults = landingPreset(category);
     const current = source.copy.serviceLanding?.[category.id];
-    return !isComplete(current) || missingFeatureRows(current, landingPreset(category));
+    return !isComplete(current, defaults) || missingFeatureRows(current, defaults);
   });
   if (!needsWork) return base;
 
@@ -457,7 +497,7 @@ export function ensureServiceLandings(document: CmsDocument): CmsDocument {
   for (const category of pending) {
     const current = next.copy.serviceLanding?.[category.id];
     const defaults = landingPreset(category);
-    if (isComplete(current) && !missingFeatureRows(current, defaults)) continue;
+    if (isComplete(current, defaults) && !missingFeatureRows(current, defaults)) continue;
     next.copy.serviceLanding[category.id] = hasLandingBody(current) ? mergeLanding(defaults, current) : structuredClone(defaults);
   }
   return next;

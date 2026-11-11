@@ -65,7 +65,7 @@ export function toPublicCms(document: CmsDocument, pathname: string): CmsDocumen
       cards: [],
       body: "",
     };
-    copy.tvShowcase = { cards: [] };
+    copy.tvShowcase = { heading: "", cards: [] };
   }
 
   if (!isService) {

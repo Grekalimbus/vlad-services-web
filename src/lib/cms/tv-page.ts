@@ -35,18 +35,21 @@ type TvDocument = CmsDocument & {
       quiz?: { schemaVersion?: number; steps?: SavedQuizStep[]; form?: Partial<TvQuizFormCopy> };
     };
     additionals: CmsDocument["copy"]["additionals"] & { cards: AdditionalCard[] };
-    tvShowcase?: { cards: TvShowcaseCard[] };
+    tvShowcase?: { heading?: string; cards: TvShowcaseCard[] };
     tvGallery: CmsDocument["copy"]["tvGallery"] & { body?: string };
     tvPage: CmsDocument["copy"]["tvPage"] & { steps?: { title: string; text: string }[] };
   };
 };
 
 const defaultDescriptions: Record<string, string> = {
-  "1": "One television on a single wall.",
-  "2": "Two rooms, mounted in one visit.",
-  "3": "Three screens in one coordinated visit.",
-  "4plus": "Four or more across the house.",
+  "1": "One TV, one visit — bedroom, living room, or office, done in about an hour.",
+  "2": "Two rooms, one appointment. Book both together and save instantly.",
+  "3": "Whole-home bundle — living room, bedroom, and a third room in one visit.",
+  "4plus": "Outfitting a home theater, office, or rental property? Our bulk rate covers it.",
 };
+
+const defaultShowcaseHeading = "Type Mounts We Install";
+const legacyShowcaseHeading = "Mount Types We Install";
 
 const extraSlides: TvSlide[][] = [
   [
@@ -222,8 +225,13 @@ function tvReady(document: CmsDocument) {
     (card) => Array.isArray(card.slides) && card.slides.some((slide) => slide.image),
   );
   const showcase = copy.tvShowcase?.cards;
+  const showcaseHeading = copy.tvShowcase?.heading?.trim();
   const showcaseReady = Boolean(
-    showcase && showcase.length >= 4 && showcase.every((card) => card.text?.trim()),
+    showcase &&
+      showcase.length >= 4 &&
+      showcase.every((card) => card.text?.trim()) &&
+      showcaseHeading &&
+      showcaseHeading !== legacyShowcaseHeading,
   );
   const gallery = copy.tvGallery;
   const galleryReady = Boolean(gallery.body?.trim()) && !isOldBook(gallery.book) && !isOldHeading(gallery);
@@ -272,7 +280,10 @@ export function ensureTvMounting(document: CmsDocument): CmsDocument {
   });
 
   const savedShowcase = next.copy.tvShowcase?.cards ?? [];
+  const savedHeading = next.copy.tvShowcase?.heading?.trim();
   next.copy.tvShowcase = {
+    heading:
+      savedHeading && savedHeading !== legacyShowcaseHeading ? savedHeading : defaultShowcaseHeading,
     cards: (savedShowcase.length >= 4 ? savedShowcase : defaultShowcase).map((card, index) => {
       const fallback = defaultShowcase[index];
       return {
@@ -411,6 +422,12 @@ export function tvShowcaseCards(document: CmsDocument) {
       text: card.text?.trim() || fallback?.text || "",
     };
   });
+}
+
+export function tvShowcaseHeading(document: CmsDocument) {
+  const heading = asTv(document).copy.tvShowcase?.heading?.trim();
+  if (!heading || heading === legacyShowcaseHeading) return defaultShowcaseHeading;
+  return heading;
 }
 
 export function tvSteps(document: CmsDocument) {

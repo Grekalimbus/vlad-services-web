@@ -134,11 +134,25 @@ function priceList(
   saved: ElectricalLanding["prices"] | undefined,
   fallback: ElectricalLanding["prices"],
 ) {
-  if (!saved?.length) return fallback;
-  return saved.map((item) => ({
-    amount: Number(item.amount) || 0,
-    label: item.label || "",
-  }));
+  if (!saved?.length) return fallback.map((item) => ({ ...item }));
+  const merged = fallback.map((item, index) => {
+    const current = saved[index];
+    if (!current) return { ...item };
+    return {
+      amount: Number(current.amount) || 0,
+      label: current.label || item.label || "",
+    };
+  });
+  if (saved.length > fallback.length) {
+    for (let index = fallback.length; index < saved.length; index += 1) {
+      const current = saved[index];
+      merged.push({
+        amount: Number(current?.amount) || 0,
+        label: current?.label || "",
+      });
+    }
+  }
+  return merged;
 }
 
 function mergeFaq(saved: ElectricalLanding["faq"] | undefined) {
@@ -168,7 +182,11 @@ function hasLandingBody(landing: ElectricalLanding | undefined): landing is Elec
 }
 
 function isComplete(landing: ElectricalLanding | undefined): landing is ElectricalLanding {
-  return hasLandingBody(landing) && Boolean(landing.faq?.headingLead && landing.faq.items?.length);
+  return (
+    hasLandingBody(landing) &&
+    Boolean(landing.faq?.headingLead && landing.faq.items?.length) &&
+    (landing.prices?.length ?? 0) >= electricalLanding.prices.length
+  );
 }
 
 export function electricalLandingFrom(document: CmsDocument): ElectricalLanding {

@@ -151,7 +151,12 @@ export function ServiceLanding({
               </div>
             </div>
           </div>
-          <PriceGrid prices={landing.prices} label={category.name.trim()} base={copyBase} />
+          <PriceGrid
+            prices={landing.prices}
+            label={category.name.trim()}
+            categoryId={category.id}
+            base={copyBase}
+          />
         </div>
       </section>
       <GetQuoteButton serviceName={category.name} tight />
@@ -214,19 +219,25 @@ function useCountUp(target: number, active: boolean) {
 function PriceCard({
   amount,
   label,
+  amountPath,
   labelPath,
+  cardId,
   active,
 }: {
   amount: number;
   label: string;
+  amountPath: string;
   labelPath: string;
+  cardId: string;
   active: boolean;
 }) {
   const current = useCountUp(amount, active);
   return (
-    <li className={styles.priceCard}>
+    <li className={styles.priceCard} data-cms-card={cardId}>
       <p className={styles.priceValue}>
-        <span aria-hidden="true">${current}</span>
+        <span aria-hidden="true">
+          $<span data-cms={amountPath}>{current}</span>
+        </span>
         <span className={styles.priceFinal}>${amount}</span>
       </p>
       <p className={styles.priceLabel} data-cms={labelPath}>
@@ -258,10 +269,12 @@ function LandingIcon({ src }: { src: string }) {
 function PriceGrid({
   prices,
   label,
+  categoryId,
   base,
 }: {
   prices: { amount: number; label: string }[];
   label: string;
+  categoryId: string;
   base: string;
 }) {
   const listRef = useRef<HTMLUListElement>(null);
@@ -290,7 +303,9 @@ function PriceGrid({
           key={`${item.label}-${index}`}
           amount={Number(item.amount) || 0}
           label={item.label}
+          amountPath={`${base}.prices.${index}.amount`}
           labelPath={`${base}.prices.${index}.label`}
+          cardId={`price:${categoryId}:${index}`}
           active={active}
         />
       ))}

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { tvShowcaseCards } from "@/lib/cms/tv-page";
+import { tvShowcaseCards, tvShowcaseHeading } from "@/lib/cms/tv-page";
 import { useCms } from "@/lib/cms/use-cms";
 import { assetPath } from "@/lib/site";
 import overview from "@/features/home/services-overview.module.css";
@@ -11,12 +11,13 @@ import styles from "./tv-showcase.module.css";
 export function TvShowcase() {
   const cms = useCms();
   const cards = tvShowcaseCards(cms);
+  const heading = tvShowcaseHeading(cms);
 
   return (
     <section className={styles.section} aria-labelledby="mount-types-heading">
       <div className={`${overview.container} ${styles.frame}`}>
-        <h2 id="mount-types-heading" className={styles.heading}>
-          Mount Types We Install
+        <h2 id="mount-types-heading" className={styles.heading} data-cms="copy.tvShowcase.heading">
+          {heading}
         </h2>
         <ul
           className={`${overview.strip} ${overview.stripCompact} ${styles.grid}`}
