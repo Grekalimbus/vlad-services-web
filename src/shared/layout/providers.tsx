@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { ConsentAnalytics, CookieBanner } from "@/features/consent";
 import { QuoteProvider, useQuote } from "@/features/quote";
 import { MobileCta } from "./mobile-cta";
 
@@ -67,6 +68,8 @@ export function Providers({ children }: { children: ReactNode }) {
           <DealsPopup />
         </DelayedMount>
       )}
+      {admin ? null : <CookieBanner />}
+      {admin ? null : <ConsentAnalytics />}
       {admin ? null : <MobileCta />}
       <VisualEditor />
     </QuoteProvider>

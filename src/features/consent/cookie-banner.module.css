@@ -1,0 +1,129 @@
+.slot {
+	position: fixed;
+	z-index: 45;
+	right: 18px;
+	bottom: calc(4.25rem + 18px + env(safe-area-inset-bottom, 0px));
+	width: min(20.5rem, calc(100vw - 36px));
+	pointer-events: none;
+	text-align: left;
+}
+
+.panel {
+	pointer-events: auto;
+	display: grid;
+	gap: 0.75rem;
+	border: 1px solid color-mix(in srgb, var(--border) 88%, #2580cd);
+	border-radius: 14px;
+	background:
+		linear-gradient(180deg, #fff 0%, #f7fafc 100%);
+	padding: 0.85rem 0.9rem 0.9rem;
+	box-shadow:
+		0 2px 6px rgb(28 39 68 / 0.05),
+		0 12px 28px rgb(28 39 68 / 0.12);
+	animation: cookie-in 180ms ease;
+}
+
+.copy {
+	margin: 0;
+	font-size: 0.8rem;
+	font-weight: 500;
+	line-height: 1.4;
+	color: #3a4450;
+}
+
+.link {
+	color: var(--accent);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.link:hover {
+	color: color-mix(in srgb, var(--accent) 82%, #000);
+}
+
+.actions {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.45rem;
+}
+
+.accept,
+.reject {
+	display: inline-flex;
+	min-height: 2.25rem;
+	align-items: center;
+	justify-content: center;
+	border-radius: 9999px;
+	border: 1px solid transparent;
+	padding-inline: 0.75rem;
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	cursor: pointer;
+	transition:
+		background 160ms ease,
+		color 160ms ease,
+		border-color 160ms ease;
+}
+
+.accept {
+	background: var(--accent);
+	color: var(--accent-foreground);
+}
+
+.accept:hover {
+	background: color-mix(in srgb, var(--accent) 88%, #000);
+}
+
+.reject {
+	background: #fff;
+	border-color: var(--border);
+	color: #2a3340;
+}
+
+.reject:hover {
+	border-color: color-mix(in srgb, var(--border) 55%, #2580cd);
+	background: #f4f8fb;
+}
+
+@keyframes cookie-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (max-width: 640px) {
+	.slot {
+		/* Keep clear of the left review toast and full-width mobile CTA. */
+		width: min(16.75rem, calc(50vw - 14px));
+		min-width: 11.5rem;
+	}
+
+	.copy {
+		font-size: 0.74rem;
+	}
+
+	.accept,
+	.reject {
+		min-height: 2.1rem;
+		font-size: 0.72rem;
+	}
+}
+
+@media (min-width: 1024px) {
+	.slot {
+		bottom: 18px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.panel {
+		animation: none;
+	}
+}

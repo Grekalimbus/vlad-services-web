@@ -7,6 +7,7 @@ import { dealsPage } from "@/lib/cms/deals-page";
 import { useCms } from "@/lib/cms/use-cms";
 import { googleListing } from "@/lib/google-reviews";
 import { socialLinks } from "@/lib/social";
+import { openCookieConsentBanner } from "@/lib/cookie-consent";
 import { phoneHref } from "@/lib/site";
 import { InstagramIcon, LinkedInIcon, YelpIcon } from "@/shared/brand-icons";
 import { BrandLogo } from "@/shared/ui";
@@ -214,6 +215,11 @@ export function Footer() {
 									<Link href="/messaging-terms" className={styles.colLink}>
 										Messaging Terms
 									</Link>
+								</li>
+								<li>
+									<button type="button" className={styles.colLinkButton} onClick={openCookieConsentBanner}>
+										Cookie settings
+									</button>
 								</li>
 							</ul>
 						</nav>
