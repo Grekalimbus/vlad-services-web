@@ -23,7 +23,7 @@ export async function CmsPage({ path, children }: { path: string; children: Reac
       <a href="#content" className={styles.skipLink}>
         Skip to content
       </a>
-      <CmsBoundary payload={payload}>
+      <CmsBoundary payload={payload} path={path}>
         <Providers>
           <Header />
           {children}
