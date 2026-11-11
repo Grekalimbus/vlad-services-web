@@ -4,6 +4,7 @@ import {
   type ApplicationConsents,
   type ConsentRecord,
 } from "@/lib/consent";
+import { trackGenerateLead } from "@/lib/ga4";
 
 export type LeadFormId =
   | "general-quote"
@@ -146,5 +147,10 @@ export async function submitLead(payload: LeadPayload, trap: { companyUrl?: stri
   });
   const body = (await response.json().catch(() => null)) as { error?: string } | null;
   if (!response.ok) throw new Error(body?.error || "Could not send the request. Try again.");
+  trackGenerateLead({
+    dedupeKey: payload.id,
+    formLocation: payload.source.formId,
+    serviceType: fields.service,
+  });
   return { ok: true as const, payload };
 }

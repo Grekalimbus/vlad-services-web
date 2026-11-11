@@ -80,7 +80,7 @@ export function QuoteDialog() {
           {form === "tv" ? (
             <TvQuoteForm formId="quote-dialog" compact tvCount={tvCount ?? undefined} />
           ) : (
-            <QuoteForm initialService={service ?? ""} />
+            <QuoteForm initialService={service ?? ""} formLocation="quote-dialog" />
           )}
         </div>
       </div>

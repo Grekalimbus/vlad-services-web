@@ -7,6 +7,7 @@ import { HoneypotField } from "./honeypot-field";
 import { useCms } from "@/lib/cms/use-cms";
 import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { hearAboutOptions } from "@/lib/hear-about";
+import { trackGenerateLead } from "@/lib/ga4";
 import { quoteSuccessMessage } from "@/lib/leads";
 import { quoteServices } from "@/lib/services";
 import styles from "@/styles/forms.module.css";
@@ -18,7 +19,14 @@ const MAX_DESCRIPTION = 450;
 type Status = "idle" | "loading" | "success" | "error";
 type FieldKey = "name" | "phone" | "email" | "zip" | "service" | "hearAbout";
 
-export function QuoteForm({ initialService = "" }: { initialService?: string }) {
+export function QuoteForm({
+  initialService = "",
+  formLocation = "general-quote",
+}: {
+  initialService?: string;
+  /** GA4 form_location (placement id). Not shown in the UI. */
+  formLocation?: string;
+}) {
   const ids = {
     name: useId(),
     phone: useId(),
@@ -124,6 +132,10 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
 
     setStatus("loading");
     setFormError("");
+    const dedupeKey =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `quote-${Date.now()}`;
     const body = new FormData();
     body.set("name", name.trim());
     body.set("phone", phone.trim());
@@ -138,6 +150,11 @@ export function QuoteForm({ initialService = "" }: { initialService?: string }) 
       const response = await fetch("/api/applications", { method: "POST", body });
       const payload = (await response.json().catch(() => null)) as { error?: string } | null;
       if (!response.ok) throw new Error(payload?.error || "Could not send the request. Try again.");
+      trackGenerateLead({
+        dedupeKey,
+        formLocation,
+        serviceType: service,
+      });
       setStatus("success");
     } catch (error) {
       setStatus("error");
