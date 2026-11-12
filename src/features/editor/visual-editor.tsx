@@ -877,9 +877,11 @@ function cardFields(kind: string, id: string): { image: string; remove: boolean;
           options: [
             { value: "", label: "None" },
             { value: "+", label: "+" },
+            { value: "/hr", label: "/hr" },
           ],
         },
-        { path: `copy.serviceLanding.${categoryId}.prices.${index}.label`, label: "Description" },
+        { path: `copy.serviceLanding.${categoryId}.prices.${index}.label`, label: "Title" },
+        { path: `copy.serviceLanding.${categoryId}.prices.${index}.subtitle`, label: "Subtitle" },
       ],
     };
   }

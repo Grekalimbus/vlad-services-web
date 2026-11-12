@@ -220,23 +220,28 @@ function PriceCard({
   amount,
   suffix,
   label,
+  subtitle,
   amountPath,
   suffixPath,
   labelPath,
+  subtitlePath,
   cardId,
   active,
 }: {
   amount: number;
   suffix: string;
   label: string;
+  subtitle: string;
   amountPath: string;
   suffixPath: string;
   labelPath: string;
+  subtitlePath: string;
   cardId: string;
   active: boolean;
 }) {
   const current = useCountUp(amount, active);
   const mark = suffix.trim();
+  const note = subtitle.trim();
   return (
     <li className={styles.priceCard} data-cms-card={cardId}>
       <p className={styles.priceValue}>
@@ -251,6 +256,9 @@ function PriceCard({
       </p>
       <p className={styles.priceLabel} data-cms={labelPath}>
         {label}
+      </p>
+      <p className={styles.priceSubtitle} data-cms={subtitlePath} data-empty={note ? undefined : ""}>
+        {note}
       </p>
     </li>
   );
@@ -281,7 +289,7 @@ function PriceGrid({
   categoryId,
   base,
 }: {
-  prices: { amount: number; label: string; suffix?: string }[];
+  prices: { amount: number; label: string; suffix?: string; subtitle?: string }[];
   label: string;
   categoryId: string;
   base: string;
@@ -313,9 +321,11 @@ function PriceGrid({
           amount={Number(item.amount) || 0}
           suffix={item.suffix || ""}
           label={item.label}
+          subtitle={item.subtitle || ""}
           amountPath={`${base}.prices.${index}.amount`}
           suffixPath={`${base}.prices.${index}.suffix`}
           labelPath={`${base}.prices.${index}.label`}
+          subtitlePath={`${base}.prices.${index}.subtitle`}
           cardId={`price:${categoryId}:${index}`}
           active={active}
         />

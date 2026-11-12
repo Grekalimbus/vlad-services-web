@@ -17,7 +17,7 @@ export type ElectricalLanding = {
   stepsHeading: string;
   steps: { title: string; text: string }[];
   dealsBody: string;
-  prices: { amount: number; label: string; suffix?: string }[];
+  prices: { amount: number; label: string; suffix?: string; subtitle?: string }[];
   featureRows?: LandingFeatureRow[];
   faq: {
     headingLead: string;
@@ -137,6 +137,11 @@ function normalizePriceSuffix(value: unknown, fallback = "") {
   return trimmed.slice(0, 8);
 }
 
+function normalizePriceSubtitle(value: unknown, fallback = "") {
+  if (typeof value !== "string") return fallback;
+  return value.trim().slice(0, 120);
+}
+
 function priceItem(
   current: ElectricalLanding["prices"][number] | undefined,
   fallback?: ElectricalLanding["prices"][number],
@@ -145,6 +150,7 @@ function priceItem(
     amount: Number(current?.amount) || Number(fallback?.amount) || 0,
     label: current?.label || fallback?.label || "",
     suffix: normalizePriceSuffix(current?.suffix, fallback?.suffix || ""),
+    subtitle: normalizePriceSubtitle(current?.subtitle, fallback?.subtitle || ""),
   };
 }
 
@@ -152,7 +158,13 @@ function priceList(
   saved: ElectricalLanding["prices"] | undefined,
   fallback: ElectricalLanding["prices"],
 ) {
-  if (!saved?.length) return fallback.map((item) => ({ ...item, suffix: item.suffix || "" }));
+  if (!saved?.length) {
+    return fallback.map((item) => ({
+      ...item,
+      suffix: item.suffix || "",
+      subtitle: item.subtitle || "",
+    }));
+  }
   const merged = fallback.map((item, index) => priceItem(saved[index], item));
   if (saved.length > fallback.length) {
     for (let index = fallback.length; index < saved.length; index += 1) {
