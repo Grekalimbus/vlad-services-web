@@ -1,18 +1,14 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CategoryLanding } from "@/features/services";
 import { TvMountingPage } from "@/features/services/tv-mounting-page";
 import { CmsPage } from "@/lib/cms/cms-page";
 import { bindCms } from "@/lib/cms/load";
-import { pageMeta } from "@/lib/seo";
+import { pageMeta, redirectTarget } from "@/lib/seo";
 import { metadataFor } from "@/lib/seo-metadata";
-import { landingForSlug, serviceRouteSlugs } from "@/lib/services";
+import { landingForSlug } from "@/lib/services";
 import { JsonLd } from "@/shared/seo";
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return serviceRouteSlugs.map((slug) => ({ slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -30,7 +26,9 @@ export default async function ServicePage({
 }) {
   const { slug } = await params;
   const cms = await bindCms();
-  const landing = landingForSlug(slug);
+  const destination = redirectTarget(`/services/${slug}`, cms);
+  if (destination) redirect(destination);
+  const landing = landingForSlug(slug, cms);
   if (!landing) notFound();
   const data = <JsonLd data={pageMeta(`/services/${slug}`, cms).jsonLd} />;
 

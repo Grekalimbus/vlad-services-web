@@ -1,6 +1,19 @@
 name = "primefixpros"
+main = ".open-next/worker.js"
 compatibility_date = "2026-09-24"
-pages_build_output_dir = "out"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+# Set only in the Worker. Local Next.js leaves this unset and reads production D1.
+[vars]
+CMS_RUNTIME = "cloudflare"
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "primefixpros"
 
 [[d1_databases]]
 binding = "CMS_DB"

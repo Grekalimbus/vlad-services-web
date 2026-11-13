@@ -1,8 +1,8 @@
 import { handleContentPut } from "@/lib/cms/http";
-import { localEnv } from "@/lib/cms/local-env";
+import { getCmsEnv } from "@/lib/cms/runtime";
 
 export const dynamic = "force-dynamic";
 
-export function PUT(request: Request) {
-  return handleContentPut(request, localEnv());
+export async function PUT(request: Request) {
+  return handleContentPut(request, await getCmsEnv());
 }

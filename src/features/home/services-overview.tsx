@@ -38,7 +38,7 @@ export function ServicesOverview() {
                   const coverIndex = cms.copy.home.serviceCovers.findIndex((item) => item.id === category.id);
                   const cover = covers[category.id];
                   const src = cover?.src ?? category.coverImage;
-                  const href = servicePageHref(category);
+                  const href = servicePageHref(category, cms.serviceCategories);
                   return (
                     <li key={category.id} className={styles.item}>
                       <Link href={href} className={styles.card} data-cms-card={`service:${category.id}`}>

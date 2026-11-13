@@ -1,35 +1,27 @@
-import { live, readCms } from "@/lib/cms/read";
-
-export type GalleryKind = "project" | "before-after";
-
 export type GalleryCategory = {
   id: string;
   slug: string;
   name: string;
-  summary: string;
-  serviceCategoryId?: string;
+  description: string;
 };
 
 export type GallerySubcategory = {
   id: string;
-  slug: string;
   categoryId: string;
+  slug: string;
   name: string;
+  description: string;
 };
 
 export type GalleryItem = {
   id: string;
   categoryId: string;
-  subcategoryId: string | null;
+  subcategoryId: string;
   title: string;
-  summary?: string;
+  summary: string;
   alt: string;
-  kind: GalleryKind;
-  src: string | null;
-  beforeSrc?: string | null;
-  afterSrc?: string | null;
+  kind: string;
+  src: string;
+  beforeSrc?: string;
+  afterSrc?: string;
 };
-
-export const galleryCategories = live(() => readCms().galleryCategories as GalleryCategory[]);
-export const gallerySubcategories = live(() => readCms().gallerySubcategories as GallerySubcategory[]);
-export const galleryItems = live(() => readCms().galleryItems as GalleryItem[]);

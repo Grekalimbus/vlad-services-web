@@ -2,7 +2,8 @@
 
 import { FormEvent, PointerEvent as ReactPointerEvent, useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { getPath, readCms } from "@/lib/cms/read";
+import { getPath } from "@/lib/cms/read";
+import type { CmsDocument } from "@/lib/cms/types";
 import {
   adoptSaved,
   clearEditingTab,
@@ -19,8 +20,6 @@ import { heroSlides } from "@/features/home/hero-slides";
 import { projectReels, type ReelPhoto } from "@/features/home/project-photos";
 import { assetPath } from "@/lib/site";
 import { projectIconOptions } from "@/lib/project-cards";
-import { ensureServiceTemplates } from "@/lib/service-pages";
-import { ensureTrustItems } from "@/lib/cms/trust-items";
 import { peekReveal, revealSurface } from "@/lib/cms/reveal";
 import { removeDeal } from "./deal-actions";
 import { removeHomepageService } from "./service-actions";
@@ -68,7 +67,7 @@ export function VisualEditor() {
             const response = await fetch("/api/content", { cache: "no-store", credentials: "same-origin" });
             const document = response.ok ? await response.json() : null;
             if (!cancelled && document && document.version === 1 && Array.isArray(document.serviceCategories)) {
-              publishDocument(ensureTrustItems(ensureServiceTemplates(document)));
+              publishDocument(document);
             }
           } catch {
             void 0;
@@ -281,9 +280,10 @@ export function VisualEditor() {
 }
 
 function TextPopover({ panel, onClose }: { panel: Extract<Panel, { kind: "text" }>; onClose: () => void }) {
-  const raw = getPath(readCms(), panel.path);
+  const cms = useCms();
+  const raw = getPath(cms, panel.path);
   const numeric = panel.path.endsWith(".amount") || typeof raw === "number";
-  const value = numeric ? String(raw ?? "") : textAt(panel.path);
+  const value = numeric ? String(raw ?? "") : textAt(cms, panel.path);
   const multiline = !numeric && (value.length > 80 || value.includes("\n"));
   return (
     <form className="editorPopover" style={anchor(panel.top, panel.left)} data-editor-ui onSubmit={(event) => event.preventDefault()}>
@@ -315,7 +315,8 @@ function TextPopover({ panel, onClose }: { panel: Extract<Panel, { kind: "text" 
 function ImagePopover({ panel, onClose }: { panel: Extract<Panel, { kind: "image" }>; onClose: () => void }) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const src = textAt(panel.path) || (panel.path === "copy.home.hero.builder" ? "/hero/builder.webp" : "");
+  const cms = useCms();
+  const src = textAt(cms, panel.path);
   const portrait = panel.path === "copy.home.hero.builder";
   const badge = panel.path.includes("copy.home.hero.badges");
   return (
@@ -386,7 +387,8 @@ function CardPopover({
   const splitAt = card.indexOf(":");
   const kind = splitAt < 0 ? card : card.slice(0, splitAt);
   const id = splitAt < 0 ? "" : card.slice(splitAt + 1);
-  const fields = cardFields(kind, id);
+  const cms = useCms();
+  const fields = cardFields(cms, kind, id);
 
   function replace(path: string, file: File | undefined) {
     if (!file) return;
@@ -396,8 +398,8 @@ function CardPopover({
       .then((src) => {
         setAt(path, src);
         if (kind === "service") {
-          const cover = readCms().copy.home.serviceCovers.findIndex((item) => item.id === id);
-          const index = readCms().serviceCategories.findIndex((item) => item.id === id);
+          const cover = cms.copy.home.serviceCovers.findIndex((item) => item.id === id);
+          const index = cms.serviceCategories.findIndex((item) => item.id === id);
           if (cover >= 0) setAt(`copy.home.serviceCovers.${cover}.src`, src);
           if (index >= 0) setAt(`serviceCategories.${index}.coverImage`, src);
         }
@@ -424,15 +426,15 @@ function CardPopover({
     >
       {fields.image ? (
         <>
-          {kind === "deal" && textAt(`copy.dealsPage.items.${id}.kind`) === "video" ? (
+          {kind === "deal" && textAt(cms, `copy.dealsPage.items.${id}.kind`) === "video" ? (
             <video
-              src={assetPath(textAt(fields.image))}
+              src={assetPath(textAt(cms, fields.image))}
               controls
               style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8, background: "#0c121c" }}
             />
           ) : (
             <img
-              src={assetPath(textAt(fields.image))}
+              src={assetPath(textAt(cms, fields.image))}
               alt=""
               style={{
                 width: "100%",
@@ -459,9 +461,9 @@ function CardPopover({
         <label key={field.path} className="editorLabel">
           {field.label}
           {field.options ? (
-            <select value={textAt(field.path)} onChange={(event) => setAt(field.path, event.target.value)}>
-              {field.options.some((option) => option.value === textAt(field.path)) ? null : (
-                <option value={textAt(field.path)}>{textAt(field.path) || "Select"}</option>
+            <select value={textAt(cms, field.path)} onChange={(event) => setAt(field.path, event.target.value)}>
+              {field.options.some((option) => option.value === textAt(cms, field.path)) ? null : (
+                <option value={textAt(cms, field.path)}>{textAt(cms, field.path) || "Select"}</option>
               )}
               {field.options.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -470,10 +472,10 @@ function CardPopover({
               ))}
             </select>
           ) : field.long ? (
-            <textarea value={textAt(field.path)} onChange={(event) => setAt(field.path, event.target.value)} />
+            <textarea value={textAt(cms, field.path)} onChange={(event) => setAt(field.path, event.target.value)} />
           ) : (
             <input
-              value={textAt(field.path)}
+              value={textAt(cms, field.path)}
               inputMode={field.numeric ? "numeric" : undefined}
               onChange={(event) =>
                 setAt(field.path, field.numeric ? Number(event.target.value.replace(/[^\d]/g, "")) || 0 : event.target.value)
@@ -510,10 +512,11 @@ function CardPopover({
 }
 
 function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => void }) {
+  const cms = useCms();
   const titleId = useId();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
-  const frames = galleryFrames(gallery);
+  const frames = galleryFrames(cms, gallery);
   const photosOnly = gallery.startsWith("photos:") || gallery.startsWith("reels:");
   const title = gallery === "reels:top" ? "Top carousel" : gallery === "reels:bottom" ? "Bottom carousel" : "Photos";
   const dragStart = useRef<{ index: number; x: number; y: number } | null>(null);
@@ -547,7 +550,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
         const origin = dragStart.current;
         const to = thumbAt(event.clientX, event.clientY);
         dragStart.current = null;
-        if (origin && dragMoved.current && to != null) reorderFrames(gallery, origin.index, to);
+        if (origin && dragMoved.current && to != null) reorderFrames(cms, gallery, origin.index, to);
         dragMoved.current = false;
         setDragIndex(null);
         setOverIndex(null);
@@ -605,7 +608,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
               {photosOnly || !frame.captionPath ? null : (
                 <label className="editorLabel">
                   Caption
-                  <input value={textAt(frame.captionPath)} onChange={(event) => setAt(frame.captionPath!, event.target.value)} />
+                  <input value={textAt(cms, frame.captionPath)} onChange={(event) => setAt(frame.captionPath!, event.target.value)} />
                 </label>
               )}
               <div className="editorThumbActions">
@@ -618,7 +621,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
                     onChange={(event) => {
                       const file = event.target.files?.[0];
                       event.target.value = "";
-                      change(file, (src) => replaceFrame(gallery, index, src, false));
+                      change(file, (src) => replaceFrame(cms, gallery, index, src, false));
                     }}
                   />
                 </label>
@@ -632,12 +635,12 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
                       onChange={(event) => {
                         const file = event.target.files?.[0];
                         event.target.value = "";
-                        change(file, (src) => replaceFrame(gallery, index, src, true));
+                        change(file, (src) => replaceFrame(cms, gallery, index, src, true));
                       }}
                     />
                   </label>
                 ) : null}
-                <button type="button" onClick={() => deleteFrame(gallery, index)}>
+                <button type="button" onClick={() => deleteFrame(cms, gallery, index)}>
                   Delete
                 </button>
               </div>
@@ -660,7 +663,7 @@ function GalleryModal({ gallery, onClose }: { gallery: string; onClose: () => vo
               setError("");
               void Promise.all(files.map((file) => uploadImage(file)))
                 .then((sources) => {
-                  sources.forEach((src) => addFrame(gallery, src));
+                  sources.forEach((src) => addFrame(cms, gallery, src));
                   setPending(false);
                 })
                 .catch((reason: unknown) => {
@@ -684,8 +687,8 @@ function anchor(top: number, left: number) {
   };
 }
 
-function textAt(path: string) {
-  const value = getPath(readCms(), path);
+function textAt(document: CmsDocument, path: string) {
+  const value = getPath(document, path);
   return value == null ? "" : String(value);
 }
 
@@ -762,8 +765,7 @@ type CardField = {
   options?: { value: string; label: string }[];
 };
 
-function cardFields(kind: string, id: string): { image: string; remove: boolean; texts: CardField[] } | null {
-  const document = readCms();
+function cardFields(document: CmsDocument, kind: string, id: string): { image: string; remove: boolean; texts: CardField[] } | null {
   if (kind === "serviceIcon") {
     const separator = id.lastIndexOf(":");
     const categoryId = separator > 0 ? id.slice(0, separator) : "";
@@ -929,30 +931,29 @@ function reelRow(gallery: string) {
   return null;
 }
 
-function reelPhotos(gallery: string) {
+function reelPhotos(document: CmsDocument, gallery: string) {
   const row = reelRow(gallery);
   if (!row) return null;
-  return projectReels(readCms())[row].map((photo) => ({ ...photo }));
+  return projectReels(document)[row].map((photo) => ({ ...photo }));
 }
 
-function commitReel(gallery: string, photos: ReelPhoto[]) {
+function commitReel(document: CmsDocument, gallery: string, photos: ReelPhoto[]) {
   const row = reelRow(gallery);
   if (!row) return;
-  const current = projectReels(readCms());
+  const current = projectReels(document);
   setAt("copy.home.works.reels", { ...current, [row]: photos });
 }
 
-function galleryFrames(gallery: string): Frame[] {
-  const reel = reelPhotos(gallery);
+function galleryFrames(document: CmsDocument, gallery: string): Frame[] {
+  const reel = reelPhotos(document, gallery);
   if (reel) {
     return reel.map((photo, index) => ({
       key: `${index}-${photo.image}`,
       src: photo.image,
     }));
   }
-  const document = readCms();
   if (gallery.startsWith("slides:")) {
-    return slideArray(gallery).slides.map((slide, index) => ({
+    return slideArray(document, gallery).slides.map((slide, index) => ({
       key: `${index}-${slide?.image ?? index}`,
       src: String(slide?.image ?? ""),
     }));
@@ -976,9 +977,9 @@ function itemCategory(gallery: string) {
 
 type SlideRecord = { image?: string; alt?: string; position?: string };
 
-function slideArray(gallery: string): { path: string; slides: SlideRecord[] } {
+function slideArray(document: CmsDocument, gallery: string): { path: string; slides: SlideRecord[] } {
   const path = gallery.slice("slides:".length);
-  const current = getPath(readCms(), path);
+  const current = getPath(document, path);
   if (Array.isArray(current)) {
     return {
       path,
@@ -988,7 +989,7 @@ function slideArray(gallery: string): { path: string; slides: SlideRecord[] } {
     };
   }
   if (path === "copy.home.hero.slides") {
-    return { path, slides: heroSlides(readCms().copy.home.hero).map((slide) => ({ ...slide })) };
+    return { path, slides: heroSlides(document.copy.home.hero).map((slide) => ({ ...slide })) };
   }
   return { path, slides: [] };
 }
@@ -1015,25 +1016,25 @@ function commitSlides(path: string, slides: SlideRecord[]) {
   setAt("copy.home.hero.imageNextAlt", second?.alt ?? "");
 }
 
-function categoryEntries(gallery: string) {
+function categoryEntries(document: CmsDocument, gallery: string) {
   const categoryId = itemCategory(gallery);
-  const items = [...readCms().galleryItems];
+  const items = [...document.galleryItems];
   const indexes = items.flatMap((item, index) => (item.categoryId === categoryId ? [index] : []));
   return { items, indexes, categoryId };
 }
 
-function reorderFrames(gallery: string, from: number, to: number) {
+function reorderFrames(document: CmsDocument, gallery: string, from: number, to: number) {
   if (from === to) return;
-  const reel = reelPhotos(gallery);
+  const reel = reelPhotos(document, gallery);
   if (reel) {
     if (from < 0 || to < 0 || from >= reel.length || to >= reel.length) return;
     const [item] = reel.splice(from, 1);
     reel.splice(to, 0, item);
-    commitReel(gallery, reel);
+    commitReel(document, gallery, reel);
     return;
   }
   if (gallery.startsWith("slides:")) {
-    const { path, slides } = slideArray(gallery);
+    const { path, slides } = slideArray(document, gallery);
     if (from < 0 || to < 0 || from >= slides.length || to >= slides.length) return;
     const next = slides.slice();
     const [item] = next.splice(from, 1);
@@ -1041,7 +1042,7 @@ function reorderFrames(gallery: string, from: number, to: number) {
     commitSlides(path, next);
     return;
   }
-  const { items, indexes } = categoryEntries(gallery);
+  const { items, indexes } = categoryEntries(document, gallery);
   if (from < 0 || to < 0 || from >= indexes.length || to >= indexes.length) return;
   const subset = indexes.map((index) => items[index]);
   const [item] = subset.splice(from, 1);
@@ -1053,39 +1054,39 @@ function reorderFrames(gallery: string, from: number, to: number) {
   setAt("galleryItems", next);
 }
 
-function deleteFrame(gallery: string, index: number) {
-  const reel = reelPhotos(gallery);
+function deleteFrame(document: CmsDocument, gallery: string, index: number) {
+  const reel = reelPhotos(document, gallery);
   if (reel) {
     reel.splice(index, 1);
-    commitReel(gallery, reel);
+    commitReel(document, gallery, reel);
     return;
   }
   if (gallery.startsWith("slides:")) {
-    const { path, slides } = slideArray(gallery);
+    const { path, slides } = slideArray(document, gallery);
     slides.splice(index, 1);
     commitSlides(path, slides);
     return;
   }
-  const { items, indexes } = categoryEntries(gallery);
+  const { items, indexes } = categoryEntries(document, gallery);
   items.splice(indexes[index], 1);
   setAt("galleryItems", items);
 }
 
-function replaceFrame(gallery: string, index: number, src: string, secondary: boolean) {
-  const reel = reelPhotos(gallery);
+function replaceFrame(document: CmsDocument, gallery: string, index: number, src: string, secondary: boolean) {
+  const reel = reelPhotos(document, gallery);
   if (reel) {
     if (!reel[index]) return;
     reel[index] = { ...reel[index], image: src };
-    commitReel(gallery, reel);
+    commitReel(document, gallery, reel);
     return;
   }
   if (gallery.startsWith("slides:")) {
-    const { path, slides } = slideArray(gallery);
+    const { path, slides } = slideArray(document, gallery);
     slides[index] = { ...slides[index], image: src };
     commitSlides(path, slides);
     return;
   }
-  const { items, indexes } = categoryEntries(gallery);
+  const { items, indexes } = categoryEntries(document, gallery);
   const item = { ...items[indexes[index]] };
   if (item.beforeSrc || secondary) {
     if (secondary) item.afterSrc = src;
@@ -1098,21 +1099,21 @@ function replaceFrame(gallery: string, index: number, src: string, secondary: bo
   setAt("galleryItems", items);
 }
 
-function addFrame(gallery: string, src: string) {
-  const reel = reelPhotos(gallery);
+function addFrame(document: CmsDocument, gallery: string, src: string) {
+  const reel = reelPhotos(document, gallery);
   if (reel) {
     reel.push({ image: src, alt: "Project photo" });
-    commitReel(gallery, reel);
+    commitReel(document, gallery, reel);
     return;
   }
   if (gallery.startsWith("slides:")) {
-    const { path, slides } = slideArray(gallery);
+    const { path, slides } = slideArray(document, gallery);
     slides.push({ image: src, alt: "Photo", position: "center" });
     commitSlides(path, slides);
     return;
   }
-  const { items, categoryId } = categoryEntries(gallery);
-  const subs = readCms().gallerySubcategories.filter((item) => item.categoryId === categoryId);
+  const { items, categoryId } = categoryEntries(document, gallery);
+  const subs = document.gallerySubcategories.filter((item) => item.categoryId === categoryId);
   const beforeAfter = categoryId === "before-after";
   items.push({
     id: `photo-${crypto.randomUUID().slice(0, 8)}`,

@@ -1,26 +1,16 @@
-import { ensureServiceTemplates } from "@/lib/service-pages";
 import { applyLiveGoogleRating } from "@/lib/google-place-rating";
-import { ensureTrustItems } from "./trust-items";
-import { fallbackDocument } from "./read";
+import { CmsUnavailableError } from "./errors";
 import type { CmsDocument, CmsEnv } from "./types";
 import { inspectMedia, mediaKey, publicMediaPath, validateDocument } from "./validate";
 
-const COMPANY_EMAIL = "info@primefixpros.com";
-const PREVIOUS_COMPANY_EMAILS = ["info@primefix.com", "info@primefixhandyman.com"];
-
-export function withCompanyEmail(document: CmsDocument): CmsDocument {
-  let json = JSON.stringify(document);
-  let changed = false;
-  for (const email of PREVIOUS_COMPANY_EMAILS) {
-    if (!json.includes(email)) continue;
-    json = json.replaceAll(email, COMPANY_EMAIL);
-    changed = true;
-  }
-  return changed ? (JSON.parse(json) as CmsDocument) : document;
-}
+const READ_ONLY = "This environment is read-only. Production content was not changed.";
 
 export async function loadDocument(env: CmsEnv): Promise<CmsDocument> {
   return applyLiveGoogleRating(await readStoredDocument(env));
+}
+
+function prepareStored(raw: unknown) {
+  return validateDocument(raw);
 }
 
 async function readStoredDocument(env: CmsEnv): Promise<CmsDocument> {
@@ -28,19 +18,15 @@ async function readStoredDocument(env: CmsEnv): Promise<CmsDocument> {
     const row = await env.CMS_DB.prepare("SELECT body FROM documents WHERE id = ?")
       .bind("site")
       .first<{ body: string }>();
-    if (row?.body) return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(validateDocument(JSON.parse(row.body)))));
+    if (!row?.body) throw new CmsUnavailableError("The CMS document is missing from the database.");
+    return prepareStored(JSON.parse(row.body));
   }
-  if (env.readLocal) {
-    try {
-      return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(validateDocument(await env.readLocal()))));
-    } catch {
-      return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(structuredClone(fallbackDocument))));
-    }
-  }
-  return withCompanyEmail(ensureTrustItems(ensureServiceTemplates(structuredClone(fallbackDocument))));
+  if (env.readLocal) return prepareStored(await env.readLocal());
+  throw new CmsUnavailableError("Content storage is not configured.");
 }
 
 export async function saveDocument(env: CmsEnv, input: unknown) {
+  if (env.readOnly) throw new Error(READ_ONLY);
   const document = validateDocument(input);
   const body = JSON.stringify(document);
   if (env.CMS_DB) {
@@ -50,22 +36,18 @@ export async function saveDocument(env: CmsEnv, input: unknown) {
       .bind("site", body, new Date().toISOString())
       .run();
   }
-  if (env.writeLocal) await env.writeLocal(document);
-  if (!env.CMS_DB && !env.writeLocal) throw new Error("Content storage is not configured.");
+  if (!env.CMS_DB) throw new Error("Content storage is not configured.");
   return document;
 }
 
 export async function storeImage(env: CmsEnv, key: string, bytes: Uint8Array, type: string) {
+  if (env.readOnly) throw new Error(READ_ONLY);
   if (env.CMS_MEDIA) {
     await env.CMS_MEDIA.put(key, bytes, { httpMetadata: { contentType: type } });
     return;
   }
   if (env.CMS_MEDIA_KV) {
     await env.CMS_MEDIA_KV.put(key, bytes, { metadata: { contentType: type } });
-    return;
-  }
-  if (env.putMedia) {
-    await env.putMedia(key, bytes, type);
     return;
   }
   throw new Error("Image storage is not configured.");
@@ -88,15 +70,14 @@ export async function loadImage(env: CmsEnv, key: string) {
       type: stored.metadata?.contentType || "application/octet-stream",
     };
   }
-  if (env.getMedia) return env.getMedia(key);
   return null;
 }
 
 export async function discardImage(env: CmsEnv, key: string) {
+  if (env.readOnly) throw new Error(READ_ONLY);
   if (env.CMS_MEDIA) await env.CMS_MEDIA.delete(key);
   if (env.CMS_MEDIA_KV) await env.CMS_MEDIA_KV.delete(key);
-  if (env.deleteMedia) await env.deleteMedia(key);
-  if (!env.CMS_MEDIA && !env.CMS_MEDIA_KV && !env.deleteMedia) {
+  if (!env.CMS_MEDIA && !env.CMS_MEDIA_KV) {
     throw new Error("Image storage is not configured.");
   }
 }
@@ -148,7 +129,6 @@ export async function listMedia(env: CmsEnv) {
     } while (cursor && items.length < 500);
     return items;
   }
-  if (env.listMedia) return env.listMedia();
   return [];
 }
 

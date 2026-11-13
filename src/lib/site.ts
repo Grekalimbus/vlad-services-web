@@ -1,4 +1,3 @@
-import { live, readCms } from "@/lib/cms/read";
 import { publicOrigin } from "@/lib/seo";
 
 export const assetPath = (path: string) =>
@@ -19,22 +18,6 @@ export function phoneHref(display: string) {
   return `tel:+${digits.length === 10 ? `1${digits}` : digits}`;
 }
 
-export const site = live(() => {
-  const value = readCms().site;
-  return {
-    ...value,
-    phoneHref: phoneHref(value.phoneDisplay),
-    url: publicOrigin(),
-    websiteHost: "primefixpros.com",
-    locale: "en_US" as const,
-  };
-});
-
-export const ctas = live(() => ({
-  ...readCms().ctas,
-  call: readCms().site.phoneDisplay,
-}));
-
-export const nav = live(() => readCms().nav);
-export const footerNav = live(() => readCms().footerNav);
-export const legalNav = live(() => readCms().legalNav);
+export function siteUrl() {
+  return publicOrigin();
+}

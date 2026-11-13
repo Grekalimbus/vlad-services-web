@@ -1,8 +1,8 @@
 import { handleLogin } from "@/lib/cms/http";
-import { localEnv } from "@/lib/cms/local-env";
+import { getCmsEnv } from "@/lib/cms/runtime";
 
 export const dynamic = "force-dynamic";
 
-export function POST(request: Request) {
-  return handleLogin(request, localEnv());
+export async function POST(request: Request) {
+  return handleLogin(request, await getCmsEnv());
 }

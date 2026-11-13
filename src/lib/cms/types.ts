@@ -1,6 +1,28 @@
 import type defaultDocument from "./default-document.json";
 
-export type CmsDocument = typeof defaultDocument;
+export type CmsReview = {
+  id: string;
+  author: string;
+  dateLabel: string;
+  rating: number;
+  quote: string;
+};
+
+export type CmsReviewListing = {
+  name?: string;
+  rating: number | null;
+  reviewCount: number;
+  profileUrl: string;
+  writeReviewUrl: string;
+};
+
+export type CmsDocument = typeof defaultDocument & {
+  yelpListing?: CmsReviewListing;
+  yelpReviews?: CmsReview[];
+  angiReviews?: CmsReview[];
+  bbbListing?: CmsReviewListing;
+  bbbReviews?: CmsReview[];
+};
 
 export type CmsEnv = {
   CMS_DB?: D1Like;
@@ -10,12 +32,13 @@ export type CmsEnv = {
   ADMIN_SESSION_SECRET?: string;
   CF_ACCESS_TEAM_DOMAIN?: string;
   CF_ACCESS_AUD?: string;
+  /** Local viewing of production. Writes throw before any network call. */
+  readOnly?: boolean;
+  /** Worker preview may read production images without writing to R2. */
+  mediaReadonly?: boolean;
+  CMS_MEDIA_READONLY?: string;
+  /** Local Next.js reads the production document through this function. It is not a file. */
   readLocal?: () => Promise<unknown>;
-  writeLocal?: (document: CmsDocument) => Promise<void>;
-  putMedia?: (key: string, bytes: Uint8Array, type: string) => Promise<void>;
-  getMedia?: (key: string) => Promise<{ bytes: Uint8Array; type: string } | null>;
-  deleteMedia?: (key: string) => Promise<void>;
-  listMedia?: () => Promise<{ key: string; src: string }[]>;
   readApplications?: () => Promise<unknown>;
   writeApplications?: (rows: unknown) => Promise<void>;
 };

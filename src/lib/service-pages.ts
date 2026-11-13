@@ -194,22 +194,5 @@ export function normalizeServiceCatalog(document: CmsDocument): CmsDocument {
 }
 
 export function ensureServiceTemplates(document: CmsDocument): CmsDocument {
-  if (!document?.copy?.offers?.electrical || !Array.isArray(document.galleryItems) || !Array.isArray(document.serviceCategories)) {
-    return document;
-  }
-  const catalog = normalizeServiceCatalog(document);
-  const targets = extraLandingCategories(catalog.serviceCategories);
-  const offers = catalog.copy.offers as Record<string, unknown>;
-  const missing = targets.some((category) => {
-    const list = offers[category.id];
-    const hasOffers = Array.isArray(list) && list.length > 0;
-    const hasPhotos = catalog.galleryItems.some((item) => item.categoryId === category.id && item.src);
-    return !hasOffers || !hasPhotos;
-  });
-  if (!missing) return catalog;
-  const next = catalog === document ? structuredClone(document) : catalog;
-  for (const category of extraLandingCategories(next.serviceCategories)) {
-    fillElectricalTemplate(next, category.id);
-  }
-  return next;
+  return document;
 }

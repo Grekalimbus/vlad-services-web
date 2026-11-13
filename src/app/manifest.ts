@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { bindCms } from "@/lib/cms/load";
 import { pageMeta } from "@/lib/seo";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const cms = await bindCms();

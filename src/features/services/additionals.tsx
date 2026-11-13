@@ -41,7 +41,7 @@ export function Additionals() {
               <li key={`${card.title}-${index}`} className={styles.card}>
                 <CardReel
                   title={card.title}
-                  slides={additionalSlides(card, index)}
+                  slides={additionalSlides(card)}
                   galleryPath={`slides:copy.additionals.cards.${index}.slides`}
                 />
                 <div className={styles.copy} data-cms-card={`additional:${index}`}>

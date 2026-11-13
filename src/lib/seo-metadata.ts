@@ -8,15 +8,11 @@ export async function metadataFor(path: string): Promise<Metadata> {
     ? {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-image-preview": "large" as const,
-          "max-snippet": -1,
-          "max-video-preview": -1,
-        },
+        "max-image-preview": "large" as const,
+        "max-snippet": -1,
+        "max-video-preview": -1,
       }
-    : { index: false, follow: meta.follow, googleBot: { index: false, follow: meta.follow } };
+    : { index: false, follow: false };
 
   const image = {
     url: meta.image,

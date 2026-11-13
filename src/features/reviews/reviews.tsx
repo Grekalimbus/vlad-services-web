@@ -2,10 +2,9 @@
 
 import { useId, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { angiReviews } from "@/lib/angi-reviews";
 import { useCms } from "@/lib/cms/use-cms";
-import { angiListing, angiProfileUrl, angiReviews } from "@/lib/angi-reviews";
 import { bbbListing, bbbReviews } from "@/lib/bbb-reviews";
-import { googleListing, googleReviews } from "@/lib/google-reviews";
 import { yelpListing, yelpReviews } from "@/lib/yelp-reviews";
 import { YelpIcon } from "@/shared/brand-icons";
 import shared from "@/styles/shared.module.css";
@@ -19,7 +18,11 @@ type SourceId = "google" | "yelp" | "angi" | "bbb";
 const SOURCE_ORDER: SourceId[] = ["google", "yelp", "angi", "bbb"];
 
 export function Reviews() {
-  const heading = useCms().copy.home.reviews;
+  const cms = useCms();
+  const heading = cms.copy.home.reviews;
+  const googleListing = cms.googleListing;
+  const googleReviews = cms.googleReviews ?? [];
+  const angiListing = cms.angiListing;
   const headingId = "reviews-heading";
   const statusId = useId();
   const [source, setSource] = useState<SourceId>("google");
@@ -54,7 +57,7 @@ export function Reviews() {
       writeLabel: "Review us on Angi",
       empty: "No Angi reviews yet",
       emptyCta: "View the Angi page",
-      emptyHref: angiListing.profileUrl || angiProfileUrl,
+      emptyHref: angiListing?.profileUrl || "",
     },
     bbb: {
       listing: bbbListing,
@@ -209,7 +212,12 @@ export function Reviews() {
                     >
                       {initials(review.author)}
                     </span>
-                    <p className={styles.authorName}>{review.author}</p>
+                    <p
+                      className={styles.authorName}
+                      data-cms={source === "google" ? `googleReviews.${(start + index) % reviews.length}.author` : undefined}
+                    >
+                      {review.author}
+                    </p>
                     <p className={styles.reviewStars} aria-label={`${review.rating} out of 5 stars`}>
                       {Array.from({ length: review.rating }, (_, index) => (
                         <Star
@@ -222,7 +230,12 @@ export function Reviews() {
                     </p>
                     <p className={styles.date}>{review.dateLabel}</p>
                   </div>
-                  <div className={styles.quote}>{text}</div>
+                  <div
+                    className={styles.quote}
+                    data-cms={source === "google" ? `googleReviews.${(start + index) % reviews.length}.quote` : undefined}
+                  >
+                    {text}
+                  </div>
                   <button
                     type="button"
                     className={styles.more}

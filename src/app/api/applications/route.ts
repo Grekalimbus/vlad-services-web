@@ -1,8 +1,8 @@
 import { handleApplicationPost } from "@/lib/applications";
-import { localEnv } from "@/lib/cms/local-env";
+import { getCmsEnv } from "@/lib/cms/runtime";
 
 export const dynamic = "force-dynamic";
 
-export function POST(request: Request) {
-  return handleApplicationPost(request, localEnv());
+export async function POST(request: Request) {
+  return handleApplicationPost(request, await getCmsEnv());
 }

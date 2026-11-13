@@ -2,24 +2,16 @@
 
 import { useContext, useSyncExternalStore } from "react";
 import { CmsContext } from "./boundary";
+import { CmsUnavailableError } from "./errors";
 import { isEditing, peekOverride, subscribe } from "./edit-store";
-import { readPublished } from "./read";
 import type { CmsDocument } from "./types";
-
-function noOverride(): CmsDocument | null {
-  return null;
-}
-
-function publishedSnapshot(): CmsDocument | null {
-  return typeof window === "undefined" ? null : (window.__CMS__ ?? null);
-}
 
 export function useCms(): CmsDocument {
   const provided = useContext(CmsContext);
-  const override = useSyncExternalStore(subscribe, peekOverride, noOverride);
-  const published = useSyncExternalStore(subscribe, publishedSnapshot, noOverride);
-  // Prefer route context over window.__CMS__: soft nav leaves the script stale.
-  return override ?? provided ?? published ?? readPublished();
+  const override = useSyncExternalStore(subscribe, peekOverride, () => null);
+  if (override) return override;
+  if (provided) return provided;
+  throw new CmsUnavailableError("CMS content is not loaded for this request.");
 }
 
 export function useEditing() {

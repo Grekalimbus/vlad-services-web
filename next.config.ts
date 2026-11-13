@@ -1,49 +1,36 @@
 import type { NextConfig } from "next";
-import document from "./src/lib/cms/default-document.json";
-import { redirectRules } from "./src/lib/seo";
-import type { CmsDocument } from "./src/lib/cms/types";
 
-const isStaticExport = process.env.STATIC_EXPORT === "true";
-const permanentRedirects = redirectRules(document as CmsDocument);
+const security = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+  { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+];
+const hidden = { key: "X-Robots-Tag", value: "noindex, nofollow" };
+const noStore = { key: "Cache-Control", value: "private, no-store" };
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  trailingSlash: true,
   allowedDevOrigins: ["127.0.0.1"],
-  async redirects() {
-    if (isStaticExport) return [];
-    return permanentRedirects.map((redirect) => ({ ...redirect, permanent: true }));
+  images: { unoptimized: true, qualities: [65, 70, 75, 80] },
+  experimental: {
+    staleTimes: { dynamic: 0, static: 30 },
   },
-  ...(isStaticExport
-    ? {
-        output: "export" as const,
-        images: { unoptimized: true },
-        trailingSlash: true,
-      }
-    : {
-        images: {
-          formats: ["image/avif", "image/webp"],
-          minimumCacheTTL: 60 * 60 * 24 * 30,
-          // Cap srcset for a marketing site; 3840w was bloating markup for logos/cards.
-          deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-          imageSizes: [48, 64, 96, 128, 256, 384],
-        },
-        async headers() {
-          const security = [
-            { key: "X-Content-Type-Options", value: "nosniff" },
-            { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-            { key: "X-Frame-Options", value: "SAMEORIGIN" },
-            { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-            { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
-            { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
-          ];
-          const hidden = { key: "X-Robots-Tag", value: "noindex, nofollow" };
-          return [
-            { source: "/admin/:path*", headers: [...security, hidden] },
-            { source: "/api/:path*", headers: [...security, hidden] },
-            { source: "/:path*", headers: security },
-          ];
-        },
-      }),
+  async headers() {
+    const pages = ["/", "/areas", "/deals", "/contact", "/blog", "/blog/:path*", "/privacy-policy", "/messaging-terms", "/services", "/services/:path*"];
+    return [
+      { source: "/:path*", headers: security },
+      ...pages.map((source) => ({ source, headers: [noStore] })),
+      { source: "/admin", headers: [hidden, noStore] },
+      { source: "/admin/:path*", headers: [...security, hidden, noStore] },
+      { source: "/api/admin/:path*", headers: [...security, hidden, noStore] },
+      { source: "/api/content", headers: [...security, hidden, noStore] },
+      { source: "/api/applications", headers: [...security, hidden, noStore] },
+    ];
+  },
 };
 
 export default nextConfig;

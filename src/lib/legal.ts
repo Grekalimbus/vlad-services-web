@@ -1,5 +1,3 @@
-import { live, readCms } from "@/lib/cms/read";
-
 export type LegalSection = {
   id: string;
   heading: string;
@@ -14,5 +12,3 @@ export type LegalPage = {
   intro: string;
   sections: LegalSection[];
 };
-
-export const legalPages = live(() => readCms().legalPages as LegalPage[]);

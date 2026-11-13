@@ -10,8 +10,8 @@ import styles from "./simple-page.module.css";
 export function AreasPageView() {
   const cms = useCms();
   const locations = cms.locations.filter((item) => item.status === "active");
-  const areaLabel = cms.site.areaServed || "San Diego and surrounding areas";
-  const shortArea = cms.site.areaServedShort || "San Diego";
+  const areaLabel = cms.site.areaServed;
+  const shortArea = cms.site.areaServedShort;
   const sanDiegoCities =
     serviceAreas.find((region) => region.id === "san-diego")?.cities.map((city) => city.label) ?? [];
   const services = cms.serviceCategories.filter(
@@ -64,7 +64,7 @@ export function AreasPageView() {
             <ul className={styles.list}>
               {services.map((category) => (
                 <li key={category.id}>
-                  <Link href={servicePageHref(category)}>{category.name.trim()}</Link>
+                  <Link href={servicePageHref(category, cms.serviceCategories)}>{category.name.trim()}</Link>
                 </li>
               ))}
             </ul>

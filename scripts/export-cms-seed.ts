@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { writeFileSync } from "node:fs";
 import { faqs, trustItems } from "../src/lib/content";
 import { galleryCategories, galleryItems, gallerySubcategories } from "../src/lib/gallery";

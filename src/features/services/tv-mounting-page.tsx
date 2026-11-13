@@ -13,9 +13,24 @@ import { TvShowcase } from "./tv-showcase";
 export function TvMountingPage() {
   const cms = useCms();
   const page = cms.copy.tvPage;
-  const reel = cms.galleryItems.flatMap((entry) =>
+  const cards = cms.copy.home.works.cards;
+  const cardIndex = cards.findIndex(
+    (card) => card.href.replace(/\/$/, "") === "/services/tv-mounting" || card.icon === "tv",
+  );
+  const cardPhotos = cardIndex >= 0 ? cards[cardIndex].photos.filter((photo) => photo.image) : [];
+  const galleryPhotos = cms.galleryItems.flatMap((entry) =>
     entry.categoryId === "tv-mounting" && entry.src ? [{ id: entry.id, src: entry.src, alt: entry.alt }] : [],
   );
+  const reel =
+    cardPhotos.length > 0
+      ? cardPhotos.map((photo, index) => ({
+          id: `tv-${index}`,
+          src: photo.image,
+          alt: photo.alt || "",
+        }))
+      : galleryPhotos;
+  const gallery =
+    cardPhotos.length > 0 ? `slides:copy.home.works.cards.${cardIndex}.photos` : "photos:tv-mounting";
 
   return (
     <PageFrame
@@ -24,7 +39,7 @@ export function TvMountingPage() {
       title={page.title}
       description={page.description}
       hero={
-        <div data-cms-gallery="photos:tv-mounting" data-empty={reel.length === 0 ? "" : undefined}>
+        <div data-cms-gallery={gallery} data-empty={reel.length === 0 ? "" : undefined}>
           <TvPhotoMarquee photos={reel} seamless />
         </div>
       }

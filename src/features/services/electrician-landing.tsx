@@ -192,15 +192,12 @@ export function ServiceLanding({
 }
 
 function useCountUp(target: number, active: boolean) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(target);
 
   useEffect(() => {
     if (!active) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      setValue(target);
-      return;
-    }
+    if (reduce) return;
     const duration = 3000;
     const start = performance.now();
     let frame = 0;
@@ -265,8 +262,10 @@ function PriceCard({
 }
 
 function LandingIcon({ src }: { src: string }) {
+  if (!src) return null;
   if (src.startsWith("lucide:")) {
-    const Icon = glyphs[src.slice("lucide:".length)] ?? Wrench;
+    const Icon = glyphs[src.slice("lucide:".length)];
+    if (!Icon) return null;
     return <Icon className={styles.iconGlyph} strokeWidth={1.35} aria-hidden="true" />;
   }
   return (

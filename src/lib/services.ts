@@ -1,4 +1,4 @@
-import { live, readCms } from "@/lib/cms/read";
+import type { CmsDocument } from "@/lib/cms/types";
 import { categoryForPageSlug, pageSlugForCategory, SERVICE_PAGE_SLUGS } from "@/lib/service-pages";
 import { routes } from "@/lib/site";
 
@@ -37,46 +37,27 @@ export type ServicePackage = {
   currency: "USD";
 };
 
-export const serviceCategories = live(() => readCms().serviceCategories as ServiceCategory[]);
-export const services = live(() => readCms().services as Service[]);
-export const servicePackages = live(() => readCms().servicePackages as ServicePackage[]);
-export const tvCounts = live(() => readCms().tvCounts);
-export const tvSizes = live(() => readCms().tvSizes);
-export const wallTypes = live(() => readCms().wallTypes);
-export const mountTypes = live(() => readCms().mountTypes);
-export const tvAddons = live(() => readCms().tvAddons);
-export const concealmentOptions = live(() => readCms().concealmentOptions);
-export const mountTypeOptions = live(() => readCms().mountTypeOptions);
-
-const activeCategories = live(() => serviceCategories.filter((category) => category.status === "active"));
-const activeServices = live(() => services.filter((service) => service.status === "active"));
-const featuredCategories = live(() => activeCategories.filter((category) => category.featured));
-export const quoteServices = featuredCategories;
-
-function getCategoryById(id: string) {
-  return serviceCategories.find((category) => category.id === id);
-}
-
-function getService(slug: string) {
-  return activeServices.find((service) => service.slug === slug);
-}
-
 export function categoryHref(category: Pick<ServiceCategory, "slug">) {
   return routes.service(category.slug);
 }
 
-export function servicePageHref(category: Pick<ServiceCategory, "id" | "slug">) {
-  const slug = pageSlugForCategory(category, serviceCategories);
+export function servicePageHref(
+  category: Pick<ServiceCategory, "id" | "slug">,
+  categories: Pick<ServiceCategory, "id" | "slug">[],
+) {
+  const slug = pageSlugForCategory(category, categories);
   return slug ? routes.service(slug) : "/#footer";
 }
 
-export function landingForSlug(slug: string) {
-  const mapped = categoryForPageSlug(slug, serviceCategories);
+export function landingForSlug(slug: string, document: CmsDocument) {
+  const categories = document.serviceCategories as ServiceCategory[];
+  const serviceList = document.services as Service[];
+  const mapped = categoryForPageSlug(slug, categories);
   if (mapped?.status === "active" && mapped.featured) return mapped;
-  const service = getService(slug);
+  const service = serviceList.find((item) => item.status === "active" && item.slug === slug);
   if (!service) return undefined;
-  const parent = getCategoryById(service.categoryId);
-  if (parent?.status === "active" && parent.featured && pageSlugForCategory(parent, serviceCategories)) return parent;
+  const parent = categories.find((category) => category.id === service.categoryId);
+  if (parent?.status === "active" && parent.featured && pageSlugForCategory(parent, categories)) return parent;
   return undefined;
 }
 

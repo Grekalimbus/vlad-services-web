@@ -8,7 +8,6 @@ import { HoneypotField, PrivacyNotice } from "@/features/quote";
 import { hearAboutOptions } from "@/lib/hear-about";
 import { zipPattern } from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
-import { tvCounts } from "@/lib/services";
 import { nationalDigits, useUsPhone } from "@/lib/use-us-phone";
 import shared from "@/styles/shared.module.css";
 import { TvDiscountDialog } from "./tv-discount-dialog";
@@ -77,7 +76,7 @@ export function Plan() {
 				{step === 0 ? (
 					<>
 						<ul className={styles.options} role="radiogroup" aria-labelledby="plan-heading">
-							{tvCounts.map((item) => {
+							{cms.tvCounts.map((item) => {
 						const active = selected === item.id;
 						const discount = isDiscountCard(item.id) ? item.id : null;
 						return (

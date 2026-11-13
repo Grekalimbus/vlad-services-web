@@ -1,20 +1,6 @@
 import type { GoogleReview } from "@/lib/google-reviews";
-import { live, readCms } from "@/lib/cms/read";
-
-export const angiProfileUrl =
-  "https://www.angi.com/companylist/us/ca/sacramento/primefix-home-handyman-services-llc-unlicensed-contractor-reviews-1.htm";
-
-export const angiListing = live(() => readCms().angiListing);
 
 export const angiReviews: GoogleReview[] = [
-  {
-    id: "nancy-a",
-    author: "Nancy A.",
-    dateLabel: "Nov 2025",
-    rating: 1,
-    quote:
-      "Extremely unprofessional experience. He showed up alone to mount a 65-inch TV and expected me to help lift and hold it — never disclosed. He left the job unfinished, didn't hook anything up properly and gave no receipt or warranty despite advertising one. He scheduled a follow-up for 11:30 AM the next day, 11/29/25, and never showed up, only giving excuses after I contacted him that his car was in the shop. Then he tried to claim the hookups \"weren't included,\" something he never mentioned until after the fact. Who hooks up a TV without the sound bar operating properly or any hookups? Why buy that service? He advertises hookups. Bait-and-switch. Rescheduled for 4 pm on 11/29/25 and never showed up or called. I do not recommend him. Unreliable, unprepared, and not transparent.",
-  },
   {
     id: "renee-j",
     author: "Renee J.",
@@ -102,5 +88,13 @@ export const angiReviews: GoogleReview[] = [
     rating: 5,
     quote:
       "Very impressed with Vlad’s professionalism and craftsmanship. My set up looks great, thanks to Vlad!! Will definitely recommend and use again.",
+  },
+  {
+    id: "nancy-a",
+    author: "Nancy A.",
+    dateLabel: "Nov 2025",
+    rating: 1,
+    quote:
+      "Extremely unprofessional experience. He showed up alone to mount a 65-inch TV and expected me to help lift and hold it — never disclosed. He left the job unfinished, didn't hook anything up properly and gave no receipt or warranty despite advertising one. He scheduled a follow-up for 11:30 AM the next day, 11/29/25, and never showed up, only giving excuses after I contacted him that his car was in the shop. Then he tried to claim the hookups \"weren't included,\" something he never mentioned until after the fact. Who hooks up a TV without the sound bar operating properly or any hookups? Why buy that service? He advertises hookups. Bait-and-switch. Rescheduled for 4 pm on 11/29/25 and never showed up or called. I do not recommend him. Unreliable, unprepared, and not transparent.",
   },
 ];

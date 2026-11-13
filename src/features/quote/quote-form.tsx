@@ -9,7 +9,6 @@ import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
 import { hearAboutOptions } from "@/lib/hear-about";
 import { trackGenerateLead } from "@/lib/ga4";
 import { quoteSuccessMessage } from "@/lib/leads";
-import { quoteServices } from "@/lib/services";
 import styles from "@/styles/forms.module.css";
 
 const MAX_PHOTOS = 5;
@@ -48,6 +47,9 @@ export function QuoteForm({
   const [zip, setZip] = useState("");
   const [hearAbout, setHearAbout] = useState("");
   const [description, setDescription] = useState("");
+  const cms = useCms();
+  const copy = cms.copy.forms;
+  const quoteServices = cms.serviceCategories.filter((item) => item.featured && item.status === "active");
   const preset =
     quoteServices.find((item) => item.name === initialService)?.name ??
     quoteServices.find((item) => item.name.trim() === initialService.trim())?.name ??
@@ -58,7 +60,6 @@ export function QuoteForm({
   const previewsRef = useRef<string[]>([]);
   const honeypotRef = useRef<HTMLInputElement>(null);
   const [photoError, setPhotoError] = useState("");
-  const copy = useCms().copy.forms;
 
   useEffect(() => {
     const urls = previewsRef;

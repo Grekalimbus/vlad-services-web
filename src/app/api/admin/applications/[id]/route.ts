@@ -1,12 +1,14 @@
 import { handleApplicationDelete, handleApplicationUpdate } from "@/lib/applications";
-import { localEnv } from "@/lib/cms/local-env";
+import { getCmsEnv } from "@/lib/cms/runtime";
 
 export const dynamic = "force-dynamic";
 
-export function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
-  return context.params.then((params) => handleApplicationUpdate(request, localEnv(), params.id));
+export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
+  return handleApplicationUpdate(request, await getCmsEnv(), params.id);
 }
 
-export function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
-  return context.params.then((params) => handleApplicationDelete(request, localEnv(), params.id));
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
+  return handleApplicationDelete(request, await getCmsEnv(), params.id);
 }

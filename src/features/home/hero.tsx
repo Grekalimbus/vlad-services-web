@@ -102,8 +102,8 @@ export function Hero() {
   useLayoutEffect(() => syncHeroViewport(), []);
   const cms = useCms();
   const hero = cms.copy.home.hero;
-  const builderSrc = hero.builder || "/hero/builder.webp";
-  const kicker = hero.kicker || "HIRE a Pro";
+  const builderSrc = hero.builder;
+  const kicker = hero.kicker;
   const badges = hero.badges?.length
     ? hero.badges
     : [

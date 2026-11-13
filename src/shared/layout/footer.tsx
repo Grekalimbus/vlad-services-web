@@ -5,7 +5,6 @@ import Link from "next/link";
 import { AREA_SELECT_EVENT, serviceAreas, type AreaSelectDetail } from "@/features/areas/areas";
 import { dealsPage } from "@/lib/cms/deals-page";
 import { useCms } from "@/lib/cms/use-cms";
-import { googleListing } from "@/lib/google-reviews";
 import { socialLinks } from "@/lib/social";
 import { openCookieConsentBanner } from "@/lib/cookie-consent";
 import { phoneHref } from "@/lib/site";
@@ -86,7 +85,7 @@ export function Footer() {
 	);
 	const deals = dealsPage(cms).items;
 	const regions = serviceAreas;
-	const googleMapsUrl = googleListing.mapsUrl || brandSocial[0].href;
+	const googleMapsUrl = cms.googleListing.mapsUrl || brandSocial[0].href;
 
 	return (
 		<footer id="footer" tabIndex={-1} className={styles.footer}>
@@ -235,7 +234,7 @@ export function Footer() {
 								<p className={styles.meta}>
 									<span>Southern California</span>
 									{" · "}
-									<span data-cms="site.availability">{cms.site.availability || "Available 24/7"}</span>
+									<span data-cms="site.availability">{cms.site.availability}</span>
 								</p>
 								<BbbSeal className={styles.bbbSealMobile} />
 							</div>

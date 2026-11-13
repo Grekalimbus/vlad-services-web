@@ -5,7 +5,6 @@ import { ConsentFields, PrivacyNotice } from "./consent-fields";
 import { HoneypotField } from "./honeypot-field";
 import { useCms } from "@/lib/cms/use-cms";
 import { fieldClass, phonePattern, zipPattern } from "@/lib/forms";
-import { tvSizes } from "@/lib/services";
 import {
   buildLeadPayload,
   filesFromFormData,
@@ -183,7 +182,7 @@ export function TvQuoteForm({
           <option value="" disabled>
             Select a size
           </option>
-          {tvSizes.map((size) => (
+          {cms.tvSizes.map((size) => (
             <option key={size} value={size}>
               {size}
             </option>

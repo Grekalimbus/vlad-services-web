@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
+import { CmsUnavailableError } from "@/lib/cms/errors";
 import { loadCms } from "@/lib/cms/load";
 import { pageMeta, publicOrigin } from "@/lib/seo";
 import styles from "./layout.module.css";
@@ -42,8 +43,19 @@ const bespokeStencil = localFont({
   preload: true,
 });
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
-  const cms = await loadCms();
+  let cms;
+  try {
+    cms = await loadCms();
+  } catch (error) {
+    if (!(error instanceof CmsUnavailableError)) throw error;
+    return {
+      title: "PrimeFix",
+      robots: { index: false, follow: false },
+    };
+  }
   const meta = pageMeta("/", cms);
   return {
     metadataBase: new URL(publicOrigin()),

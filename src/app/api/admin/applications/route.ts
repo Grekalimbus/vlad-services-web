@@ -1,8 +1,8 @@
 import { handleApplicationList } from "@/lib/applications";
-import { localEnv } from "@/lib/cms/local-env";
+import { getCmsEnv } from "@/lib/cms/runtime";
 
 export const dynamic = "force-dynamic";
 
-export function GET(request: Request) {
-  return handleApplicationList(request, localEnv());
+export async function GET(request: Request) {
+  return handleApplicationList(request, await getCmsEnv());
 }

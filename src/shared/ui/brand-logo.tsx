@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import { assetPath, site } from "@/lib/site";
+import { useCms } from "@/lib/cms/use-cms";
+import { assetPath } from "@/lib/site";
 import styles from "./brand-logo.module.css";
 
 type BrandLogoProps = {
@@ -13,6 +16,7 @@ export function BrandLogo({
   priority = false,
   plain = false,
 }: BrandLogoProps) {
+  const site = useCms().site;
   return (
     <span className={`${styles.logo} ${styles.header} ${plain ? styles.plain : ""} ${className}`}>
       <Image

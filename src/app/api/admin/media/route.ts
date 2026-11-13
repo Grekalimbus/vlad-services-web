@@ -1,16 +1,16 @@
 import { handleMediaDelete, handleMediaList, handleMediaPost } from "@/lib/cms/http";
-import { localEnv } from "@/lib/cms/local-env";
+import { getCmsEnv } from "@/lib/cms/runtime";
 
 export const dynamic = "force-dynamic";
 
-export function GET(request: Request) {
-  return handleMediaList(request, localEnv());
+export async function GET(request: Request) {
+  return handleMediaList(request, await getCmsEnv());
 }
 
-export function POST(request: Request) {
-  return handleMediaPost(request, localEnv());
+export async function POST(request: Request) {
+  return handleMediaPost(request, await getCmsEnv());
 }
 
-export function DELETE(request: Request) {
-  return handleMediaDelete(request, localEnv());
+export async function DELETE(request: Request) {
+  return handleMediaDelete(request, await getCmsEnv());
 }

@@ -1,19 +1,11 @@
 import type { CmsDocument } from "./cms/types";
-import {
-  categoryForPageSlug,
-  ensureServiceTemplates,
-  isServicePageSlug,
-  pageSlugForCategory,
-} from "./service-pages";
+import { categoryForPageSlug, isServicePageSlug, pageSlugForCategory } from "./service-pages";
 
 export const PRODUCTION_ORIGIN = "https://primefixpros.com";
 const GENERIC_AREA =
   /^(california|southern california|south california|south cal|so\.?\s*cal|socal|ca)$/i;
 const BROAD_AREA_PHRASE =
   /\b(?:southern|south)\s+california\b|\bsocal\b|\bso\.?\s*cal\b/gi;
-const OLD_HERO_TAGLINE = "Fast Response • Same-Day Availability • High Quality Service";
-const OLD_PORTFOLIO_TITLE = "Project gallery";
-const OLD_PORTFOLIO_DESCRIPTION = "TV mounting, electrical, and general handyman work. Browse by category.";
 const PLACEHOLDER_SUMMARY = /^(describe this service\.?|tbd|todo|coming soon\.?)$/i;
 
 export const LANDING_SLUGS = ["tv-mounting", "electrical", "handyman"] as const;
@@ -35,7 +27,6 @@ const LEGACY_SERVICE_REDIRECTS: Record<string, string> = {
   "/services/service-0ed47ac2": "/services/appliance-expert",
   "/services/service-b7cb3d8a": "/services/landscaper",
   "/services/service-3dbbdaa1": "/services/handyman",
-  "/portfolio/before-after": "/",
 };
 
 type Area = { short: string; full: string };
@@ -97,10 +88,8 @@ export function areaLabel(site: { areaServed?: string; areaServedShort?: string 
   if (!fullIsBroad) {
     return { short: shortIsBroad ? full : short, full };
   }
-  return {
-    short: shortIsBroad ? "San Diego" : short,
-    full: "San Diego and surrounding areas",
-  };
+  if (!shortIsBroad) return { short, full: `${short} and surrounding areas` };
+  return { short: "—", full: "—" };
 }
 
 function localizeText(value: string, area: Area) {
@@ -127,72 +116,7 @@ export function normalizePath(pathname: string) {
 }
 
 export function normalizeCms(document: CmsDocument): CmsDocument {
-  const prepared = ensureServiceTemplates(document);
-  const area = areaLabel(prepared.site);
-  const blob = [
-    prepared.site.areaServed,
-    prepared.site.areaServedShort,
-    prepared.site.seoTitle,
-    prepared.site.seoDescription,
-    prepared.site.tagline,
-    prepared.site.description,
-    prepared.site.keywords,
-    prepared.copy.home.hero.tagline,
-    prepared.copy.portfolio.title,
-    prepared.copy.portfolio.description,
-    ...prepared.faqs.map((item) => item.a),
-    ...prepared.services.map((item) => item.summary),
-    ...prepared.serviceCategories.map((item) => item.summary),
-  ].join("\n");
-  const stockHero = prepared.copy.home.hero.tagline === OLD_HERO_TAGLINE;
-  const stockPortfolio =
-    prepared.copy.portfolio.title === OLD_PORTFOLIO_TITLE ||
-    prepared.copy.portfolio.description === OLD_PORTFOLIO_DESCRIPTION;
-  const needsAreaFix =
-    BROAD_AREA_TEST.test(blob) ||
-    GENERIC_AREA.test(prepared.site.areaServed) ||
-    GENERIC_AREA.test(prepared.site.areaServedShort) ||
-    stockHero ||
-    stockPortfolio;
-  if (!needsAreaFix) return prepared;
-
-  const next = structuredClone(prepared);
-  const resolved = areaLabel(next.site);
-  if (
-    GENERIC_AREA.test(next.site.areaServed) ||
-    BROAD_AREA_TEST.test(next.site.areaServed) ||
-    !next.site.areaServed.trim()
-  ) {
-    next.site.areaServed = resolved.full;
-  } else {
-    next.site.areaServed = localizeText(next.site.areaServed, resolved);
-  }
-  if (GENERIC_AREA.test(next.site.areaServedShort) || BROAD_AREA_TEST.test(next.site.areaServedShort)) {
-    next.site.areaServedShort = resolved.short;
-  }
-  const phrase = (value: string) => localizeText(value, resolved);
-  next.site.tagline = phrase(next.site.tagline);
-  next.site.description = phrase(next.site.description);
-  next.site.keywords = phrase(next.site.keywords);
-  next.site.seoTitle = phrase(next.site.seoTitle);
-  next.site.seoDescription = phrase(next.site.seoDescription);
-  next.faqs = next.faqs.map((item) => ({ ...item, q: phrase(item.q), a: phrase(item.a) }));
-  next.services = next.services.map((item) => ({ ...item, summary: phrase(item.summary) }));
-  next.serviceCategories = next.serviceCategories.map((item) => ({
-    ...item,
-    summary: phrase(item.summary),
-  }));
-  if (next.copy.home.hero.tagline === OLD_HERO_TAGLINE || !next.copy.home.hero.tagline.trim()) {
-    next.copy.home.hero.tagline = `${resolved.short} and nearby • Same-day availability • High quality service`;
-  }
-  if (next.copy.portfolio.title === OLD_PORTFOLIO_TITLE) next.copy.portfolio.title = `Projects in ${resolved.short}`;
-  if (next.copy.portfolio.description === OLD_PORTFOLIO_DESCRIPTION) {
-    next.copy.portfolio.description = `TV mounting, electrical, and handyman projects in ${resolved.full}.`;
-  } else {
-    next.copy.portfolio.title = phrase(next.copy.portfolio.title);
-    next.copy.portfolio.description = phrase(next.copy.portfolio.description);
-  }
-  return next;
+  return document;
 }
 
 function landingFor(document: CmsDocument, slug: string) {
@@ -208,7 +132,7 @@ function landingFor(document: CmsDocument, slug: string) {
 export function redirectTarget(pathname: string, document?: CmsDocument | null) {
   const path = normalizePath(pathname);
   const portfolio = PORTFOLIO_REDIRECTS[path] ?? LEGACY_SERVICE_REDIRECTS[path];
-  if (portfolio) return portfolio;
+  if (portfolio) return slash(portfolio);
   if (!document) return null;
   const match = /^\/services\/([a-z0-9-]+)$/.exec(path);
   if (!match) return null;
@@ -216,13 +140,28 @@ export function redirectTarget(pathname: string, document?: CmsDocument | null) 
   if (!slug || isServicePageSlug(slug)) return null;
   const category = document.serviceCategories.find((item) => item.id === slug || item.slug === slug);
   const categoryPage = category ? pageSlugForCategory(category, document.serviceCategories) : null;
-  if (categoryPage && categoryPage !== slug) return `/services/${categoryPage}`;
+  if (categoryPage && categoryPage !== slug) return slash(`/services/${categoryPage}`);
   const service = document.services.find((item) => item.slug === slug && item.status === "active");
   if (!service) return null;
   const parent = document.serviceCategories.find((item) => item.id === service.categoryId);
   const page = parent ? pageSlugForCategory(parent, document.serviceCategories) : null;
   if (!page) return null;
-  return `/services/${page}`;
+  return slash(`/services/${page}`);
+}
+
+function slash(path: string) {
+  if (!path || path === "/") return "/";
+  return path.endsWith("/") ? path : `${path}/`;
+}
+
+/** Legacy paths that do not depend on the CMS document. */
+export function permanentRedirects() {
+  const seen = new Set<string>();
+  return Object.entries({ ...PORTFOLIO_REDIRECTS, ...LEGACY_SERVICE_REDIRECTS }).flatMap(([source, destination]) => {
+    if (seen.has(source)) return [];
+    seen.add(source);
+    return [{ source, destination: slash(destination), permanent: true as const }];
+  });
 }
 
 export function redirectRules(document: CmsDocument) {

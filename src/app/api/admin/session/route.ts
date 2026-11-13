@@ -1,8 +1,8 @@
 import { handleSession } from "@/lib/cms/http";
-import { localEnv } from "@/lib/cms/local-env";
+import { getCmsEnv } from "@/lib/cms/runtime";
 
 export const dynamic = "force-dynamic";
 
-export function GET(request: Request) {
-  return handleSession(request, localEnv());
+export async function GET(request: Request) {
+  return handleSession(request, await getCmsEnv());
 }

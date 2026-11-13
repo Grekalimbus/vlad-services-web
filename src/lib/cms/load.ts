@@ -1,77 +1,11 @@
 import { cache } from "react";
-import { PRODUCTION_ORIGIN } from "@/lib/seo";
-import { ensureServiceTemplates } from "@/lib/service-pages";
-import { ensureTrustItems } from "./trust-items";
-import { rememberCms } from "./store";
-import { fallbackDocument, readCms } from "./read";
+import { loadDocument } from "./content-store";
+import { getCmsEnv } from "./runtime";
 import type { CmsDocument } from "./types";
-import { withCompanyEmail } from "./content-store";
-import { validateDocument } from "./validate";
-import { applyLiveGoogleRating } from "@/lib/google-place-rating";
 
-const PRODUCTION_TTL_MS = 15_000;
-
-let productionCache: { at: number; document: CmsDocument } | null = null;
-
-export const loadCms = cache(async (): Promise<CmsDocument> => {
-  return withCompanyEmail(await applyLiveGoogleRating(await readSavedDocument()));
-});
+/** The CMS document for this request. React cache() keeps it on this request only. */
+export const loadCms = cache(async (): Promise<CmsDocument> => loadDocument(await getCmsEnv()));
 
 export async function bindCms(): Promise<CmsDocument> {
-  const document = await loadCms();
-  rememberCms(document);
-  return document;
-}
-
-async function readLocalDocument(): Promise<CmsDocument | null> {
-  try {
-    const { readFile } = await import("node:fs/promises");
-    const path = await import("node:path");
-    const raw = await readFile(path.join(process.cwd(), ".cms", "content.json"), "utf8");
-    return ensureTrustItems(ensureServiceTemplates(validateDocument(JSON.parse(raw))));
-  } catch {
-    return null;
-  }
-}
-
-async function readSavedDocument(): Promise<CmsDocument> {
-  if (process.env.NEXT_PHASE === "phase-production-build" || process.env.STATIC_EXPORT === "true") {
-    const local = await readLocalDocument();
-    if (local) return local;
-    const remote = await readProductionDocument();
-    if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
-    return ensureTrustItems(ensureServiceTemplates(fallbackDocument));
-  }
-  // Local CMS first in development so admin edits and .cms/content.json win over prod.
-  // Set CMS_SOURCE=production to preview the live document instead.
-  if (process.env.NODE_ENV === "development") {
-    if (process.env.CMS_SOURCE === "production") {
-      const remote = await readProductionDocument();
-      if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
-    }
-    const local = await readLocalDocument();
-    if (local) return local;
-    const remote = await readProductionDocument();
-    if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
-  }
-  return (await readLocalDocument()) ?? ensureTrustItems(ensureServiceTemplates(readCms()));
-}
-
-async function readProductionDocument(): Promise<CmsDocument | null> {
-  if (process.env.CMS_SOURCE === "local") return null;
-  if (productionCache && Date.now() - productionCache.at < PRODUCTION_TTL_MS) {
-    return productionCache.document;
-  }
-  try {
-    const response = await fetch(`${PRODUCTION_ORIGIN}/api/content`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!response.ok) return productionCache?.document ?? null;
-    const document = validateDocument(await response.json());
-    productionCache = { at: Date.now(), document };
-    return document;
-  } catch {
-    return productionCache?.document ?? null;
-  }
+  return loadCms();
 }

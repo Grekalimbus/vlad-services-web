@@ -1,4 +1,12 @@
-import { live, readCms } from "@/lib/cms/read";
+export type TrustItem = {
+  id: string;
+  value: number | string;
+  suffix?: string;
+  label: string;
+};
 
-export const trustItems = live(() => readCms().trustItems);
-export const faqs = live(() => readCms().faqs);
+export type Faq = {
+  id?: string;
+  q: string;
+  a: string;
+};
