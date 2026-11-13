@@ -2,6 +2,8 @@ name = "primefixpros"
 main = ".open-next/worker.js"
 compatibility_date = "2026-09-24"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+workers_dev = true
+preview_urls = true
 
 # Set only in the Worker. Local Next.js leaves this unset and reads production D1.
 [vars]
@@ -23,3 +25,12 @@ database_id = "a7b9675c-46b4-481e-a7ce-447985f5b63b"
 [[r2_buckets]]
 binding = "CMS_MEDIA"
 bucket_name = "primefixpros-media"
+
+# Serve the Worker on the live site through the existing proxied DNS zone.
+[[routes]]
+pattern = "primefixpros.com/*"
+zone_name = "primefixpros.com"
+
+[[routes]]
+pattern = "www.primefixpros.com/*"
+zone_name = "primefixpros.com"
