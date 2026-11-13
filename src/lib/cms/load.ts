@@ -42,7 +42,15 @@ async function readSavedDocument(): Promise<CmsDocument> {
     if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
     return ensureTrustItems(ensureServiceTemplates(fallbackDocument));
   }
+  // Local CMS first in development so admin edits and .cms/content.json win over prod.
+  // Set CMS_SOURCE=production to preview the live document instead.
   if (process.env.NODE_ENV === "development") {
+    if (process.env.CMS_SOURCE === "production") {
+      const remote = await readProductionDocument();
+      if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
+    }
+    const local = await readLocalDocument();
+    if (local) return local;
     const remote = await readProductionDocument();
     if (remote) return ensureTrustItems(ensureServiceTemplates(remote));
   }
