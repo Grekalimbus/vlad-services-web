@@ -249,14 +249,14 @@
 
 .card {
   display: flex;
-  height: 600px;
+  height: 570px;
   flex-direction: column;
   align-items: stretch;
   overflow: hidden;
   border: 0;
   border-radius: 1.35rem;
   background: #fff;
-  padding: 1.35rem 1.35rem 1.15rem;
+  padding: 1.35rem;
   text-align: left;
   box-shadow:
     0 1px 2px rgb(90 60 10 / 0.04),
@@ -328,6 +328,11 @@
   width: 100%;
   min-height: 0;
   margin: 0.85rem 0 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.35rem;
+  scrollbar-gutter: stable;
   font-size: 0.875rem;
   line-height: 1.5rem;
   color: #5c564e;
@@ -336,51 +341,18 @@
   overflow-wrap: anywhere;
 }
 
-.quoteCollapsed {
-  overflow: hidden;
-}
-
-.quoteExpanded {
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 0.35rem;
-  scrollbar-gutter: stable;
-}
-
-.quoteExpanded::-webkit-scrollbar {
+.quote::-webkit-scrollbar {
   width: 6px;
 }
 
-.quoteExpanded::-webkit-scrollbar-thumb {
+.quote::-webkit-scrollbar-thumb {
   border-radius: 9999px;
   background: rgb(214 158 42 / 0.55);
 }
 
-.quoteExpanded::-webkit-scrollbar-track {
+.quote::-webkit-scrollbar-track {
   background: rgb(214 158 42 / 0.12);
   border-radius: 9999px;
-}
-
-.more,
-.moreSpacer {
-  flex-shrink: 0;
-  align-self: center;
-  margin-top: 0.75rem;
-  min-height: 1.25rem;
-}
-
-.more {
-  border: 0;
-  background: none;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #ffb800;
-  transition: color 200ms;
-}
-
-.more:hover {
-  color: #c99600;
 }
 
 .controls {
@@ -534,7 +506,7 @@
 
 @media (min-width: 768px) {
   .carousel {
-    min-height: calc(600px + 1.35rem + 0.55rem);
+    min-height: calc(570px + 1.35rem + 0.55rem);
     padding-inline: 2rem;
   }
 

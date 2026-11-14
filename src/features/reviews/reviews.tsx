@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { angiReviews } from "@/lib/angi-reviews";
 import { useCms } from "@/lib/cms/use-cms";
@@ -30,7 +30,6 @@ export function Reviews() {
   const statusId = useId();
   const [source, setSource] = useState<SourceId>("google");
   const [page, setPage] = useState(0);
-  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const catalog = {
     google: {
       listing: googleListing,
@@ -87,7 +86,6 @@ export function Reviews() {
     event?.stopPropagation();
     setSource(next);
     setPage(0);
-    setExpandedIds({});
   }
 
   function shift(step: number) {
@@ -96,7 +94,6 @@ export function Reviews() {
       const next = (current + step) % pageCount;
       return next < 0 ? next + pageCount : next;
     });
-    setExpandedIds({});
   }
 
   return (
@@ -196,22 +193,14 @@ export function Reviews() {
           <ul className={styles.list}>
             {visible.map((review, index) => {
               const reviewIndex = safePage * DESKTOP_PAGE_SIZE + index;
-              const expanded = Boolean(expandedIds[review.id]);
 
               return (
                 <ReviewCard
                   key={`${review.id}-${safePage}`}
                   review={review}
                   hidden={index !== 0}
-                  expanded={expanded}
                   authorCmsPath={source === "google" ? `googleReviews.${reviewIndex}.author` : undefined}
                   quoteCmsPath={source === "google" ? `googleReviews.${reviewIndex}.quote` : undefined}
-                  onToggleExpand={() =>
-                    setExpandedIds((current) => ({
-                      ...current,
-                      [review.id]: !current[review.id],
-                    }))
-                  }
                 />
               );
             })}
@@ -246,10 +235,7 @@ export function Reviews() {
                 className={index === safePage ? styles.dotActive : styles.dot}
                 aria-label={`Show review page ${index + 1}`}
                 aria-current={index === safePage ? "true" : undefined}
-                onClick={() => {
-                  setPage(index);
-                  setExpandedIds({});
-                }}
+                onClick={() => setPage(index)}
               />
             ))}
           </div> : null}
@@ -262,36 +248,15 @@ export function Reviews() {
 function ReviewCard({
   review,
   hidden,
-  expanded,
   authorCmsPath,
   quoteCmsPath,
-  onToggleExpand,
 }: {
   review: { id: string; author: string; dateLabel: string; rating: number; quote: string; photos?: string[] };
   hidden: boolean;
-  expanded: boolean;
   authorCmsPath?: string;
   quoteCmsPath?: string;
-  onToggleExpand: () => void;
 }) {
-  const quoteRef = useRef<HTMLDivElement>(null);
-  const [overflows, setOverflows] = useState(false);
   const photos = reviewPhotoUrls(review.photos);
-
-  useLayoutEffect(() => {
-    const el = quoteRef.current;
-    if (!el || expanded) return;
-
-    const measure = () => {
-      setOverflows(el.scrollHeight > el.clientHeight + 1);
-    };
-
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    if (el.parentElement) observer.observe(el.parentElement);
-    return () => observer.disconnect();
-  }, [review.quote, expanded, photos.length]);
 
   return (
     <li className={`${styles.card} ${hidden ? styles.cardHidden : ""}`}>
@@ -309,21 +274,10 @@ function ReviewCard({
         </p>
         <p className={styles.date}>{review.dateLabel}</p>
       </div>
-      <div
-        ref={quoteRef}
-        className={`${styles.quote} ${expanded ? styles.quoteExpanded : styles.quoteCollapsed}`}
-        data-cms={quoteCmsPath}
-      >
+      <div className={styles.quote} data-cms={quoteCmsPath}>
         {review.quote}
       </div>
       <ReviewPhotos photos={photos} label={review.author} />
-      {overflows || expanded ? (
-        <button type="button" className={styles.more} onClick={onToggleExpand}>
-          {expanded ? "Show less" : "Read more"}
-        </button>
-      ) : (
-        <span className={styles.moreSpacer} aria-hidden="true" />
-      )}
     </li>
   );
 }
