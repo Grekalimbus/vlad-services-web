@@ -15,10 +15,13 @@ export const projectIcons: Record<string, { label: string; icon: LucideIcon }> =
   tree: { label: "Landscape", icon: TreePine },
 };
 
-export const projectIconOptions = Object.entries(projectIcons).map(([value, item]) => ({
-  value,
-  label: item.label,
-}));
+export const projectIconOptions = [
+  { value: "", label: "None" },
+  ...Object.entries(projectIcons).map(([value, item]) => ({
+    value,
+    label: item.label,
+  })),
+];
 
 const STOCK: Record<string, { icon: string; photos: [string, string] }> = {
   "tv-mounting": { icon: "tv", photos: ["/works/hero.jpg", "/works/tv-living-blue.jpg"] },
@@ -28,6 +31,20 @@ const STOCK: Record<string, { icon: string; photos: [string, string] }> = {
   "appliance-expert": { icon: "refrigerator", photos: ["/works/pexels-kitchen.jpg", "/works/pexels-outlet.jpg"] },
   landscaper: { icon: "tree", photos: ["/works/modern-interior.jpg", "/works/interior-styled.jpg"] },
 };
+
+/** Empty Projects card: editable in admin, shows — / placeholders publicly. */
+export function emptyWorksCard(): ProjectCard {
+  return {
+    title: "",
+    lines: [],
+    href: "",
+    src: "",
+    alt: "",
+    position: "center",
+    icon: "",
+    photos: [],
+  };
+}
 
 export function projectCardFor(category: { slug: string; name: string }, cover = ""): ProjectCard {
   const stock = STOCK[category.slug] ?? { icon: "wrench", photos: ["/works/hero.jpg", "/works/modern-interior.jpg"] as [string, string] };

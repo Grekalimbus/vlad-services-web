@@ -62,6 +62,26 @@
 	transform: rotate(-28deg);
 }
 
+.googleBadge {
+	position: absolute;
+	right: -0.12rem;
+	bottom: -0.08rem;
+	z-index: 1;
+	display: grid;
+	width: 1.05rem;
+	height: 1.05rem;
+	place-items: center;
+	border-radius: 999px;
+	background: #fff;
+	box-shadow: 0 0 0 1.5px #fff, 0 1px 2px rgb(28 39 68 / 0.18);
+}
+
+.googleMark {
+	width: 0.72rem;
+	height: 0.72rem;
+	display: block;
+}
+
 .body {
 	min-width: 0;
 	flex: 1;

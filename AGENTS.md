@@ -1,4 +1,4 @@
-<!-- BEGIN:nextjs-agent-rules -->
+_<!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
 
@@ -6,11 +6,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
-<!-- END:nextjs-agent-rules -->
+<!-- END:nextjs-agent-rules -->_
 
 ## PrimeFixPros — Mandatory Development Rules
 
 ### 1. Single Source of Truth
+
 - Production Cloudflare D1 is the only authoritative source of CMS-managed business content.
 - Cloudflare R2 stores CMS-uploaded images.
 - Local development and production must use the same authoritative D1/R2.
@@ -19,32 +20,41 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Missing CMS values display `—` publicly and `Not filled` in admin. Database failures must surface as errors, never silently fall back.
 
 ### 2. Content Ownership
+
 - CMS-managed titles, subtitles, descriptions, prices, services, cards, icons, galleries, contacts, and editable SEO fields must come from D1.
 - Never hardcode CMS-managed content in React components, configuration, or default objects.
+- New static UI content that is explicitly not CMS-managed may be hardcoded. Never replace existing CMS-managed content with static values.
 - Static UI labels, technical constants, and existing legal policy text may remain in code.
 - Reviews are not editable through admin. Preserve existing Google, Yelp, Angi, and BBB integrations and their current sources unless explicitly requested otherwise.
 
 ### 3. Existing Content Changes
+
 - Always identify the current data source before editing content.
 - Change CMS-managed text and images in D1, never by overriding them in code.
 - Never overwrite client-edited CMS values during builds, migrations, or deployments.
 - Preserve all unrelated CMS fields and media references.
 
 ### 4. New Fields and Features
+
 - Inspect the existing CMS structure, public component, and admin editor first.
-- New CMS-managed fields and repeatable cards must work in both the public site and admin editor.
+- When extending an existing CMS-managed component, automatically reuse its data model, admin editing behavior, and empty-state placeholders.
+- New CMS-managed fields and repeatable cards must work in both the public site and admin editor, including newly added empty items.
+- Empty fields must remain editable through admin, including titles, images, icons, and other supported fields. Placeholder elements must be clickable/editable in admin.
+- Display `—` for missing public text and neutral placeholders for missing images or icons. Never substitute hardcoded business content.
 - Store new business content in authoritative D1, never in hardcoded defaults.
 - Use targeted, non-destructive updates for new fields or initial content.
 - Preserve existing content, ordering, and functionality.
 - Do not introduce alternative data sources or fallback mechanisms.
 
 ### 5. Deployment and Safety
+
 - Never reset, reseed, or replace production CMS content.
 - Code deployment must never overwrite D1/R2 data.
 - Never push, deploy, modify production data, or change Cloudflare configuration without explicit approval for that action.
 - Local development must reflect authoritative CMS data without manual synchronization.
 
 ### 6. Regression Protection
+
 - Verify affected public pages and admin functionality after changes.
 - Ensure CMS updates are reflected correctly and existing client content is preserved.
 - Preserve existing design, routes, SEO, forms, analytics, review integrations, and legal pages unless explicitly requested.

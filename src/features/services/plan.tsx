@@ -33,6 +33,7 @@ export function Plan() {
 	const editingOffer = isDiscountCard(revealedOffer) ? revealedOffer : null;
 	const activeOffer = editing ? editingOffer : offer;
 	const question = step > 0 && step <= quiz.length ? quiz[step - 1] : null;
+	const formStep = step > quiz.length;
 	const heading =
 		step === 0
 			? { lead: copy.headingLead, accent: copy.headingAccent, leadPath: "copy.plan.headingLead", accentPath: "copy.plan.headingAccent" }
@@ -56,7 +57,11 @@ export function Plan() {
 	}, [step]);
 
 	return (
-		<section id="plan" aria-labelledby="plan-heading" className={styles.section}>
+		<section
+			id="plan"
+			aria-labelledby="plan-heading"
+			className={formStep ? `${styles.section} ${styles.sectionForm}` : styles.section}
+		>
 			<div className={styles.atmosphere} aria-hidden="true">
 				<span className={styles.glowLeft} />
 				<span className={styles.glowRight} />

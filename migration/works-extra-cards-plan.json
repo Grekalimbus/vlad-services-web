@@ -1,0 +1,35 @@
+{
+  "updatedAt": "2026-11-13T20:00:10.129Z",
+  "beforeCount": 6,
+  "beforeTitles": [
+    "TVs",
+    "Electrical",
+    "Handyman",
+    "Painting  Interior/Exterior",
+    "Appliance Repair",
+    "Landscaping"
+  ],
+  "afterCount": 8,
+  "afterTitles": [
+    "TVs",
+    "Electrical",
+    "Handyman",
+    "(empty)",
+    "Painting  Interior/Exterior",
+    "Appliance Repair",
+    "Landscaping",
+    "(empty)"
+  ],
+  "row1": [
+    "TVs",
+    "Electrical",
+    "Handyman",
+    "(empty)"
+  ],
+  "row2": [
+    "Painting  Interior/Exterior",
+    "Appliance Repair",
+    "Landscaping",
+    "(empty)"
+  ]
+}

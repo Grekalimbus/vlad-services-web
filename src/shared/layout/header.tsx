@@ -7,7 +7,7 @@ import { useCms } from "@/lib/cms/use-cms";
 import { Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useState } from "react";
 import shared from "@/styles/shared.module.css";
 import { HashLink, HashScroll } from "./hash-link";
 import styles from "./header.module.css";
@@ -18,12 +18,14 @@ export function Header() {
 	const [scrolled, setScrolled] = useState(false);
 	const panelId = useId();
 	const pathname = usePathname();
-	const path = pathname.replace(/\/$/, "");
+	// "/" → "" after stripping the trailing slash; normalize home back to "/".
+	const path = pathname.replace(/\/$/, "") || "/";
 	const admin = path === "/admin" || path.startsWith("/admin/");
 	// Light pages need dark nav from first paint; only the home hero stays transparent.
 	const solid = path !== "/";
+	const raised = solid || scrolled || open;
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const updateHeader = () => {
 			setScrolled(window.scrollY >= 25);
 		};
@@ -51,9 +53,7 @@ export function Header() {
 	if (admin) return null;
 
 	return (
-		<header
-			className={`${styles.header} ${solid || scrolled ? styles.headerScrolled : styles.headerTop}`}
-		>
+		<header className={`${styles.header} ${raised ? styles.headerScrolled : styles.headerTop}`}>
 			<HashScroll />
 			<div className={styles.headerBar}>
 				<div className={styles.headerRow}>

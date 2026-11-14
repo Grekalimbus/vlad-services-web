@@ -20,20 +20,18 @@
 }
 
 .container {
-  composes: sectionInner from "../../styles/shared.module.css";
   position: relative;
   z-index: 1;
   display: flex;
+  width: min(100% - 3rem, 74rem);
+  margin-inline: auto;
   flex-direction: column;
   align-items: center;
-}
-
-.section .container {
   padding-block: 24px;
 }
 
 @media (min-width: 768px) {
-  .section .container {
+  .container {
     padding-block: 32px;
   }
 }
@@ -60,13 +58,18 @@
   list-style: none;
 }
 
+.grid > li {
+  container-type: inline-size;
+}
+
 .card {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 9.2;
+  width: 100%;
+  height: calc(100cqw * 11.04 / 16 - 25px);
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 0.14);
-  border-radius: 1.15rem;
+  border-radius: 1.38rem;
   background: #121820;
   color: #fff;
 }
@@ -79,6 +82,7 @@
 .media {
   position: absolute;
   inset: 0;
+  z-index: 0;
   transition: transform 500ms ease;
 }
 
@@ -100,7 +104,12 @@
   position: absolute;
   inset: auto 0 0;
   height: 58%;
+  pointer-events: none;
   background: linear-gradient(to top, rgb(6 10 16 / 0.88) 0%, rgb(6 10 16 / 0.28) 62%, transparent 100%);
+}
+
+.media[data-empty] .cardShade {
+  display: none;
 }
 
 .stretch {
@@ -113,21 +122,21 @@
 
 .cardBar {
   position: absolute;
-  right: 0.7rem;
-  bottom: 0.7rem;
-  left: 0.7rem;
-  z-index: 1;
+  right: 0.84rem;
+  bottom: 0.84rem;
+  left: 0.84rem;
+  z-index: 3;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 
 .cardLabel {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 0.65rem;
-  font-size: 0.92rem;
+  gap: 0.78rem;
+  font-size: 1.1rem;
   font-weight: 600;
   line-height: 1.15;
 }
@@ -139,12 +148,12 @@
 
 .icon {
   display: inline-flex;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 2.82rem;
+  height: 2.82rem;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  border-radius: 0.7rem;
+  border-radius: 0.84rem;
   background: rgb(255 255 255 / 0.94);
   color: #2580cd;
 }
@@ -154,8 +163,8 @@
   top: 50%;
   z-index: 2;
   display: inline-flex;
-  width: 2.15rem;
-  height: 2.15rem;
+  width: 2.58rem;
+  height: 2.58rem;
   transform: translateY(-50%);
   align-items: center;
   justify-content: center;
@@ -170,11 +179,11 @@
 }
 
 .prev {
-  left: 0.7rem;
+  left: 0.84rem;
 }
 
 .next {
-  right: 0.7rem;
+  right: 0.84rem;
 }
 
 .card:hover .nav,
@@ -325,13 +334,31 @@
 
 @media (min-width: 1024px) {
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    --cols: 3;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     gap: 1.15rem;
   }
 
   .picker {
     padding-bottom: 1rem;
   }
+}
+
+.add {
+  display: block;
+  margin: 1.25rem auto 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.add:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {

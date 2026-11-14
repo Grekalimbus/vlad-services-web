@@ -18,6 +18,8 @@ export function serviceLandingFrom(
   const saved = (document as LandingDocument).copy?.serviceLanding?.[category.id];
   if (!saved) return electricalLandingFrom({ ...document, copy: { ...document.copy, serviceLanding: {} } } as CmsDocument);
   return {
+    iconsTitle: saved.iconsTitle ?? "",
+    iconsSubtitle: saved.iconsSubtitle ?? "",
     icons: saved.icons ?? [],
     description: saved.description ?? { title: "", subtitle: "", imageAlt: "", body: "" },
     stepsHeading: saved.stepsHeading ?? "",

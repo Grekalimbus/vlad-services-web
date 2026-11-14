@@ -3,8 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight, Wrench, X } from "lucide-react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import { addWorksCard } from "@/features/editor/works-actions";
+import { cmsText } from "@/lib/cms/blank";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { projectIcons } from "@/lib/project-cards";
 import { pageSlugForCategory } from "@/lib/service-pages";
@@ -64,21 +66,36 @@ export function Works() {
           </span>
         </h2>
 
-        <ul className={styles.grid}>
+        <ul
+          className={styles.grid}
+          style={{ "--cols": works.cards.length > 6 ? 4 : 3 } as CSSProperties}
+        >
           {works.cards.map((card, index) => {
             const photos = card.photos.filter((photo) => photo.image);
             const currentIndex = photos.length ? (slide[index] ?? 0) % photos.length : 0;
             const Icon = projectIcons[card.icon]?.icon ?? Wrench;
+            const title = cmsText(card.title, editing);
             const label = (
               <span className={styles.cardLabel}>
                 <span className={styles.icon} aria-hidden="true">
-                  <Icon size={18} strokeWidth={1.75} />
+                  <Icon size={22} strokeWidth={1.75} />
                 </span>
-                <span data-cms={`copy.home.works.cards.${index}.title`}>{card.title}</span>
+                <span data-cms={`copy.home.works.cards.${index}.title`}>{title}</span>
               </span>
             );
+            const bar = editing ? (
+              <div className={styles.cardBar} data-cms-card={`works:${index}`} data-empty={card.title.trim() ? undefined : ""}>
+                {label}
+              </div>
+            ) : card.href ? (
+              <Link href={card.href} className={styles.stretch}>
+                <span className={styles.cardBar}>{label}</span>
+              </Link>
+            ) : (
+              <div className={styles.cardBar}>{label}</div>
+            );
             return (
-              <li key={`${card.href}-${index}`}>
+              <li key={`${card.href || "card"}-${index}`}>
                 <article className={styles.card}>
                   <div
                     className={styles.media}
@@ -89,14 +106,15 @@ export function Works() {
                       <Image
                         key={`${photos[currentIndex].image}-${currentIndex}`}
                         src={assetPath(photos[currentIndex].image)}
-                        alt={photos[currentIndex].alt || card.alt || card.title}
+                        alt={photos[currentIndex].alt || card.alt || card.title || title}
                         fill
                         loading="lazy"
                         quality={70}
                         unoptimized={photos[currentIndex].image.startsWith("/api/media/")}
-                        sizes="(min-width: 1024px) 22rem, (min-width: 720px) 45vw, 92vw"
+                        sizes="(min-width: 1024px) 20rem, (min-width: 720px) 45vw, 92vw"
                         className={`${styles.cardImage} ${styles.cardImageOn}`}
-                        style={{ objectPosition: photos[currentIndex].position || card.position }}                      />
+                        style={{ objectPosition: photos[currentIndex].position || card.position }}
+                      />
                     ) : null}
                     <span className={styles.cardShade} aria-hidden="true" />
                   </div>
@@ -108,7 +126,7 @@ export function Works() {
                         aria-label="Previous photo"
                         onClick={() => step(index, -1, photos.length)}
                       >
-                        <ChevronLeft size={18} strokeWidth={1.75} />
+                        <ChevronLeft size={22} strokeWidth={1.75} />
                       </button>
                       <button
                         type="button"
@@ -116,24 +134,22 @@ export function Works() {
                         aria-label="Next photo"
                         onClick={() => step(index, 1, photos.length)}
                       >
-                        <ChevronRight size={18} strokeWidth={1.75} />
+                        <ChevronRight size={22} strokeWidth={1.75} />
                       </button>
                     </>
                   ) : null}
-                  {editing ? (
-                    <div className={styles.cardBar} data-cms-card={`works:${index}`}>
-                      {label}
-                    </div>
-                  ) : (
-                    <Link href={card.href} className={styles.stretch}>
-                      <span className={styles.cardBar}>{label}</span>
-                    </Link>
-                  )}
+                  {bar}
                 </article>
               </li>
             );
           })}
         </ul>
+
+        {editing ? (
+          <button type="button" className={styles.add} data-editor-ui onClick={addWorksCard}>
+            Add a project
+          </button>
+        ) : null}
 
         <button ref={buttonRef} type="button" className={styles.projectsButton} onClick={() => setOpen(true)}>
           <span data-cms="copy.home.works.explore">{exploreLabel(works.explore)}</span>

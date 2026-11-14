@@ -7,6 +7,8 @@ export type LandingFeatureRow = {
 };
 
 export type ElectricalLanding = {
+  iconsTitle?: string;
+  iconsSubtitle?: string;
   icons: { src: string; alt: string; text: string }[];
   description: {
     title: string;
@@ -74,6 +76,8 @@ function savedLanding(document: CmsDocument) {
 
 function emptyLanding(): ElectricalLanding {
   return {
+    iconsTitle: "",
+    iconsSubtitle: "",
     icons: [],
     description: { title: "", subtitle: "", imageAlt: "", body: "" },
     stepsHeading: "",
@@ -88,6 +92,8 @@ export function electricalLandingFrom(document: CmsDocument): ElectricalLanding 
   const saved = savedLanding(document);
   if (!saved) return emptyLanding();
   return {
+    iconsTitle: saved.iconsTitle ?? "",
+    iconsSubtitle: saved.iconsSubtitle ?? "",
     icons: (saved.icons ?? []).map((icon) => ({
       src: normalizeIconSrc(icon.src || ""),
       alt: icon.alt || "",

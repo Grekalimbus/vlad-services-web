@@ -21,6 +21,7 @@ import { projectReels, type ReelPhoto } from "@/features/home/project-photos";
 import { assetPath } from "@/lib/site";
 import { projectIconOptions } from "@/lib/project-cards";
 import { peekReveal, revealSurface } from "@/lib/cms/reveal";
+import { removeBlogPost } from "./blog-actions";
 import { removeDeal } from "./deal-actions";
 import { removeHomepageService } from "./service-actions";
 import "./visual-editor.css";
@@ -403,9 +404,10 @@ function CardPopover({
           if (cover >= 0) setAt(`copy.home.serviceCovers.${cover}.src`, src);
           if (index >= 0) setAt(`serviceCategories.${index}.coverImage`, src);
         }
-        if (kind === "deal" && file) {
+        if ((kind === "deal" || kind === "blog") && file) {
           const video = file.type.startsWith("video/") || /\.(mp4|webm)$/i.test(file.name);
-          setAt(`copy.dealsPage.items.${id}.kind`, video ? "video" : "image");
+          const base = kind === "deal" ? "copy.dealsPage.items" : "copy.blogPage.items";
+          setAt(`${base}.${id}.kind`, video ? "video" : "image");
         }
         setPending(false);
       })
@@ -426,7 +428,11 @@ function CardPopover({
     >
       {fields.image ? (
         <>
-          {kind === "deal" && textAt(cms, `copy.dealsPage.items.${id}.kind`) === "video" ? (
+          {(kind === "deal" || kind === "blog") &&
+          textAt(
+            cms,
+            kind === "deal" ? `copy.dealsPage.items.${id}.kind` : `copy.blogPage.items.${id}.kind`,
+          ) === "video" ? (
             <video
               src={assetPath(textAt(cms, fields.image))}
               controls
@@ -446,10 +452,18 @@ function CardPopover({
             />
           )}
           <label className="editorPrimary" style={{ display: "inline-block", margin: "0.7rem 0" }}>
-            {pending ? "Uploading…" : kind === "deal" ? "Replace photo or video" : "Replace image"}
+            {pending
+              ? "Uploading…"
+              : kind === "deal" || kind === "blog"
+                ? "Replace photo or video"
+                : "Replace image"}
             <input
               type="file"
-              accept={kind === "deal" ? "image/*,.svg,image/svg+xml,video/mp4,video/webm,.mp4,.webm" : "image/*,.svg,image/svg+xml"}
+              accept={
+                kind === "deal" || kind === "blog"
+                  ? "image/*,.svg,image/svg+xml,video/mp4,video/webm,.mp4,.webm"
+                  : "image/*,.svg,image/svg+xml"
+              }
               hidden
               disabled={pending}
               onChange={(event) => replace(fields.image, event.target.files?.[0])}
@@ -491,6 +505,7 @@ function CardPopover({
             className="editorDanger"
             onClick={() => {
               if (kind === "deal") removeDeal(Number(id));
+              else if (kind === "blog") removeBlogPost(Number(id));
               else removeHomepageService(id);
               onClose();
             }}
@@ -499,7 +514,7 @@ function CardPopover({
           </button>
         ) : (
           <button type="button" className="editorDanger" onClick={() => setConfirming(true)}>
-            {kind === "deal" ? "Remove deal" : "Remove service"}
+            {kind === "deal" ? "Remove deal" : kind === "blog" ? "Remove post" : "Remove service"}
           </button>
         )
       ) : null}
@@ -863,6 +878,18 @@ function cardFields(document: CmsDocument, kind: string, id: string): { image: s
       ],
     };
   }
+  if (kind === "blog") {
+    const index = Number(id);
+    if (!Number.isInteger(index) || index < 0) return null;
+    return {
+      image: `copy.blogPage.items.${index}.media`,
+      remove: true,
+      texts: [
+        { path: `copy.blogPage.items.${index}.title`, label: "Title" },
+        { path: `copy.blogPage.items.${index}.text`, label: "Description", long: true },
+      ],
+    };
+  }
   if (kind === "price") {
     const separator = id.lastIndexOf(":");
     const categoryId = separator > 0 ? id.slice(0, separator) : "";
@@ -899,12 +926,15 @@ function cardFields(document: CmsDocument, kind: string, id: string): { image: s
     };
   }
   if (kind === "works") {
+    const index = Number(id);
+    if (!Number.isInteger(index) || index < 0 || index >= document.copy.home.works.cards.length) return null;
     return {
       image: "",
       remove: false,
       texts: [
-        { path: `copy.home.works.cards.${id}.title`, label: "Title" },
-        { path: `copy.home.works.cards.${id}.icon`, label: "Icon", options: projectIconOptions },
+        { path: `copy.home.works.cards.${index}.title`, label: "Title" },
+        { path: `copy.home.works.cards.${index}.icon`, label: "Icon", options: projectIconOptions },
+        { path: `copy.home.works.cards.${index}.href`, label: "Link" },
       ],
     };
   }

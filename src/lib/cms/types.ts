@@ -6,6 +6,8 @@ export type CmsReview = {
   dateLabel: string;
   rating: number;
   quote: string;
+  /** Optional customer photos attached to the review (R2 / site paths). */
+  photos?: string[];
 };
 
 export type CmsReviewListing = {
@@ -16,7 +18,8 @@ export type CmsReviewListing = {
   writeReviewUrl: string;
 };
 
-export type CmsDocument = typeof defaultDocument & {
+export type CmsDocument = Omit<typeof defaultDocument, "googleReviews"> & {
+  googleReviews: CmsReview[];
   yelpListing?: CmsReviewListing;
   yelpReviews?: CmsReview[];
   angiReviews?: CmsReview[];

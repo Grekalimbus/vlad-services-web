@@ -6,9 +6,9 @@
 	z-index: 50;
 	border-bottom: 1px solid transparent;
 	transition:
-		background-color 300ms,
-		border-color 300ms,
-		box-shadow 300ms;
+		background-color 400ms ease,
+		border-color 400ms ease,
+		box-shadow 400ms ease;
 }
 
 .headerScrolled {
@@ -18,6 +18,7 @@
 
 .headerTop {
 	background: transparent;
+	border-bottom-color: transparent;
 }
 
 .headerBar {
@@ -79,8 +80,8 @@
 	line-height: 1;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: rgb(255 255 255 / 0.88);
-	transition: color 200ms;
+	color: rgb(255 255 255 / 0.92);
+	transition: color 400ms ease;
 }
 
 .navLabel {
@@ -124,7 +125,7 @@
 	text-decoration: none;
 	white-space: nowrap;
 	color: #49b4f0;
-	transition: color 200ms;
+	transition: color 400ms ease;
 }
 
 .dealsLink:hover,
@@ -171,10 +172,17 @@
 	line-height: 1;
 	color: var(--foreground);
 	transition:
-		color 200ms,
-		background-color 200ms,
-		border-color 200ms,
-		box-shadow 200ms;
+		color 400ms ease,
+		background-color 400ms ease,
+		border-color 400ms ease,
+		box-shadow 400ms ease;
+}
+
+.headerTop .phone {
+	background: transparent;
+	border-color: #fff;
+	box-shadow: none;
+	color: #fff;
 }
 
 .headerScrolled .phone {
@@ -225,14 +233,36 @@
 	cursor: pointer;
 	align-items: center;
 	justify-content: center;
-	border: 0;
+	border: 2px solid transparent;
 	border-radius: 9999px;
 	color: var(--foreground);
-	transition: background-color 200ms;
+	transition:
+		color 400ms ease,
+		background-color 400ms ease,
+		border-color 400ms ease,
+		box-shadow 400ms ease;
 }
 
-.menuButton:hover {
-	background: #fff;
+.headerTop .menuButton {
+	background: transparent;
+	border-color: #fff;
+	box-shadow: none;
+	color: #fff;
+}
+
+.headerTop .menuButton:hover {
+	background: rgb(255 255 255 / 0.12);
+}
+
+.headerScrolled .menuButton {
+	background: transparent;
+	border-color: #000;
+	box-shadow: none;
+	color: #000;
+}
+
+.headerScrolled .menuButton:hover {
+	background: rgb(0 0 0 / 0.06);
 }
 
 .mobileNav {
@@ -369,10 +399,3 @@
 	}
 }
 
-@media (max-width: 1023px) {
-	.header,
-	.headerTop {
-		border-bottom-color: #c8c8c8;
-		background: #fff;
-	}
-}

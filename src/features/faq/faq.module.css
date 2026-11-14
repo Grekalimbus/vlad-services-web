@@ -2,6 +2,7 @@
   composes: section from "../../styles/shared.module.css";
   position: relative;
   z-index: 1;
+  margin-top: 40px;
   border-bottom: 0;
   background: transparent;
 }

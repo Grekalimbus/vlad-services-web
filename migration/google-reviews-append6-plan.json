@@ -1,0 +1,58 @@
+{
+  "beforeCount": 12,
+  "added": [
+    {
+      "id": "maksym-husiev",
+      "author": "Maksym Husiev",
+      "photos": 2
+    },
+    {
+      "id": "ulyana-rabtsava",
+      "author": "Ulyana Rabtsava",
+      "photos": 2
+    },
+    {
+      "id": "naomi-mcaulay",
+      "author": "Naomi McAulay",
+      "photos": 2
+    },
+    {
+      "id": "shannon-petersen",
+      "author": "Shannon Petersen",
+      "photos": 2
+    },
+    {
+      "id": "charles-money",
+      "author": "charles money",
+      "photos": 1
+    },
+    {
+      "id": "justin-heinen",
+      "author": "Justin Heinen",
+      "photos": 1
+    }
+  ],
+  "afterCount": 18,
+  "authors": [
+    "Ed M",
+    "Liliia Zinko",
+    "Damian Roman",
+    "Brian VanDeMark",
+    "jeff reid",
+    "Daniel G",
+    "Jordan Kelly",
+    "Jaime Lopez",
+    "Neal Salazar",
+    "taylor leshae",
+    "James Ford",
+    "JP Conly",
+    "Maksym Husiev",
+    "Ulyana Rabtsava",
+    "Naomi McAulay",
+    "Shannon Petersen",
+    "charles money",
+    "Justin Heinen"
+  ],
+  "allHavePhotos": true,
+  "uniqueAuthors": true
+}

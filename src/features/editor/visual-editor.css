@@ -17,26 +17,37 @@ html[data-editing] [data-cms-gallery][data-empty] {
   min-height: 9rem;
   display: grid;
   place-items: center;
+  cursor: pointer;
 }
 
 html[data-editing] [data-cms-gallery][data-empty]::before {
   content: "Add photos";
+  position: relative;
+  z-index: 1;
   color: #2580cd;
   font-size: 0.95rem;
   font-weight: 600;
 }
 
-html[data-editing] [data-cms-card^="featurePhoto:"][data-empty] {
+html[data-editing] [data-cms-card^="featurePhoto:"][data-empty],
+html[data-editing] [data-cms-card^="blog:"][data-empty],
+html[data-editing] [data-cms-card^="deal:"][data-empty] {
   min-height: 10rem;
   display: grid;
   place-items: center;
 }
 
-html[data-editing] [data-cms-card^="featurePhoto:"][data-empty]::before {
+html[data-editing] [data-cms-card^="featurePhoto:"][data-empty]::before,
+html[data-editing] [data-cms-card^="blog:"][data-empty]::before,
+html[data-editing] [data-cms-card^="deal:"][data-empty]::before {
   content: "Add photo";
   color: #2580cd;
   font-size: 0.95rem;
   font-weight: 600;
+}
+
+html[data-editing] [data-cms-card^="works:"] {
+  cursor: pointer;
 }
 
 .editorBar,

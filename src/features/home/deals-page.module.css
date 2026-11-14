@@ -128,7 +128,7 @@
   font-weight: 750;
   letter-spacing: -0.03em;
   line-height: 1.15;
-  color: #121417;
+  color: #0076fe;
 }
 
 .text {
@@ -138,6 +138,32 @@
   font-size: 1.05rem;
   line-height: 1.7;
   color: #3c4654;
+}
+
+.serviceLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  margin-top: 1.65rem;
+  border-radius: 9999px;
+  background: #0076fe;
+  padding: 0.7rem 1.85rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #fff;
+  text-decoration: none;
+}
+
+.serviceLink:hover {
+  background: #0066e0;
+}
+
+.serviceLink:focus-visible {
+  outline: 2px solid #0076fe;
+  outline-offset: 3px;
 }
 
 .empty {

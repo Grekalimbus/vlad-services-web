@@ -79,6 +79,7 @@ export function ServiceLanding({
   const { openQuote } = useQuote();
   const figureRef = useRef<HTMLElement>(null);
   const [figureVisible, setFigureVisible] = useState(false);
+  const iconIntro = category.id !== "electrical" && category.slug !== "electrical";
 
   useEffect(() => {
     const node = figureRef.current;
@@ -103,24 +104,40 @@ export function ServiceLanding({
 
   return (
     <>
-      <ul className={styles.iconRow}>
-        {landing.icons.map((icon, index) => (
-          <li key={`${icon.src}-${index}`}>
-            <button
-              type="button"
-              className={styles.iconButton}
-              data-cms-card={`serviceIcon:${category.id}:${index}`}
-              aria-label={`${icon.text}. Book ${category.name.trim()}`}
-              onClick={() => openQuote("quote", undefined, category.name)}
-            >
-              <LandingIcon src={icon.src} />
-              <span className={styles.iconLabel} data-cms={`${copyBase}.icons.${index}.text`}>
-                {icon.text}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <section
+        className={styles.iconBlock}
+        data-large={iconIntro ? "" : undefined}
+        aria-label={`${category.name.trim()} services`}
+      >
+        {iconIntro ? (
+          <header className={styles.iconIntro}>
+            <h2 className={styles.iconsTitle} data-cms={`${copyBase}.iconsTitle`}>
+              {landing.iconsTitle || "—"}
+            </h2>
+            <p className={styles.iconsSubtitle} data-cms={`${copyBase}.iconsSubtitle`}>
+              {landing.iconsSubtitle || "—"}
+            </p>
+          </header>
+        ) : null}
+        <ul className={styles.iconRow}>
+          {landing.icons.map((icon, index) => (
+            <li key={`${icon.src}-${index}`}>
+              <button
+                type="button"
+                className={styles.iconButton}
+                data-cms-card={`serviceIcon:${category.id}:${index}`}
+                aria-label={`${icon.text}. Book ${category.name.trim()}`}
+                onClick={() => openQuote("quote", undefined, category.name)}
+              >
+                <LandingIcon src={icon.src} />
+                <span className={styles.iconLabel} data-cms={`${copyBase}.icons.${index}.text`}>
+                  {icon.text}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
       <section className={styles.story} data-side="start" aria-labelledby={`${category.slug}-story-title`}>
         <div className={styles.storyLayout}>
           <div className={styles.storyStage}>

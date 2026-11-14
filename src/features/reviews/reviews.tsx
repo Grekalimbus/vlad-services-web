@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { angiReviews } from "@/lib/angi-reviews";
 import { useCms } from "@/lib/cms/use-cms";
@@ -8,10 +8,13 @@ import { bbbListing, bbbReviews } from "@/lib/bbb-reviews";
 import { yelpListing, yelpReviews } from "@/lib/yelp-reviews";
 import { YelpIcon } from "@/shared/brand-icons";
 import shared from "@/styles/shared.module.css";
+import { ReviewPhotos, reviewPhotoUrls } from "./review-photos";
 import styles from "./reviews.module.css";
 
-const PREVIEW_LENGTH = 168;
 const DESKTOP_PAGE_SIZE = 3;
+/** Max carousel pages (3 cards each) across every review source. */
+const MAX_REVIEW_PAGES = 6;
+const MAX_REVIEWS = DESKTOP_PAGE_SIZE * MAX_REVIEW_PAGES;
 
 type SourceId = "google" | "yelp" | "angi" | "bbb";
 
@@ -26,8 +29,8 @@ export function Reviews() {
   const headingId = "reviews-heading";
   const statusId = useId();
   const [source, setSource] = useState<SourceId>("google");
-  const [start, setStart] = useState(0);
-  const [expanded, setExpanded] = useState(false);
+  const [page, setPage] = useState(0);
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
   const catalog = {
     google: {
       listing: googleListing,
@@ -72,30 +75,28 @@ export function Reviews() {
   } as const;
   const current = catalog[source];
   const listing = current.listing;
-  const reviews = current.reviews;
+  const reviews = current.reviews.slice(0, MAX_REVIEWS);
+  const pageCount = Math.max(1, Math.ceil(reviews.length / DESKTOP_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
   const countLabel = current.countLabel;
   const writeLabel = current.writeLabel;
-  const visible =
-    reviews.length === 0
-      ? []
-      : Array.from({ length: Math.min(DESKTOP_PAGE_SIZE, reviews.length) }, (_, index) => {
-          return reviews[(start + index) % reviews.length];
-        });
+  const visible = reviews.slice(safePage * DESKTOP_PAGE_SIZE, safePage * DESKTOP_PAGE_SIZE + DESKTOP_PAGE_SIZE);
 
   function selectSource(next: SourceId, event?: { preventDefault(): void; stopPropagation(): void }) {
     event?.preventDefault();
     event?.stopPropagation();
     setSource(next);
-    setStart(0);
-    setExpanded(false);
+    setPage(0);
+    setExpandedIds({});
   }
 
   function shift(step: number) {
     if (reviews.length === 0) return;
-    setStart((current) => {
-      const next = (current + step) % reviews.length;
-      return next < 0 ? next + reviews.length : next;
+    setPage((current) => {
+      const next = (current + step) % pageCount;
+      return next < 0 ? next + pageCount : next;
     });
+    setExpandedIds({});
   }
 
   return (
@@ -194,62 +195,30 @@ export function Reviews() {
           ) : (
           <ul className={styles.list}>
             {visible.map((review, index) => {
-              const isLong = review.quote.length > PREVIEW_LENGTH;
-              const text =
-                isLong && !expanded
-                  ? `${review.quote.slice(0, PREVIEW_LENGTH).trimEnd()}…`
-                  : review.quote;
+              const reviewIndex = safePage * DESKTOP_PAGE_SIZE + index;
+              const expanded = Boolean(expandedIds[review.id]);
 
               return (
-                <li
-                  key={`${review.id}-${start}`}
-                  className={`${styles.card} ${index === 0 ? "" : styles.cardHidden}`}
-                >
-                  <div className={styles.cardHead}>
-                    <span
-                      aria-hidden="true"
-                      className={styles.avatar}
-                    >
-                      {initials(review.author)}
-                    </span>
-                    <p
-                      className={styles.authorName}
-                      data-cms={source === "google" ? `googleReviews.${(start + index) % reviews.length}.author` : undefined}
-                    >
-                      {review.author}
-                    </p>
-                    <p className={styles.reviewStars} aria-label={`${review.rating} out of 5 stars`}>
-                      {Array.from({ length: review.rating }, (_, index) => (
-                        <Star
-                          key={index}
-                          size={14}
-                          className={styles.star}
-                          aria-hidden="true"
-                        />
-                      ))}
-                    </p>
-                    <p className={styles.date}>{review.dateLabel}</p>
-                  </div>
-                  <div
-                    className={styles.quote}
-                    data-cms={source === "google" ? `googleReviews.${(start + index) % reviews.length}.quote` : undefined}
-                  >
-                    {text}
-                  </div>
-                  <button
-                    type="button"
-                    className={styles.more}
-                    onClick={() => setExpanded((current) => !current)}
-                  >
-                    {expanded ? "Show less" : "Read more"}
-                  </button>
-                </li>
+                <ReviewCard
+                  key={`${review.id}-${safePage}`}
+                  review={review}
+                  hidden={index !== 0}
+                  expanded={expanded}
+                  authorCmsPath={source === "google" ? `googleReviews.${reviewIndex}.author` : undefined}
+                  quoteCmsPath={source === "google" ? `googleReviews.${reviewIndex}.quote` : undefined}
+                  onToggleExpand={() =>
+                    setExpandedIds((current) => ({
+                      ...current,
+                      [review.id]: !current[review.id],
+                    }))
+                  }
+                />
               );
             })}
           </ul>
           )}
 
-          {reviews.length > 1 ? <div className={styles.controls}>
+          {pageCount > 1 ? <div className={styles.controls}>
             <button
               type="button"
               onClick={() => shift(-1)}
@@ -269,21 +238,93 @@ export function Reviews() {
               <span className={shared.visuallyHidden}>Next reviews</span>
             </button>
           </div> : null}
-          {reviews.length > 1 ? <div className={styles.dots}>
-            {reviews.map((review, index) => (
+          {pageCount > 1 ? <div className={styles.dots}>
+            {Array.from({ length: pageCount }, (_, index) => (
               <button
-                key={review.id}
+                key={index}
                 type="button"
-                className={index === start ? styles.dotActive : styles.dot}
-                aria-label={`Show reviews starting with ${review.author}`}
-                aria-current={index === start ? "true" : undefined}
-                onClick={() => setStart(index)}
+                className={index === safePage ? styles.dotActive : styles.dot}
+                aria-label={`Show review page ${index + 1}`}
+                aria-current={index === safePage ? "true" : undefined}
+                onClick={() => {
+                  setPage(index);
+                  setExpandedIds({});
+                }}
               />
             ))}
           </div> : null}
         </div>
       </div>
     </section>
+  );
+}
+
+function ReviewCard({
+  review,
+  hidden,
+  expanded,
+  authorCmsPath,
+  quoteCmsPath,
+  onToggleExpand,
+}: {
+  review: { id: string; author: string; dateLabel: string; rating: number; quote: string; photos?: string[] };
+  hidden: boolean;
+  expanded: boolean;
+  authorCmsPath?: string;
+  quoteCmsPath?: string;
+  onToggleExpand: () => void;
+}) {
+  const quoteRef = useRef<HTMLDivElement>(null);
+  const [overflows, setOverflows] = useState(false);
+  const photos = reviewPhotoUrls(review.photos);
+
+  useLayoutEffect(() => {
+    const el = quoteRef.current;
+    if (!el || expanded) return;
+
+    const measure = () => {
+      setOverflows(el.scrollHeight > el.clientHeight + 1);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    if (el.parentElement) observer.observe(el.parentElement);
+    return () => observer.disconnect();
+  }, [review.quote, expanded, photos.length]);
+
+  return (
+    <li className={`${styles.card} ${hidden ? styles.cardHidden : ""}`}>
+      <div className={styles.cardHead}>
+        <span aria-hidden="true" className={styles.avatar}>
+          {initials(review.author)}
+        </span>
+        <p className={styles.authorName} data-cms={authorCmsPath}>
+          {review.author}
+        </p>
+        <p className={styles.reviewStars} aria-label={`${review.rating} out of 5 stars`}>
+          {Array.from({ length: review.rating }, (_, starIndex) => (
+            <Star key={starIndex} size={14} className={styles.star} aria-hidden="true" />
+          ))}
+        </p>
+        <p className={styles.date}>{review.dateLabel}</p>
+      </div>
+      <div
+        ref={quoteRef}
+        className={`${styles.quote} ${expanded ? styles.quoteExpanded : styles.quoteCollapsed}`}
+        data-cms={quoteCmsPath}
+      >
+        {review.quote}
+      </div>
+      <ReviewPhotos photos={photos} label={review.author} />
+      {overflows || expanded ? (
+        <button type="button" className={styles.more} onClick={onToggleExpand}>
+          {expanded ? "Show less" : "Read more"}
+        </button>
+      ) : (
+        <span className={styles.moreSpacer} aria-hidden="true" />
+      )}
+    </li>
   );
 }
 

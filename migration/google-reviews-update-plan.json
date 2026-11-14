@@ -1,0 +1,68 @@
+{
+  "beforeUpdatedAt": "2026-11-13T23:14:48.145Z",
+  "beforeCount": 9,
+  "afterCount": 12,
+  "withPhotos": 12,
+  "authors": [
+    {
+      "id": "ed-m",
+      "author": "Ed M",
+      "photos": 3
+    },
+    {
+      "id": "liliia-zinko",
+      "author": "Liliia Zinko",
+      "photos": 3
+    },
+    {
+      "id": "damian-roman",
+      "author": "Damian Roman",
+      "photos": 3
+    },
+    {
+      "id": "brian-vandemark",
+      "author": "Brian VanDeMark",
+      "photos": 3
+    },
+    {
+      "id": "jeff-reid",
+      "author": "jeff reid",
+      "photos": 3
+    },
+    {
+      "id": "daniel-g",
+      "author": "Daniel G",
+      "photos": 3
+    },
+    {
+      "id": "jordan-kelly",
+      "author": "Jordan Kelly",
+      "photos": 3
+    },
+    {
+      "id": "jaime-lopez",
+      "author": "Jaime Lopez",
+      "photos": 3
+    },
+    {
+      "id": "neal-salazar",
+      "author": "Neal Salazar",
+      "photos": 3
+    },
+    {
+      "id": "taylor-leshae",
+      "author": "taylor leshae",
+      "photos": 3
+    },
+    {
+      "id": "james-ford",
+      "author": "James Ford",
+      "photos": 3
+    },
+    {
+      "id": "jp-conly",
+      "author": "JP Conly",
+      "photos": 3
+    }
+  ]
+}

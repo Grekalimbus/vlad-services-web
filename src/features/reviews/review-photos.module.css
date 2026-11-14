@@ -1,0 +1,238 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  width: 100%;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  flex-shrink: 0;
+}
+
+.grid[data-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: calc(5.1rem + 20px);
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.7rem;
+  background: #efe6d6;
+  padding: 0;
+  cursor: pointer;
+}
+
+.grid[data-count="1"] .thumb {
+  height: calc(8.5rem + 20px);
+}
+
+.thumb:focus-visible {
+  outline: 2px solid #ffb800;
+  outline-offset: 2px;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.more {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.moreShade {
+  position: absolute;
+  inset: 0;
+  background: rgb(20 14 6 / 0.52);
+}
+
+.moreBadge {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-width: 2.6rem;
+  min-height: 2.6rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.94);
+  padding-inline: 0.7rem;
+  color: #24180a;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.18);
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.dismiss {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background:
+    linear-gradient(180deg, rgb(36 24 10 / 0.42), rgb(36 24 10 / 0.58)),
+    rgb(255 248 241 / 0.28);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.dialog {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 78rem);
+  max-height: min(94vh, 66rem);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgb(214 158 42 / 0.22);
+  border-radius: 1.35rem;
+  background: #fff;
+  color: #24180a;
+  box-shadow:
+    0 1px 2px rgb(90 60 10 / 0.06),
+    0 28px 70px rgb(180 130 40 / 0.22);
+}
+
+.dialogHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem 0.9rem;
+  background: linear-gradient(180deg, #fffaf3 0%, #fff 100%);
+  border-bottom: 1px solid rgb(214 158 42 / 0.16);
+}
+
+.dialogTitle {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.65rem;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.dialogCount {
+  color: #8a7352;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.close {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff;
+  color: #24180a;
+  cursor: pointer;
+  box-shadow:
+    0 1px 2px rgb(90 60 10 / 0.06),
+    0 10px 24px rgb(90 60 10 / 0.12);
+  transition: background-color 200ms, color 200ms;
+}
+
+.close:hover {
+  background: #24180a;
+  color: #fff;
+}
+
+.close:focus-visible,
+.nav:focus-visible {
+  outline: 2px solid #ffb800;
+  outline-offset: 2px;
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: min(78vh, 42rem);
+  margin: 0.85rem 1rem 1rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, rgb(255 224 160 / 0.35), transparent 70%),
+    #efe6d6;
+}
+
+.stageImage {
+  object-fit: contain;
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
+  width: 2.85rem;
+  height: 2.85rem;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9999px;
+  background: #fff;
+  color: #24180a;
+  cursor: pointer;
+  box-shadow:
+    0 1px 2px rgb(90 60 10 / 0.06),
+    0 10px 24px rgb(90 60 10 / 0.14);
+  transition: background-color 200ms, color 200ms;
+}
+
+.nav:hover {
+  background: #24180a;
+  color: #fff;
+}
+
+.prev {
+  left: 0.85rem;
+}
+
+.next {
+  right: 0.85rem;
+}
+
+@media (max-width: 639px) {
+  .lightbox {
+    padding: 0;
+  }
+
+  .dialog {
+    width: 100%;
+    max-height: 100vh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .stage {
+    min-height: 68vh;
+    margin: 0;
+    border-radius: 0;
+  }
+}
