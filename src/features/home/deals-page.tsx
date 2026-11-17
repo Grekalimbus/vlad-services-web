@@ -31,6 +31,13 @@ export function serviceSlugForDeal(dealId: string, dealIndex: number): string {
   return DEAL_SERVICE_LINKS[dealIndex]?.slug ?? "";
 }
 
+function splitDealLead(text: string) {
+  const normalized = text.replace(/\r\n/g, "\n");
+  const breakAt = normalized.indexOf("\n");
+  if (breakAt < 0) return { lead: normalized, rest: "" };
+  return { lead: normalized.slice(0, breakAt), rest: normalized.slice(breakAt + 1) };
+}
+
 function indexFromHash(items: { id: string }[]) {
   const id = window.location.hash.replace(/^#/, "");
   if (!id) return 0;
@@ -47,7 +54,15 @@ export function DealsPageView() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const index = page.items.length === 0 ? 0 : Math.min(active, page.items.length - 1);
   const deal = page.items[index];
+  const description = splitDealLead(deal?.text ?? "");
   const serviceLink = DEAL_SERVICE_LINKS[index];
+  const mediaClass = index === 0 ? `${styles.media} ${styles.mediaTv}` : styles.media;
+  const titleClass =
+    index === 2 || index === 3
+      ? `${styles.title} ${styles.titleTighter}`
+      : index === 1
+        ? `${styles.title} ${styles.titleTight}`
+        : styles.title;
 
   useLayoutEffect(() => {
     setActive(indexFromHash(page.items));
@@ -127,7 +142,7 @@ export function DealsPageView() {
                 {deal.kind === "video" ? (
                   <video
                     key={deal.media || deal.id}
-                    className={styles.media}
+                    className={mediaClass}
                     src={assetPath(deal.media)}
                     controls
                     playsInline
@@ -143,18 +158,19 @@ export function DealsPageView() {
                     height={400}
                     priority
                     unoptimized={deal.media.startsWith("/api/media/")}
-                    className={styles.media}
+                    className={mediaClass}
                     data-cms-src={`copy.dealsPage.items.${index}.media`}
                   />
                 ) : (
-                  <div className={styles.media} aria-hidden="true" />
+                  <div className={mediaClass} aria-hidden="true" />
                 )}
               </figure>
-              <h2 className={styles.title} data-cms={`copy.dealsPage.items.${index}.title`}>
+              <h2 className={titleClass} data-cms={`copy.dealsPage.items.${index}.title`}>
                 {deal.title}
               </h2>
               <p className={styles.text} data-cms={`copy.dealsPage.items.${index}.text`}>
-                {deal.text}
+                {description.lead ? <strong className={styles.lead}>{description.lead}</strong> : null}
+                {description.rest}
               </p>
               <DealOfferCards
                 dealIndex={index}
