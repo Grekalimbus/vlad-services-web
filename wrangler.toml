@@ -6,7 +6,7 @@ workers_dev = true
 preview_urls = true
 
 # Set only in the Worker. Local Next.js leaves this unset and reads production D1.
-# Telegram PROD secrets (do not commit): TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID=-5446346193
+# Telegram PROD secrets (do not commit): TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID=-1004490021068
 [vars]
 CMS_RUNTIME = "cloudflare"
 TELEGRAM_ENABLED = "1"

@@ -339,8 +339,8 @@ async function createApplication(
     await env.writeApplications([row, ...current]);
   }
 
-  // Once after successful persist. Telegram failures must not affect the lead.
-  notifyNewApplication(env, {
+  // After the lead is stored. Telegram failures must not affect the save.
+  await notifyNewApplication(env, {
     form: row.form,
     name: row.name,
     phone: row.phone,

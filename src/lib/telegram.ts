@@ -46,6 +46,7 @@ async function sendLeadTelegramNotification(env: CmsEnv, lead: LeadNotification)
   const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
     method: "POST",
     headers: { "content-type": "application/json" },
+    signal: AbortSignal.timeout(8000),
     body: JSON.stringify({
       chat_id: config.chatId,
       text: formatLeadTelegramMessage(lead),
@@ -54,31 +55,18 @@ async function sendLeadTelegramNotification(env: CmsEnv, lead: LeadNotification)
   });
 
   if (!response.ok) {
-    throw new Error(`Telegram send failed (${response.status})`);
+    const detail = await response.text();
+    throw new Error(`Telegram send failed (${response.status}) ${detail.slice(0, 300)}`);
   }
 }
 
-/** Fire-and-forget; never throws into the application save path. */
-export function notifyNewApplication(env: CmsEnv, lead: LeadNotification) {
+/** Awaited after the lead is stored. Failures are logged and do not fail the form. */
+export async function notifyNewApplication(env: CmsEnv, lead: LeadNotification) {
   if (!telegramConfig(env)) return;
-
-  const task = sendLeadTelegramNotification(env, lead).catch(() => {
-    console.error("Telegram lead notification failed");
-  });
-
-  void scheduleBackground(task);
-}
-
-async function scheduleBackground(task: Promise<void>) {
-  if (process.env.CMS_RUNTIME === "cloudflare") {
-    try {
-      const { getCloudflareContext } = await import("@opennextjs/cloudflare");
-      const { ctx } = await getCloudflareContext({ async: true });
-      ctx.waitUntil(task);
-      return;
-    } catch {
-      // Fall through to local/dev behavior.
-    }
+  try {
+    await sendLeadTelegramNotification(env, lead);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown";
+    console.error(`Telegram lead notification failed: ${message}`);
   }
-  await task;
 }
