@@ -1,10 +1,11 @@
 import { isAuthorized } from "./cms/auth";
-import { discardImage, loadImage, storeImage } from "./cms/content-store";
+import { discardImage, loadDocument, loadImage, storeImage } from "./cms/content-store";
 import {
   buildApplicationConsents,
   parseApplicationConsents,
   type ApplicationConsents,
 } from "./consent";
+import { planQuiz } from "./cms/tv-page";
 import {
   APPLICATION_RATE,
   applySecurityHeaders,
@@ -15,10 +16,11 @@ import {
   sameOrigin,
 } from "./form-guard";
 import type { CmsEnv } from "./cms/types";
+import { notifyNewApplication } from "./telegram";
 
 const MAX_PHOTOS = 5;
 const MAX_BYTES = 10 * 1024 * 1024;
-const phonePattern = /^[\d+\s()-]{10,20}$/;
+const phonePattern = /^[\d+\s()-]{7,80}$/;
 const zipPattern = /^\d{5}(?:-\d{4})?$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -73,7 +75,7 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
     const form = await request.formData();
     if (honeypotTripped(form)) return json({ ok: true });
     const name = plainText(form.get("name"), 120);
-    const phone = plainText(form.get("phone"), 40);
+    const phone = plainText(form.get("phone"), 80);
     const email = plainText(form.get("email"), 200);
     const zip = plainText(form.get("zip"), 20);
     const service = plainText(form.get("service"), 80);
@@ -106,6 +108,16 @@ export async function handleApplicationPost(request: Request, env: CmsEnv) {
     });
     const details: Record<string, string> = { hearAbout };
     if (description) details.description = description;
+    const leadSource = plainText(form.get("leadSource"), 40);
+    const dealOffer = plainText(form.get("dealOffer"), 160);
+    const sourcePage = plainText(form.get("sourcePage"), 200);
+    const formId = plainText(form.get("formId"), 40);
+    const formLocation = plainText(form.get("formLocation"), 80);
+    if (leadSource) details.leadSource = leadSource;
+    if (dealOffer) details.dealOffer = dealOffer;
+    if (sourcePage) details.sourcePage = sourcePage;
+    if (formId) details.formId = formId;
+    if (formLocation) details.formLocation = formLocation;
     await createApplication(env, {
       name,
       phone,
@@ -127,9 +139,24 @@ export async function handleApplicationList(request: Request, env: CmsEnv) {
   if (!(await isAuthorized(request, env))) return json({ error: "Unauthorized" }, 401);
   try {
     const items = (await readApplications(env)).map(toView);
-    return json({ items });
+    const quizStepLabels = await readQuizStepLabels(env);
+    return json({ items, quizStepLabels });
   } catch {
     return json({ error: "Could not load applications." }, 500);
+  }
+}
+
+async function readQuizStepLabels(env: CmsEnv): Promise<Record<string, string>> {
+  try {
+    const document = await loadDocument(env);
+    const labels: Record<string, string> = {};
+    for (const step of planQuiz(document)) {
+      const label = [step.lead, step.accent].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+      if (step.id && label) labels[step.id] = label;
+    }
+    return labels;
+  } catch {
+    return {};
   }
 }
 
@@ -202,7 +229,7 @@ async function handleJsonApplication(request: Request, env: CmsEnv) {
   const form = parseForm(record.form);
   if (!form) return json({ error: "Unknown form." }, 400);
   const name = plainText(record.name, 120);
-  const phone = plainText(record.phone, 40);
+  const phone = plainText(record.phone, 80);
   const email = plainText(record.email, 200);
   const zip = plainText(record.zip, 20);
   const service = plainText(record.service, 120);
@@ -221,6 +248,12 @@ async function handleJsonApplication(request: Request, env: CmsEnv) {
   }
   const details = asDetails(record.details);
   if (hearAbout) details.hearAbout = hearAbout;
+  const sourcePage = plainText(record.sourcePage, 200) || details.sourcePage || "";
+  if (sourcePage) details.sourcePage = sourcePage;
+  const formId = plainText(record.formId, 40) || details.formId || "";
+  if (formId) details.formId = formId;
+  const formLocation = plainText(record.formLocation, 80) || details.formLocation || "";
+  if (formLocation) details.formLocation = formLocation;
   const serviceLabel = service || (form === "signup" ? "Sign up" : "TV");
   const consents = buildApplicationConsents({
     privacyPolicy: "accepted",
@@ -300,11 +333,20 @@ async function createApplication(
         JSON.stringify(consents),
       )
       .run();
-    return;
+  } else {
+    if (!env.readApplications || !env.writeApplications) throw new Error("Application storage is not configured.");
+    const current = await readApplications(env);
+    await env.writeApplications([row, ...current]);
   }
-  if (!env.readApplications || !env.writeApplications) throw new Error("Application storage is not configured.");
-  const current = await readApplications(env);
-  await env.writeApplications([row, ...current]);
+
+  // Once after successful persist. Telegram failures must not affect the lead.
+  notifyNewApplication(env, {
+    form: row.form,
+    name: row.name,
+    phone: row.phone,
+    service: row.service,
+    zip: row.zip,
+  });
 }
 
 async function readApplications(env: CmsEnv): Promise<StoredApplication[]> {

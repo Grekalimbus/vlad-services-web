@@ -22,8 +22,10 @@ import { assetPath } from "@/lib/site";
 import { projectIconOptions } from "@/lib/project-cards";
 import { peekReveal, revealSurface } from "@/lib/cms/reveal";
 import { removeBlogPost } from "./blog-actions";
-import { removeDeal } from "./deal-actions";
+import { removeDeal, removeDealOfferCard } from "./deal-actions";
+import { DEAL_OFFER_ICONS, dealsPage } from "@/lib/cms/deals-page";
 import { removeHomepageService } from "./service-actions";
+import { removeWorksVideo } from "./works-actions";
 import "./visual-editor.css";
 
 type Chip = { element: HTMLElement; top: number; left: number; action: "edit" | "reveal" };
@@ -393,6 +395,11 @@ function CardPopover({
 
   function replace(path: string, file: File | undefined) {
     if (!file) return;
+    const isVideo = file.type.startsWith("video/") || /\.(mp4|webm)$/i.test(file.name);
+    if (kind === "worksVideo" && !isVideo) {
+      setError("Upload an MP4 or WebM video.");
+      return;
+    }
     setPending(true);
     setError("");
     void uploadImage(file)
@@ -405,9 +412,8 @@ function CardPopover({
           if (index >= 0) setAt(`serviceCategories.${index}.coverImage`, src);
         }
         if ((kind === "deal" || kind === "blog") && file) {
-          const video = file.type.startsWith("video/") || /\.(mp4|webm)$/i.test(file.name);
           const base = kind === "deal" ? "copy.dealsPage.items" : "copy.blogPage.items";
-          setAt(`${base}.${id}.kind`, video ? "video" : "image");
+          setAt(`${base}.${id}.kind`, isVideo ? "video" : "image");
         }
         setPending(false);
       })
@@ -428,16 +434,34 @@ function CardPopover({
     >
       {fields.image ? (
         <>
-          {(kind === "deal" || kind === "blog") &&
-          textAt(
-            cms,
-            kind === "deal" ? `copy.dealsPage.items.${id}.kind` : `copy.blogPage.items.${id}.kind`,
-          ) === "video" ? (
-            <video
-              src={assetPath(textAt(cms, fields.image))}
-              controls
-              style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8, background: "#0c121c" }}
-            />
+          {((kind === "deal" || kind === "blog") &&
+            textAt(
+              cms,
+              kind === "deal" ? `copy.dealsPage.items.${id}.kind` : `copy.blogPage.items.${id}.kind`,
+            ) === "video") ||
+          kind === "worksVideo" ? (
+            textAt(cms, fields.image) ? (
+              <video
+                src={assetPath(textAt(cms, fields.image))}
+                controls
+                style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 8, background: "#0c121c" }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  height: 120,
+                  borderRadius: 8,
+                  background: "#0c121c",
+                  display: "grid",
+                  placeItems: "center",
+                  color: "#9aa7b8",
+                  fontSize: 13,
+                }}
+              >
+                Not filled
+              </div>
+            )
           ) : (
             <img
               src={assetPath(textAt(cms, fields.image))}
@@ -456,13 +480,17 @@ function CardPopover({
               ? "Uploading…"
               : kind === "deal" || kind === "blog"
                 ? "Replace photo or video"
-                : "Replace image"}
+                : kind === "worksVideo"
+                  ? "Replace video"
+                  : "Replace image"}
             <input
               type="file"
               accept={
                 kind === "deal" || kind === "blog"
                   ? "image/*,.svg,image/svg+xml,video/mp4,video/webm,.mp4,.webm"
-                  : "image/*,.svg,image/svg+xml"
+                  : kind === "worksVideo"
+                    ? "video/mp4,video/webm,.mp4,.webm"
+                    : "image/*,.svg,image/svg+xml"
               }
               hidden
               disabled={pending}
@@ -485,6 +513,11 @@ function CardPopover({
                 </option>
               ))}
             </select>
+          ) : field.list ? (
+            <textarea
+              value={listAt(cms, field.path)}
+              onChange={(event) => setAt(field.path, event.target.value.split("\n"))}
+            />
           ) : field.long ? (
             <textarea value={textAt(cms, field.path)} onChange={(event) => setAt(field.path, event.target.value)} />
           ) : (
@@ -505,7 +538,11 @@ function CardPopover({
             className="editorDanger"
             onClick={() => {
               if (kind === "deal") removeDeal(Number(id));
-              else if (kind === "blog") removeBlogPost(Number(id));
+              else if (kind === "dealOffer") {
+                const [dealIndex, offerIndex] = id.split(":").map(Number);
+                removeDealOfferCard(dealIndex, offerIndex);
+              } else if (kind === "blog") removeBlogPost(Number(id));
+              else if (kind === "worksVideo") removeWorksVideo(Number(id));
               else removeHomepageService(id);
               onClose();
             }}
@@ -514,7 +551,15 @@ function CardPopover({
           </button>
         ) : (
           <button type="button" className="editorDanger" onClick={() => setConfirming(true)}>
-            {kind === "deal" ? "Remove deal" : kind === "blog" ? "Remove post" : "Remove service"}
+            {kind === "deal"
+              ? "Remove deal"
+              : kind === "dealOffer"
+                ? "Remove offer card"
+                : kind === "blog"
+                  ? "Remove post"
+                  : kind === "worksVideo"
+                    ? "Remove video"
+                    : "Remove service"}
           </button>
         )
       ) : null}
@@ -707,6 +752,12 @@ function textAt(document: CmsDocument, path: string) {
   return value == null ? "" : String(value);
 }
 
+function listAt(document: CmsDocument, path: string) {
+  const value = getPath(document, path);
+  if (Array.isArray(value)) return value.map((item) => (item == null ? "" : String(item))).join("\n");
+  return value == null ? "" : String(value);
+}
+
 async function uploadImage(file: File) {
   const body = new FormData();
   body.append("file", file);
@@ -776,6 +827,7 @@ type CardField = {
   path: string;
   label: string;
   long?: boolean;
+  list?: boolean;
   numeric?: boolean;
   options?: { value: string; label: string }[];
 };
@@ -878,6 +930,39 @@ function cardFields(document: CmsDocument, kind: string, id: string): { image: s
       ],
     };
   }
+  if (kind === "dealOffer") {
+    const [dealIndex, offerIndex] = id.split(":").map(Number);
+    const items = dealsPage(document).items;
+    if (
+      !Number.isInteger(dealIndex) ||
+      !Number.isInteger(offerIndex) ||
+      dealIndex < 0 ||
+      offerIndex < 0 ||
+      dealIndex >= items.length ||
+      offerIndex >= items[dealIndex].offerCards.length
+    ) {
+      return null;
+    }
+    const base = `copy.dealsPage.items.${dealIndex}.offerCards.${offerIndex}`;
+    return {
+      image: "",
+      remove: true,
+      texts: [
+        { path: `${base}.icon`, label: "Icon", options: [...DEAL_OFFER_ICONS] },
+        { path: `${base}.category`, label: "Category" },
+        { path: `${base}.offer`, label: "Main offer" },
+        { path: `${base}.subtitle`, label: "Subtitle" },
+        { path: `${base}.description`, label: "Short description", long: true },
+        { path: `${base}.disclaimerTitle`, label: "Disclaimer title" },
+        { path: `${base}.disclaimerText`, label: "Disclaimer text", long: true },
+        { path: `${base}.detail`, label: "Expanded detail", long: true },
+        { path: `${base}.listTitle`, label: "List title" },
+        { path: `${base}.listItems`, label: "Services (one per line)", list: true },
+        { path: `${base}.extra`, label: "Extra info", long: true },
+        { path: `${base}.buttonLabel`, label: "Button label" },
+      ],
+    };
+  }
   if (kind === "blog") {
     const index = Number(id);
     if (!Number.isInteger(index) || index < 0) return null;
@@ -936,6 +1021,16 @@ function cardFields(document: CmsDocument, kind: string, id: string): { image: s
         { path: `copy.home.works.cards.${index}.icon`, label: "Icon", options: projectIconOptions },
         { path: `copy.home.works.cards.${index}.href`, label: "Link" },
       ],
+    };
+  }
+  if (kind === "worksVideo") {
+    const index = Number(id);
+    const videos = (document.copy.home.works as { videos?: unknown[] }).videos;
+    if (!Number.isInteger(index) || index < 0 || !Array.isArray(videos) || index >= videos.length) return null;
+    return {
+      image: `copy.home.works.videos.${index}.media`,
+      remove: true,
+      texts: [{ path: `copy.home.works.videos.${index}.alt`, label: "Description" }],
     };
   }
   if (kind === "trust") {

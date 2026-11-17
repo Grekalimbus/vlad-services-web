@@ -23,7 +23,7 @@
   margin: 0 auto;
   max-width: 38rem;
   color: #3c4654;
-  font-size: 1.02rem;
+  font-size: calc(1.02rem - 3px);
   font-weight: 400;
   line-height: 1.55;
 }
@@ -421,7 +421,7 @@
   }
 
   .iconsSubtitle {
-    font-size: 0.95rem;
+    font-size: calc(0.95rem - 3px);
   }
 
   .iconRow {

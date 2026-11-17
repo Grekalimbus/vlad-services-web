@@ -1,0 +1,16 @@
+{
+  "updatedAt": "2026-11-15T07:29:46.731Z",
+  "firstSrc": "/api/media/uploads/works-video-1-1297b479.mp4",
+  "beforeCount": 0,
+  "beforeMedia": [],
+  "afterCount": 6,
+  "afterMedia": [
+    "/api/media/uploads/works-video-1-1297b479.mp4",
+    "(empty)",
+    "(empty)",
+    "(empty)",
+    "(empty)",
+    "(empty)"
+  ],
+  "apply": true
+}

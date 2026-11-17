@@ -212,20 +212,21 @@
   justify-content: center;
   border: 0;
   border-radius: 9999px;
-  background: #2580cd;
+  background: #fff;
   padding-inline: 1.65rem;
   font: inherit;
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #fff;
+  color: #2580cd;
   cursor: pointer;
-  transition: background-color 200ms;
+  transition: background-color 200ms, color 200ms;
 }
 
 .projectsButton:hover {
-  background: #1d6aab;
+  background: #f3f7fb;
+  color: #1d6aab;
 }
 
 .projectsButton:focus-visible {

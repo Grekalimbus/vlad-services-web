@@ -100,6 +100,9 @@ export function productionReadEnv(): CmsEnv {
     readOnly: true,
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
     ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
+    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+    TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,
+    TELEGRAM_ENABLED: process.env.TELEGRAM_ENABLED,
     readLocal: async () => {
       const rows = await queryProduction("SELECT body FROM documents WHERE id = ?", ["site"]);
       const body = rows[0]?.body;

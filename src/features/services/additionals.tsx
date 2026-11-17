@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { PhotoLightbox } from "@/features/gallery/photo-lightbox";
 import { additionalSlides, type TvSlide } from "@/lib/cms/tv-page";
-import { useCms } from "@/lib/cms/use-cms";
+import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { assetPath } from "@/lib/site";
 import { GetQuoteButton } from "./process-steps";
 import styles from "./additionals.module.css";
@@ -67,8 +68,10 @@ function CardReel({
   slides: TvSlide[];
   galleryPath: string;
 }) {
+  const editing = useEditing();
   const [index, setIndex] = useState(0);
   const [frame, setFrame] = useState<{ leaving: number; direction: -1 | 1 } | null>(null);
+  const [zoom, setZoom] = useState(false);
   const count = slides.length;
   const safeIndex = count === 0 ? 0 : Math.min(index, count - 1);
   const slide = slides[safeIndex];
@@ -82,74 +85,97 @@ function CardReel({
   }
 
   return (
-    <div
-      className={styles.media}
-      data-cms-gallery={galleryPath}
-      data-empty={slide ? undefined : ""}
-      aria-roledescription="carousel"
-      aria-label={`${title} photos`}
-    >
-      {slide ? (
-        <>
-          {leaving ? (
+    <>
+      <div
+        className={styles.media}
+        data-cms-gallery={galleryPath}
+        data-empty={slide ? undefined : ""}
+        aria-roledescription="carousel"
+        aria-label={`${title} photos`}
+      >
+        {slide ? (
+          <>
+            {leaving ? (
+              <Image
+                key={`${leaving.image}-out`}
+                src={assetPath(leaving.image)}
+                alt=""
+                fill
+                unoptimized={leaving.image.startsWith("/api/media/")}
+                sizes="(min-width: 1024px) 260px, (min-width: 640px) 45vw, 100vw"
+                className={frame?.direction === 1 ? styles.leaveLeft : styles.leaveRight}
+                style={{ objectPosition: leaving.position }}
+              />
+            ) : null}
             <Image
-              key={`${leaving.image}-out`}
-              src={assetPath(leaving.image)}
-              alt=""
+              key={`${slide.image}-${safeIndex}`}
+              src={assetPath(slide.image)}
+              alt={slide.alt}
               fill
-              unoptimized={leaving.image.startsWith("/api/media/")}
+              unoptimized={slide.image.startsWith("/api/media/")}
               sizes="(min-width: 1024px) 260px, (min-width: 640px) 45vw, 100vw"
-              className={frame?.direction === 1 ? styles.leaveLeft : styles.leaveRight}
-              style={{ objectPosition: leaving.position }}
+              className={frame ? (frame.direction === 1 ? styles.enterRight : styles.enterLeft) : styles.image}
+              style={{ objectPosition: slide.position }}
+              onAnimationEnd={(event) => {
+                if (event.target === event.currentTarget) setFrame(null);
+              }}
             />
-          ) : null}
-          <Image
-            key={`${slide.image}-${safeIndex}`}
-            src={assetPath(slide.image)}
-            alt={slide.alt}
-            fill
-            unoptimized={slide.image.startsWith("/api/media/")}
-            sizes="(min-width: 1024px) 260px, (min-width: 640px) 45vw, 100vw"
-            className={frame ? (frame.direction === 1 ? styles.enterRight : styles.enterLeft) : styles.image}
-            style={{ objectPosition: slide.position }}
-            onAnimationEnd={(event) => {
-              if (event.target === event.currentTarget) setFrame(null);
-            }}
-          />
-          {count > 1 ? (
-            <>
+            {editing ? (
+              <span className={styles.shade} aria-hidden="true" />
+            ) : (
               <button
                 type="button"
-                className={`${styles.arrow} ${styles.arrowPrev}`}
-                aria-label={`Previous photo, ${title}`}
-                onClick={() => go((index - 1 + count) % count, -1)}
+                className={styles.hit}
+                aria-label={`View ${slide.alt || `${title} photo ${safeIndex + 1}`}`}
+                onClick={() => setZoom(true)}
               >
-                <ChevronLeft size={18} strokeWidth={2.25} />
+                <span className={styles.shade} aria-hidden="true" />
               </button>
-              <button
-                type="button"
-                className={`${styles.arrow} ${styles.arrowNext}`}
-                aria-label={`Next photo, ${title}`}
-                onClick={() => go((index + 1) % count, 1)}
-              >
-                <ChevronRight size={18} strokeWidth={2.25} />
-              </button>
-              <span className={styles.pager}>
-                {slides.map((item, dotIndex) => (
-                  <button
-                    key={`${item.image}-${dotIndex}`}
-                    type="button"
-                    className={dotIndex === safeIndex ? styles.dotActive : styles.dot}
-                    aria-label={`${title}, photo ${dotIndex + 1} of ${count}`}
-                    aria-current={dotIndex === safeIndex ? "true" : undefined}
-                    onClick={() => go(dotIndex, dotIndex > index ? 1 : -1)}
-                  />
-                ))}
-              </span>
-            </>
-          ) : null}
-        </>
+            )}
+            {count > 1 ? (
+              <>
+                <button
+                  type="button"
+                  className={`${styles.arrow} ${styles.arrowPrev}`}
+                  aria-label={`Previous photo, ${title}`}
+                  onClick={() => go((index - 1 + count) % count, -1)}
+                >
+                  <ChevronLeft size={18} strokeWidth={2.25} />
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.arrow} ${styles.arrowNext}`}
+                  aria-label={`Next photo, ${title}`}
+                  onClick={() => go((index + 1) % count, 1)}
+                >
+                  <ChevronRight size={18} strokeWidth={2.25} />
+                </button>
+                <span className={styles.pager}>
+                  {slides.map((item, dotIndex) => (
+                    <button
+                      key={`${item.image}-${dotIndex}`}
+                      type="button"
+                      className={dotIndex === safeIndex ? styles.dotActive : styles.dot}
+                      aria-label={`${title}, photo ${dotIndex + 1} of ${count}`}
+                      aria-current={dotIndex === safeIndex ? "true" : undefined}
+                      onClick={() => go(dotIndex, dotIndex > index ? 1 : -1)}
+                    />
+                  ))}
+                </span>
+              </>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+      {zoom && !editing ? (
+        <PhotoLightbox
+          photos={slides}
+          index={safeIndex}
+          label={title}
+          onIndex={setIndex}
+          onClose={() => setZoom(false)}
+        />
       ) : null}
-    </div>
+    </>
   );
 }

@@ -11,6 +11,9 @@ export function localEnv(): CmsEnv {
     ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
     CF_ACCESS_TEAM_DOMAIN: process.env.CF_ACCESS_TEAM_DOMAIN,
     CF_ACCESS_AUD: process.env.CF_ACCESS_AUD,
+    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+    TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,
+    TELEGRAM_ENABLED: process.env.TELEGRAM_ENABLED,
     readApplications: async () => {
       try {
         return JSON.parse(await readFile(path.join(root(), "applications.json"), "utf8"));

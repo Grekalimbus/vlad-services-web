@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { planOffers } from "@/lib/cms/tv-page";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { hearAboutOptions } from "@/lib/hear-about";
-import { zipPattern } from "@/lib/forms";
+import { allowDigitsOnlyInput, sanitizeZipInput, zipPattern } from "@/lib/forms";
 import { HoneypotField, PrivacyNotice } from "@/features/quote";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { nationalDigits, useUsPhone } from "@/lib/use-us-phone";
@@ -19,6 +19,9 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 	const cms = useCms();
 	const editing = useEditing();
 	const offer = planOffers(cms)[id];
+	const serviceName =
+		cms.serviceCategories.find((item) => item.id === "tv-mounting" || item.slug === "tv-mounting")?.name?.trim() ||
+		"TV Technician";
 	const titleId = useId();
 	const nameId = useId();
 	const phoneId = useId();
@@ -60,7 +63,7 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 		const zip = String(data.get("zip") ?? "").trim();
 		const next: { name?: boolean; phone?: boolean; zip?: boolean; hearAbout?: boolean } = {};
 		if (name.length < 2) next.name = true;
-		if (nationalDigits(phoneField.phone).length !== 10) next.phone = true;
+		if (nationalDigits(phoneField.phone).length < 7) next.phone = true;
 		if (!zipPattern.test(zip)) next.zip = true;
 		if (!hearAbout) next.hearAbout = true;
 		setErrors(next);
@@ -79,13 +82,14 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 				buildLeadPayload({
 					type: "tv-mounting",
 					formId: "tv-discount",
+					formLocation: "tv-discount",
 					fields: {
 						name,
 						phone: phoneField.phone,
 						zip,
 						tvCount: id,
 						offer: offer.title,
-						service: offer.title,
+						service: serviceName,
 						hearAbout,
 					},
 					photos: [],
@@ -104,7 +108,7 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 
 	function onPhoneChange(event: ChangeEvent<HTMLInputElement>) {
 		const count = phoneField.onPhoneChange(event);
-		if (errors.phone && count === 10) setErrors((current) => ({ ...current, phone: undefined }));
+		if (errors.phone && count >= 7) setErrors((current) => ({ ...current, phone: undefined }));
 	}
 
 	function onNameChange() {
@@ -191,6 +195,12 @@ export function TvDiscountDialog({ id, onClose }: { id: "2" | "3" | "4plus"; onC
 								required
 								className={errors.zip ? `${styles.input} ${styles.inputInvalid}` : styles.input}
 								aria-invalid={errors.zip ? true : undefined}
+								onBeforeInput={allowDigitsOnlyInput}
+								onInput={(event) => {
+									const input = event.currentTarget;
+									const next = sanitizeZipInput(input.value);
+									if (input.value !== next) input.value = next;
+								}}
 								onChange={() => {
 									if (errors.zip) setErrors((current) => ({ ...current, zip: undefined }));
 								}}

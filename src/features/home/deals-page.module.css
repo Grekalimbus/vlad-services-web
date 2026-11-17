@@ -1,43 +1,110 @@
-.layout {
-  display: grid;
-  grid-template-columns: 17rem minmax(0, 1fr);
-  width: 100%;
-  min-height: calc(100dvh - 5.5rem);
+.shell {
+  /* Keep in sync with PageFrame `.pageFlush` padding-top. */
+  --deals-sidebar-width: 17rem;
+  --deals-header-offset: calc(max(0.75rem, env(safe-area-inset-top)) + 3.25rem + 1px);
+  position: relative;
+  display: flex;
   align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
-.layout::before {
-  content: "";
-  grid-column: 1;
-  grid-row: 1;
-  width: 1px;
-  justify-self: end;
-  align-self: stretch;
-  z-index: 2;
-  background: #d7dee6;
-  pointer-events: none;
+@media (min-width: 768px) {
+  .shell {
+    --deals-header-offset: calc(2.5rem + 2.75rem + 1px);
+  }
+}
+
+.shellCollapsed {
+  --deals-sidebar-width: 3.25rem;
 }
 
 .sidebar {
-  position: sticky;
-  top: 5.5rem;
-  z-index: 1;
-  grid-column: 1;
-  grid-row: 1;
-  align-self: start;
-  width: 100%;
+  box-sizing: border-box;
+  flex: 0 0 var(--deals-sidebar-width);
+  align-self: stretch;
+  width: var(--deals-sidebar-width);
+  border-right: 1px solid #d7dee6;
   background: #f7fafc;
-  padding: 1.75rem 1.15rem 2rem 1.25rem;
+  transition: flex-basis 180ms ease, width 180ms ease;
+}
+
+.sidebarInner {
+  position: sticky;
+  top: var(--deals-header-offset);
+  z-index: 4;
+  box-sizing: border-box;
+  max-height: calc(100dvh - var(--deals-header-offset));
+  padding: 1.25rem 0.85rem 1.5rem 1rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition: padding 180ms ease;
+}
+
+.shellCollapsed .sidebarInner {
+  padding-inline: 0.55rem;
+  overflow: hidden;
+}
+
+.sidebarTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.shellCollapsed .sidebarTop {
+  justify-content: center;
+  margin-bottom: 0;
 }
 
 .pageTitle {
-  margin: 0 0 1rem;
+  margin: 0;
+  min-width: 0;
   text-align: left;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #0076fe;
+}
+
+.shellCollapsed .pageTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.collapse {
+  display: inline-flex;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin-top: -6px;
+  border: 1px solid #d7dee6;
+  border-radius: 0.65rem;
+  background: #fff;
+  color: #3c4654;
+  cursor: pointer;
+}
+
+.collapse:hover {
+  border-color: #0076fe;
+  color: #0076fe;
+  background: rgb(0 118 254 / 0.06);
+}
+
+.collapse:focus-visible {
+  outline: 2px solid #0076fe;
+  outline-offset: 2px;
 }
 
 .nav {
@@ -47,6 +114,12 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Beat `.nav { display: flex }` — bare [hidden] loses to the class rule. */
+.nav[hidden],
+.shellCollapsed .nav {
+  display: none;
 }
 
 .item {
@@ -89,13 +162,21 @@
   cursor: pointer;
 }
 
+.main {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
 .stage,
 .empty {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  justify-self: center;
-  width: min(100% - 2rem, 700px);
-  padding: 2.5rem 0 4.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(700px, 100%);
+  min-width: 0;
+  margin-inline: auto;
+  padding: 2.5rem 1rem 4.5rem;
 }
 
 .stage {
@@ -104,21 +185,25 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  overflow-x: visible;
 }
 
 .mediaHit {
-  width: min(100%, 700px);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
 }
 
 .media {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: auto;
   aspect-ratio: 700 / 400;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 1rem;
-  background: #0c121c;
+  background: #f7fafc;
 }
 
 .title {
@@ -172,36 +257,87 @@
   text-align: center;
 }
 
-@media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-    min-height: 0;
-  }
+.below {
+  box-sizing: border-box;
+  width: min(100% - 2rem, 860px);
+  max-width: 100%;
+  margin-top: -40px;
+  margin-inline: auto;
+}
 
-  .layout::before {
-    display: none;
+.below :global([class*="inner"]),
+.below :global([class*="container"]) {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebarInner {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .shell,
+  .shellCollapsed {
+    --deals-sidebar-width: 0rem;
+    flex-direction: column;
   }
 
   .sidebar {
-    position: static;
+    flex: none;
+    width: 100%;
+    border-right: 0;
     border-bottom: 1px solid #d7dee6;
+  }
+
+  .sidebarInner {
+    position: static;
+    top: auto;
+    max-height: none;
+    padding: 1rem;
+    overflow: visible;
+  }
+
+  .shellCollapsed .sidebarInner {
+    overflow: visible;
+  }
+
+  .sidebarTop {
+    align-items: center;
+  }
+
+  /* Keep DEALS label + show/hide control visible when collapsed on mobile. */
+  .shellCollapsed .pageTitle {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .shellCollapsed .sidebarTop {
+    justify-content: space-between;
+  }
+
+  .nav {
+    flex-direction: column;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .item {
+    width: 100%;
   }
 
   .stage,
   .empty {
-    grid-column: auto;
-    grid-row: auto;
-    width: min(100% - 2rem, 700px);
     margin-inline: auto;
   }
 
-  .nav {
-    flex-direction: row;
-    overflow-x: auto;
-  }
-
-  .item {
-    width: auto;
-    flex: none;
+  .below {
+    width: min(100% - 2rem, 860px);
   }
 }

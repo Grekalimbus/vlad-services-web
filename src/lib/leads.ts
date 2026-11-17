@@ -8,11 +8,12 @@ import { trackGenerateLead } from "@/lib/ga4";
 
 export type LeadFormId =
   | "general-quote"
-  | "tv-mounting-quote"
   | "tv-discount"
   | "tv-quiz"
   | "quote-dialog"
-  | "deals-signup";
+  | "deals-quote"
+  | "deals-signup"
+  | "deals-popup";
 
 export type LeadType = "quote" | "tv-mounting" | "deals";
 
@@ -30,6 +31,7 @@ export type LeadPayload = {
     path: string;
     href: string;
     formId: LeadFormId;
+    formLocation: string;
   };
   fields: Record<string, string>;
   photos: LeadPhotoMeta[];
@@ -60,6 +62,7 @@ export function filesFromFormData(data: FormData, field: string) {
 export function buildLeadPayload(input: {
   type: LeadType;
   formId: LeadFormId;
+  formLocation?: string;
   fields: Record<string, string>;
   photos: File[];
   smsConsent: boolean | null;
@@ -69,9 +72,12 @@ export function buildLeadPayload(input: {
 }): LeadPayload {
   const sourcePath =
     input.sourcePath ??
-    (typeof window !== "undefined" ? window.location.pathname : "/");
+    (typeof window !== "undefined"
+      ? `${window.location.pathname}${window.location.search}${window.location.hash}`
+      : "/");
   const href =
     input.href ?? (typeof window !== "undefined" ? window.location.href : "");
+  const formLocation = (input.formLocation ?? input.formId).trim() || input.formId;
   const phone = input.fields.phone ?? "";
   const email = input.fields.email ?? "";
   const submittedAt = new Date().toISOString();
@@ -93,6 +99,7 @@ export function buildLeadPayload(input: {
       path: sourcePath,
       href,
       formId: input.formId,
+      formLocation,
     },
     fields: input.fields,
     photos: photoMeta(input.photos),
@@ -137,6 +144,8 @@ export async function submitLead(payload: LeadPayload, trap: { companyUrl?: stri
       service: fields.service ?? "",
       hearAbout: fields.hearAbout ?? "",
       formId: payload.source.formId,
+      formLocation: payload.source.formLocation,
+      sourcePage: payload.source.path,
       company_url: trap.companyUrl ?? "",
       smsConsent:
         payload.consents.sms === null ? null : payload.consents.sms.granted,
@@ -149,7 +158,7 @@ export async function submitLead(payload: LeadPayload, trap: { companyUrl?: stri
   if (!response.ok) throw new Error(body?.error || "Could not send the request. Try again.");
   trackGenerateLead({
     dedupeKey: payload.id,
-    formLocation: payload.source.formId,
+    formLocation: payload.source.formLocation || payload.source.formId,
     serviceType: fields.service,
   });
   return { ok: true as const, payload };

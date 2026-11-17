@@ -9,14 +9,28 @@ import {
   type ReactNode,
 } from "react";
 
-type QuoteFormKind = "quote" | "tv";
+export type DealQuoteOption = {
+  id: string;
+  label: string;
+};
+
+export type DealQuoteContext = {
+  /** Selected offer card id within the deals section. */
+  selectedOfferId: string;
+  /** All offer options for the current deals section. */
+  offers: DealQuoteOption[];
+};
+
+type OpenQuoteOptions = {
+  service?: string;
+  dealQuote?: DealQuoteContext | null;
+};
 
 type QuoteContextValue = {
   open: boolean;
-  form: QuoteFormKind;
-  tvCount: string | null;
   service: string | null;
-  openQuote: (form?: QuoteFormKind, tvCount?: string, service?: string) => void;
+  dealQuote: DealQuoteContext | null;
+  openQuote: (options?: OpenQuoteOptions) => void;
   closeQuote: () => void;
 };
 
@@ -24,29 +38,30 @@ const QuoteContext = createContext<QuoteContextValue | null>(null);
 
 export function QuoteProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<QuoteFormKind>("quote");
-  const [tvCount, setTvCount] = useState<string | null>(null);
   const [service, setService] = useState<string | null>(null);
+  const [dealQuote, setDealQuote] = useState<DealQuoteContext | null>(null);
 
-  const openQuote = useCallback((next: QuoteFormKind = "quote", count?: string, serviceName?: string) => {
-    setForm(next);
-    setTvCount(next === "tv" && count ? count : null);
-    setService(next === "quote" && serviceName ? serviceName : null);
+  const openQuote = useCallback((options: OpenQuoteOptions = {}) => {
+    const nextDeal = options.dealQuote?.offers.length ? options.dealQuote : null;
+    setService(options.service?.trim() ? options.service.trim() : null);
+    setDealQuote(nextDeal);
     setOpen(true);
   }, []);
 
-  const closeQuote = useCallback(() => setOpen(false), []);
+  const closeQuote = useCallback(() => {
+    setOpen(false);
+    setDealQuote(null);
+  }, []);
 
   const value = useMemo(
     () => ({
       open,
-      form,
-      tvCount,
       service,
+      dealQuote,
       openQuote,
       closeQuote,
     }),
-    [open, form, tvCount, service, openQuote, closeQuote],
+    [open, service, dealQuote, openQuote, closeQuote],
   );
 
   return <QuoteContext.Provider value={value}>{children}</QuoteContext.Provider>;

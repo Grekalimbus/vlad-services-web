@@ -1,11 +1,38 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, Copy, Trash2, X } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  Bell,
+  Calendar,
+  Check,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Eye,
+  FileText,
+  Globe,
+  Image as ImageIcon,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Trash2,
+  X,
+} from "lucide-react";
+import {
+  FORM_TAB_LABELS,
+  formIdLabel,
+  formatDetailValue,
+  formatTvCount,
+  partitionDetails,
+  type ApplicationForm as DisplayForm,
+} from "@/lib/application-display";
+import { HearAboutIcon } from "@/shared/hear-about-icon";
+import { ServiceIcon } from "@/shared/service-icon";
 import styles from "../admin.module.css";
 
 type Status = "new" | "contacted" | "scheduled";
-
 type ApplicationForm = "book" | "signup" | "tv";
 
 type ApplicationConsents = {
@@ -34,10 +61,21 @@ type Application = {
   consents: ApplicationConsents | null;
 };
 
-const tabs: { id: ApplicationForm; label: string }[] = [
-  { id: "book", label: "Book now" },
-  { id: "signup", label: "Sign up" },
-  { id: "tv", label: "TV" },
+type TabId = "all" | ApplicationForm;
+type StatusFilter = "all" | Status;
+
+const tabs: { id: TabId; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "book", label: FORM_TAB_LABELS.book },
+  { id: "signup", label: FORM_TAB_LABELS.signup },
+  { id: "tv", label: FORM_TAB_LABELS.tv },
+];
+
+const statusFilters: { id: StatusFilter; label: string }[] = [
+  { id: "all", label: "All statuses" },
+  { id: "new", label: "New" },
+  { id: "contacted", label: "Contacted" },
+  { id: "scheduled", label: "Scheduled" },
 ];
 
 const PAGE_SIZE = 20;
@@ -46,15 +84,50 @@ export default function ApplicationsPage() {
   const [ready, setReady] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [items, setItems] = useState<Application[]>([]);
+  const [quizStepLabels, setQuizStepLabels] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [tab, setTab] = useState<ApplicationForm>("book");
+  const [tab, setTab] = useState<TabId>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [page, setPage] = useState(1);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [viewer, setViewer] = useState<{ photos: { src: string; alt: string }[]; index: number } | null>(null);
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const notifyRef = useRef<HTMLDivElement | null>(null);
+
+  async function loadApplications(options?: { silent?: boolean }) {
+    const silent = options?.silent === true;
+    try {
+      const response = await fetch("/api/admin/applications", {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      if (response.status === 401) {
+        setAuthenticated(false);
+        return;
+      }
+      if (!response.ok) throw new Error("Could not load applications.");
+      const body = (await response.json()) as {
+        items?: Application[];
+        quizStepLabels?: Record<string, string>;
+      };
+      setItems((body.items ?? []).map(normalize));
+      setQuizStepLabels(
+        body.quizStepLabels && typeof body.quizStepLabels === "object" ? body.quizStepLabels : {},
+      );
+      if (!silent) setError("");
+    } catch (reason: unknown) {
+      if (!silent) {
+        setError(reason instanceof Error ? reason.message : "Could not load applications.");
+      }
+    } finally {
+      setLoaded(true);
+    }
+  }
 
   useEffect(() => {
     fetch("/api/admin/session", { cache: "no-store", credentials: "same-origin" })
@@ -68,27 +141,35 @@ export default function ApplicationsPage() {
 
   useEffect(() => {
     if (!authenticated) return;
-    fetch("/api/admin/applications")
-      .then(async (response) => {
-        if (response.status === 401) {
-          setAuthenticated(false);
-          return;
-        }
-        if (!response.ok) throw new Error("Could not load applications.");
-        const body = (await response.json()) as { items?: Application[] };
-        setItems((body.items ?? []).map(normalize));
-        setLoaded(true);
-      })
-      .catch((reason: unknown) => {
-        setError(reason instanceof Error ? reason.message : "Could not load applications.");
-        setLoaded(true);
-      });
+    void loadApplications();
+    const timer = window.setInterval(() => {
+      void loadApplications({ silent: true });
+    }, 15_000);
+    return () => window.clearInterval(timer);
   }, [authenticated]);
+
+  useEffect(() => {
+    if (!notifyOpen) return;
+    function onPointerDown(event: MouseEvent) {
+      if (!notifyRef.current?.contains(event.target as Node)) setNotifyOpen(false);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setNotifyOpen(false);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [notifyOpen]);
 
   const filtered = useMemo(() => {
     const start = from ? new Date(`${from}T00:00:00`).getTime() : null;
     const end = to ? new Date(`${to}T23:59:59.999`).getTime() : null;
     const next = items.filter((item) => {
+      if (tab !== "all" && item.form !== tab) return false;
+      if (statusFilter !== "all" && item.status !== statusFilter) return false;
       const time = new Date(item.submittedAt).getTime();
       if (Number.isNaN(time)) return false;
       if (start !== null && time < start) return false;
@@ -96,14 +177,24 @@ export default function ApplicationsPage() {
       return true;
     });
     next.sort((left, right) => new Date(right.submittedAt).getTime() - new Date(left.submittedAt).getTime());
-    return next.filter((item) => item.form === tab);
-  }, [items, from, to, tab]);
+    return next;
+  }, [items, from, to, tab, statusFilter]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const visible = filtered.slice(startIndex, startIndex + PAGE_SIZE);
   const pending = items.find((item) => item.id === confirmId) ?? null;
+  const selected = items.find((item) => item.id === selectedId) ?? null;
+  const newCounts = useMemo(() => {
+    const counts = { book: 0, signup: 0, tv: 0, total: 0 };
+    for (const item of items) {
+      if (item.status !== "new") continue;
+      counts[item.form] += 1;
+      counts.total += 1;
+    }
+    return counts;
+  }, [items]);
 
   async function changeStatus(id: string, status: Status) {
     const previous = items;
@@ -121,7 +212,16 @@ export default function ApplicationsPage() {
     if (!response.ok) {
       setItems(previous);
       setError("Could not update the status.");
+      return;
     }
+    void loadApplications({ silent: true });
+  }
+
+  function openNewTab(form: ApplicationForm) {
+    setTab(form);
+    setStatusFilter("new");
+    setPage(1);
+    setNotifyOpen(false);
   }
 
   async function remove(id: string) {
@@ -139,6 +239,7 @@ export default function ApplicationsPage() {
     }
     setItems((current) => current.filter((item) => item.id !== id));
     setConfirmId(null);
+    if (selectedId === id) setSelectedId(null);
     if (visible.length === 1 && currentPage > 1) setPage(currentPage - 1);
   }
 
@@ -158,18 +259,78 @@ export default function ApplicationsPage() {
   return (
     <main className={styles.applications}>
       <div className={styles.applicationsInner}>
-        <h1>Applications</h1>
+        <header className={styles.crmHeader}>
+          <div>
+            <p className={styles.crmEyebrow}>PrimeFix Admin</p>
+            <h1>Applications</h1>
+          </div>
+          <div className={styles.notifyWrap} ref={notifyRef}>
+            <button
+              type="button"
+              className={styles.notifyButton}
+              aria-label={
+                newCounts.total > 0
+                  ? `${newCounts.total} new applications`
+                  : "No new applications"
+              }
+              aria-expanded={notifyOpen}
+              aria-haspopup="dialog"
+              onClick={() => setNotifyOpen((open) => !open)}
+            >
+              <Bell size={18} strokeWidth={2.2} aria-hidden="true" />
+              {newCounts.total > 0 ? (
+                <span className={styles.notifyBadge}>{newCounts.total > 99 ? "99+" : newCounts.total}</span>
+              ) : null}
+            </button>
+            {notifyOpen ? (
+              <div className={styles.notifyPanel} role="dialog" aria-label="New applications">
+                <div className={styles.notifyPanelHead}>
+                  <strong>New leads</strong>
+                  <span>{newCounts.total === 0 ? "All clear" : `${newCounts.total} waiting`}</span>
+                </div>
+                {newCounts.total === 0 ? (
+                  <p className={styles.notifyEmpty}>No applications with status New.</p>
+                ) : (
+                  <ul className={styles.notifyList}>
+                    {(
+                      [
+                        { id: "book" as const, label: FORM_TAB_LABELS.book, count: newCounts.book },
+                        { id: "signup" as const, label: FORM_TAB_LABELS.signup, count: newCounts.signup },
+                        { id: "tv" as const, label: FORM_TAB_LABELS.tv, count: newCounts.tv },
+                      ] as const
+                    ).map((entry) => (
+                      <li key={entry.id}>
+                        <button
+                          type="button"
+                          className={styles.notifyItem}
+                          disabled={entry.count === 0}
+                          onClick={() => openNewTab(entry.id)}
+                        >
+                          <span>{entry.label}</span>
+                          <strong data-active={entry.count > 0 ? "true" : "false"}>{entry.count}</strong>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className={styles.notifyHint}>Opening this panel does not change statuses.</p>
+              </div>
+            ) : null}
+          </div>
+        </header>
+
         <div className={styles.tabs} role="tablist" aria-label="Application forms">
           {tabs.map((item) => {
-            const count = items.filter((entry) => entry.form === item.id).length;
-            const selected = tab === item.id;
+            const count =
+              item.id === "all" ? items.length : items.filter((entry) => entry.form === item.id).length;
+            const selectedTab = tab === item.id;
             return (
               <button
                 key={item.id}
                 type="button"
                 role="tab"
-                aria-selected={selected}
-                className={selected ? styles.tabActive : styles.tab}
+                aria-selected={selectedTab}
+                className={selectedTab ? styles.tabActive : styles.tab}
                 onClick={() => {
                   setTab(item.id);
                   setPage(1);
@@ -181,8 +342,10 @@ export default function ApplicationsPage() {
             );
           })}
         </div>
+
         {error ? <p className={styles.error}>{error}</p> : null}
         {!loaded ? <p className={styles.empty}>Loading…</p> : null}
+
         {loaded && !error ? (
           <form className={styles.filters} onSubmit={(event) => event.preventDefault()}>
             <label>
@@ -209,130 +372,116 @@ export default function ApplicationsPage() {
                 }}
               />
             </label>
+            <label>
+              <span>Status</span>
+              <select
+                value={statusFilter}
+                onChange={(event) => {
+                  setStatusFilter(event.target.value as StatusFilter);
+                  setPage(1);
+                }}
+              >
+                {statusFilters.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               type="button"
-              disabled={!from && !to}
+              disabled={!from && !to && statusFilter === "all"}
               onClick={() => {
                 setFrom("");
                 setTo("");
+                setStatusFilter("all");
                 setPage(1);
               }}
             >
-              Clear Sorting
+              Clear filters
             </button>
           </form>
         ) : null}
+
         {loaded && !error && filtered.length === 0 ? (
           <p className={styles.empty}>
-            {items.some((item) => item.form === tab) ? "No applications in this date range." : "No applications yet."}
+            {items.length === 0
+              ? "No applications yet."
+              : tab !== "all" && !items.some((item) => item.form === tab)
+                ? "No applications in this tab."
+                : "No applications match the current filters."}
           </p>
         ) : null}
+
         {visible.length > 0 ? (
-          <div className={styles.board}>
-            <div className={styles.head} aria-hidden="true">
+          <div className={styles.crmBoard}>
+            <div className={styles.crmHead} aria-hidden="true">
               <span>Date</span>
               <span>Name</span>
               <span>Phone</span>
-              <span>Email</span>
               <span>ZIP</span>
               <span>Service</span>
-              <span>Photos</span>
               <span>Status</span>
+              <span>Signals</span>
               <span />
             </div>
-            <ul className={styles.rows}>
+            <ul className={styles.crmRows}>
               {visible.map((item) => {
                 const when = formatWhen(item.submittedAt);
+                const extras = countExtraDetails(item);
                 return (
-                  <li key={item.id} className={styles.row}>
-                    <div className={`${styles.cell} ${styles.dateCell}`}>
-                      <span className={styles.cellLabel}>Date</span>
-                      <span className={styles.value}>
-                        <span className={styles.valueText}>
+                  <li key={item.id} className={styles.crmRow}>
+                    <div className={styles.crmCell}>
+                      <span className={styles.crmLabel}>Date</span>
+                      <span className={styles.crmDate}>
+                        <Calendar size={14} aria-hidden="true" />
+                        <span>
                           {when.date}
                           {when.time ? <span className={styles.time}>{when.time}</span> : null}
                         </span>
-                        <CopyButton value={when.copy} label={`Copy date for ${item.name}`} />
                       </span>
                     </div>
-                    <div className={styles.cell}>
-                      <span className={styles.cellLabel}>Name</span>
-                      <span className={styles.valueText}>{item.name}</span>
+                    <div className={styles.crmCell}>
+                      <span className={styles.crmLabel}>Name</span>
+                      <span className={styles.crmName}>{item.name}</span>
                     </div>
-                    <div className={styles.cell}>
-                      <span className={styles.cellLabel}>Phone</span>
+                    <div className={styles.crmCell}>
+                      <span className={styles.crmLabel}>Phone</span>
                       <span className={styles.value}>
                         {telHref(item.phone) ? (
-                          <a className={styles.valueText} href={telHref(item.phone)}>
+                          <a className={styles.crmPhone} href={telHref(item.phone)}>
+                            <Phone size={14} aria-hidden="true" />
                             {item.phone}
                           </a>
                         ) : (
-                          <span className={styles.valueText}>{item.phone}</span>
+                          <span className={styles.crmPhone}>
+                            <Phone size={14} aria-hidden="true" />
+                            {item.phone}
+                          </span>
                         )}
                         <CopyButton value={item.phone} label={`Copy phone for ${item.name}`} />
                       </span>
                     </div>
-                    <div className={styles.cell}>
-                      <span className={styles.cellLabel}>Email</span>
-                      {item.email ? (
-                        <span className={styles.value}>
-                          {mailHref(item.email) ? (
-                            <a className={styles.valueText} href={mailHref(item.email)}>
-                              {item.email}
-                            </a>
-                          ) : (
-                            <span className={styles.valueText}>{item.email}</span>
-                          )}
-                          <CopyButton value={item.email} label={`Copy email for ${item.name}`} />
+                    <div className={styles.crmCell}>
+                      <span className={styles.crmLabel}>ZIP</span>
+                      {item.zip ? (
+                        <span className={styles.crmZip}>
+                          <MapPin size={14} aria-hidden="true" />
+                          {item.zip}
                         </span>
                       ) : (
                         <span className={styles.muted}>—</span>
                       )}
                     </div>
-                    <div className={styles.cell}>
-                      <span className={styles.cellLabel}>ZIP</span>
-                      <span>{item.zip || "—"}</span>
+                    <div className={styles.crmCell}>
+                      <span className={styles.crmLabel}>Service</span>
+                      <span className={styles.crmService}>
+                        <ServiceIcon service={item.service} />
+                        <span>{item.service || "Not specified"}</span>
+                      </span>
                     </div>
-                    <div className={styles.cell}>
-                      <span className={styles.cellLabel}>Service</span>
-                      {item.service ? <span>{item.service}</span> : <span className={styles.muted}>Not specified</span>}
-                      {formatDetails(item) ? <span className={styles.detail}>{formatDetails(item)}</span> : null}
-                    </div>
-                    <div className={`${styles.cell} ${styles.consentCell}`}>
-                      <span className={styles.cellLabel}>Consent & Agreements</span>
-                      <ConsentBlock consents={item.consents} submittedAt={item.submittedAt} />
-                    </div>
-                    <div className={styles.cell}>
-                      <span className={styles.cellLabel}>Photos</span>
-                      {item.photos.length > 0 ? (
-                        <ul className={styles.thumbs}>
-                          {item.photos.map((photo, position) => (
-                            <li key={photo.index}>
-                              <button
-                                type="button"
-                                className={styles.thumb}
-                                aria-label={`View photo ${position + 1} from ${item.name}`}
-                                onClick={() =>
-                                  setViewer({
-                                    index: position,
-                                    photos: item.photos.map((entry) => ({
-                                      src: `/api/admin/applications/${item.id}/photos/${entry.index}`,
-                                      alt: entry.name,
-                                    })),
-                                  })
-                                }
-                              >
-                                <img src={`/api/admin/applications/${item.id}/photos/${photo.index}`} alt="" />
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span className={styles.muted}>No photos</span>
-                      )}
-                    </div>
-                    <div className={styles.cell}>
-                      <span className={styles.cellLabel}>Status</span>
+                    <div className={styles.crmCell}>
+                      <span className={styles.crmLabel}>Status</span>
                       <select
                         className={styles.status}
                         data-status={item.status}
@@ -345,10 +494,36 @@ export default function ApplicationsPage() {
                         <option value="scheduled">Scheduled</option>
                       </select>
                     </div>
-                    <div className={styles.actions}>
+                    <div className={styles.crmCell}>
+                      <span className={styles.crmLabel}>Signals</span>
+                      <div className={styles.crmSignals}>
+                        {item.photos.length > 0 ? (
+                          <span className={styles.crmChip} title={`${item.photos.length} photo(s)`}>
+                            <ImageIcon size={13} aria-hidden="true" />
+                            {item.photos.length}
+                          </span>
+                        ) : null}
+                        {extras > 0 ? (
+                          <span className={styles.crmChipMuted} title={`${extras} extra field(s)`}>
+                            <FileText size={13} aria-hidden="true" />
+                            {extras}
+                          </span>
+                        ) : null}
+                        {!item.photos.length && extras === 0 ? <span className={styles.muted}>—</span> : null}
+                      </div>
+                    </div>
+                    <div className={styles.crmActions}>
                       <button
                         type="button"
-                        className={styles.trash}
+                        className={styles.crmView}
+                        aria-label={`View application from ${item.name}`}
+                        onClick={() => setSelectedId(item.id)}
+                      >
+                        <Eye size={16} aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.crmTrash}
                         aria-label={`Delete application from ${item.name}`}
                         onClick={() => setConfirmId(item.id)}
                       >
@@ -361,6 +536,7 @@ export default function ApplicationsPage() {
             </ul>
           </div>
         ) : null}
+
         {loaded && !error && filtered.length > PAGE_SIZE ? (
           <nav className={styles.pager} aria-label="Application pages">
             <button type="button" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
@@ -375,6 +551,25 @@ export default function ApplicationsPage() {
           </nav>
         ) : null}
       </div>
+
+      {selected ? (
+        <ApplicationDetailModal
+          item={selected}
+          quizStepLabels={quizStepLabels}
+          onClose={() => setSelectedId(null)}
+          onStatus={(status) => changeStatus(selected.id, status)}
+          onOpenPhotos={(index) =>
+            setViewer({
+              index,
+              photos: selected.photos.map((entry) => ({
+                src: `/api/admin/applications/${selected.id}/photos/${entry.index}`,
+                alt: entry.name,
+              })),
+            })
+          }
+        />
+      ) : null}
+
       {viewer ? (
         <PhotoViewer
           photos={viewer.photos}
@@ -383,6 +578,7 @@ export default function ApplicationsPage() {
           onClose={() => setViewer(null)}
         />
       ) : null}
+
       {pending ? (
         <ConfirmDelete
           name={pending.name}
@@ -395,6 +591,246 @@ export default function ApplicationsPage() {
       ) : null}
     </main>
   );
+}
+
+function ApplicationDetailModal({
+  item,
+  quizStepLabels,
+  onClose,
+  onStatus,
+  onOpenPhotos,
+}: {
+  item: Application;
+  quizStepLabels: Record<string, string>;
+  onClose: () => void;
+  onStatus: (status: Status) => void;
+  onOpenPhotos: (index: number) => void;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  const when = formatWhen(item.submittedAt);
+  const parts = partitionDetails(item.details, item.service, quizStepLabels, item.form as DisplayForm);
+  const formId = item.details.formId;
+  const formLocation = item.details.formLocation;
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCloseRef.current();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  const requestFields = [
+    item.service ? { label: "Service", value: item.service } : null,
+    ...parts.request
+      .filter((entry) => entry.key !== "description" && entry.key !== "dealOffer" && entry.key !== "offer" && entry.key !== "tvCount")
+      .map((entry) => ({ label: entry.label, value: entry.value })),
+  ].filter(Boolean) as { label: string; value: string }[];
+
+  const description = item.details.description;
+  const deal = item.details.dealOffer;
+  const offer = item.details.offer;
+  const tvCount = item.details.tvCount;
+
+  return (
+    <div className={styles.detailRoot} onClick={onClose}>
+      <div
+        className={styles.detailModal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="application-detail-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className={styles.detailHeader}>
+          <div>
+            <p className={styles.crmEyebrow}>{FORM_TAB_LABELS[item.form]}</p>
+            <h2 id="application-detail-title">{item.name}</h2>
+          </div>
+          <button ref={closeRef} type="button" className={styles.detailClose} aria-label="Close details" onClick={onClose}>
+            <X size={18} aria-hidden="true" />
+          </button>
+        </header>
+
+        <div className={styles.detailBody}>
+          <DetailSection icon={<Phone size={16} aria-hidden="true" />} title="Contact Information">
+            <DetailField label="Name" value={item.name} />
+            <DetailField
+              label="Phone"
+              value={item.phone}
+              href={telHref(item.phone)}
+              copyValue={item.phone}
+              icon={<Phone size={14} aria-hidden="true" />}
+            />
+            {item.email ? (
+              <DetailField
+                label="Email"
+                value={item.email}
+                href={mailHref(item.email)}
+                copyValue={item.email}
+                icon={<Mail size={14} aria-hidden="true" />}
+              />
+            ) : null}
+            {item.zip ? (
+              <DetailField label="ZIP" value={item.zip} icon={<MapPin size={14} aria-hidden="true" />} />
+            ) : null}
+          </DetailSection>
+
+          {(requestFields.length > 0 || description || deal || offer || tvCount || parts.quiz.length > 0) && (
+            <DetailSection
+              icon={<ServiceIcon service={item.service} size={16} />}
+              title="Request Details"
+            >
+              {item.service ? (
+                <DetailField
+                  label="Service"
+                  value={item.service}
+                  icon={<ServiceIcon service={item.service} />}
+                />
+              ) : null}
+              {requestFields
+                .filter((field) => field.label !== "Service")
+                .map((field) => (
+                  <DetailField key={field.label + field.value} label={field.label} value={field.value} />
+                ))}
+              {description ? <DetailField label="Description" value={description} /> : null}
+              {deal ? <DetailField label="Deal" value={deal} /> : null}
+              {offer ? <DetailField label="Offer" value={offer} /> : null}
+              {tvCount ? <DetailField label="TVs" value={formatTvCount(tvCount)} /> : null}
+              {parts.quiz.map((entry) => (
+                <DetailField key={entry.key} label={entry.label} value={entry.value} />
+              ))}
+            </DetailSection>
+          )}
+
+          <DetailSection icon={<Globe size={16} aria-hidden="true" />} title="Lead Source">
+            <DetailField label="Form type" value={FORM_TAB_LABELS[item.form]} />
+            {formId ? <DetailField label="Form" value={formIdLabel(formId) ?? formId} /> : null}
+            {formLocation ? <DetailField label="Form location" value={formLocation} /> : null}
+            {item.details.sourcePage ? <DetailField label="Source page" value={item.details.sourcePage} /> : null}
+            {item.details.leadSource ? <DetailField label="Lead source" value={item.details.leadSource} /> : null}
+            {item.details.hearAbout ? (
+              <DetailField
+                label="Heard about"
+                value={item.details.hearAbout}
+                icon={<HearAboutIcon value={item.details.hearAbout} className={styles.hearAboutIcon} />}
+              />
+            ) : null}
+            {parts.source
+              .filter((entry) => !["formId", "formLocation", "sourcePage", "leadSource", "hearAbout"].includes(entry.key))
+              .map((entry) => (
+                <DetailField key={entry.key} label={entry.label} value={formatDetailValue(entry.key, entry.value)} />
+              ))}
+          </DetailSection>
+
+          <DetailSection icon={<ShieldCheck size={16} aria-hidden="true" />} title="Consent & Agreements">
+            <ConsentBlock consents={item.consents} submittedAt={item.submittedAt} />
+          </DetailSection>
+
+          {item.photos.length > 0 ? (
+            <DetailSection icon={<ImageIcon size={16} aria-hidden="true" />} title="Attachments">
+              <ul className={styles.thumbs}>
+                {item.photos.map((photo, position) => (
+                  <li key={photo.index}>
+                    <button
+                      type="button"
+                      className={styles.thumb}
+                      aria-label={`View photo ${position + 1} from ${item.name}`}
+                      onClick={() => onOpenPhotos(position)}
+                    >
+                      <img src={`/api/admin/applications/${item.id}/photos/${photo.index}`} alt="" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </DetailSection>
+          ) : null}
+
+          <DetailSection icon={<CheckCircle size={16} aria-hidden="true" />} title="Application Management">
+            <DetailField
+              label="Created"
+              value={`${when.date}${when.time ? ` · ${when.time}` : ""}`}
+              icon={<Calendar size={14} aria-hidden="true" />}
+            />
+            <label className={styles.detailStatus}>
+              <span>Status</span>
+              <select
+                className={styles.status}
+                data-status={item.status}
+                aria-label={`Status for ${item.name}`}
+                value={item.status}
+                onChange={(event) => onStatus(event.target.value as Status)}
+              >
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="scheduled">Scheduled</option>
+              </select>
+            </label>
+          </DetailSection>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailSection({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
+  return (
+    <section className={styles.detailSection}>
+      <h3>
+        {icon}
+        {title}
+      </h3>
+      <div className={styles.detailGrid}>{children}</div>
+    </section>
+  );
+}
+
+function DetailField({
+  label,
+  value,
+  href,
+  copyValue,
+  icon,
+}: {
+  label: string;
+  value: string;
+  href?: string;
+  copyValue?: string;
+  icon?: ReactNode;
+}) {
+  return (
+    <div className={styles.detailField}>
+      <span className={styles.detailFieldLabel}>{label}</span>
+      <span className={styles.detailFieldValue}>
+        {icon}
+        {href ? (
+          <a href={href}>{value}</a>
+        ) : (
+          <span>{value}</span>
+        )}
+        {copyValue ? <CopyButton value={copyValue} label={`Copy ${label}`} /> : null}
+      </span>
+    </div>
+  );
+}
+
+function countExtraDetails(item: Application) {
+  return Object.entries(item.details).filter(([key, value]) => {
+    if (!value) return false;
+    if (["name", "phone", "email", "zip", "service"].includes(key)) return false;
+    if (value === item.service) return false;
+    return true;
+  }).length;
 }
 
 function CopyButton({ value, label }: { value: string; label: string }) {
@@ -702,32 +1138,8 @@ function ConsentBlock({
 
 function marketingLabel(value: "yes" | "no" | "na") {
   if (value === "yes") return "Accepted";
-  if (value === "no") return "Not Accepted";
+  if (value === "no") return "Declined";
   return "Not Applicable";
-}
-
-const detailLabels: Record<string, string> = {
-  hearAbout: "Heard via",
-  description: "Description",
-  tvCount: "TVs",
-  offer: "Offer",
-  room: "Room",
-  mount: "Mount",
-  wall: "Wall",
-  size: "Size",
-  tvSize: "Size",
-  wallType: "Wall",
-  hasMount: "Has mount",
-  mountType: "Mount",
-  concealment: "Cables",
-};
-
-function formatDetails(item: Application) {
-  const hidden = new Set(["name", "phone", "email", "zip", "service"]);
-  return Object.entries(item.details)
-    .filter(([key, value]) => !hidden.has(key) && value && value !== item.service)
-    .map(([key, value]) => `${detailLabels[key] ?? key}: ${value}`)
-    .join(" · ");
 }
 
 function formatWhen(value: string) {

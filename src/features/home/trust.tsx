@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, Calendar, ClipboardList, Shield, Users } from "lucide-react";
+import Link from "next/link";
+import { Briefcase, Calendar, ClipboardList, Gift, Shield, Users } from "lucide-react";
 import { useCms } from "@/lib/cms/use-cms";
 import styles from "./trust.module.css";
+
+const DEALS_TV_HREF = "/deals#tv-mounting";
 
 const icons = {
   warranty: Shield,
@@ -114,6 +117,21 @@ export function Trust() {
             />
           ))}
         </ul>
+
+        <aside className={styles.promo} aria-label="Black Friday offer">
+          <div className={styles.promoIcon} aria-hidden="true">
+            <Gift size={26} strokeWidth={2.1} />
+          </div>
+          <div className={styles.promoCopy}>
+            <p className={styles.promoTitle}>
+              Black Friday: <span>30% OFF</span> Any Order
+            </p>
+            <p className={styles.promoText}>Book online in under a minute and the discount is applied to your total.</p>
+          </div>
+          <Link href={DEALS_TV_HREF} className={styles.promoButton}>
+            GET MY 30% OFF
+          </Link>
+        </aside>
       </div>
     </section>
   );

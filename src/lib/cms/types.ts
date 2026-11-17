@@ -35,6 +35,12 @@ export type CmsEnv = {
   ADMIN_SESSION_SECRET?: string;
   CF_ACCESS_TEAM_DOMAIN?: string;
   CF_ACCESS_AUD?: string;
+  /** Telegram Bot API token (secret). Never log or commit. */
+  TELEGRAM_BOT_TOKEN?: string;
+  /** Destination chat/group id (TEST locally, PROD on Worker). */
+  TELEGRAM_CHAT_ID?: string;
+  /** "1" / "true" enables outbound Telegram lead notifications. */
+  TELEGRAM_ENABLED?: string;
   /** Local viewing of production. Writes throw before any network call. */
   readOnly?: boolean;
   /** Worker preview may read production images without writing to R2. */

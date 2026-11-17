@@ -1,0 +1,15 @@
+{
+  "electricalIndex": 1,
+  "electricalTitle": "Electrical Projects up to 40%OFF",
+  "hadOfferCards": true,
+  "existingCardCount": 4,
+  "hadFooter": true,
+  "willSeedCards": false,
+  "willClearFooter": true,
+  "seededCardIds": [
+    "electrical-bundle",
+    "electrical-lighting",
+    "electrical-outlets",
+    "electrical-smart"
+  ]
+}

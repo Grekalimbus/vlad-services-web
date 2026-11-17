@@ -168,19 +168,6 @@ export function Footer() {
 							</ul>
 						</nav>
 
-						<nav className={styles.col} aria-label="Deals">
-							<p className={styles.colTitle}>Deals</p>
-							<ul className={styles.colList}>
-								{deals.map((deal) => (
-									<li key={deal.id}>
-										<Link href={`/deals#${deal.id}`} className={styles.colLink}>
-											{deal.title}
-										</Link>
-									</li>
-								))}
-							</ul>
-						</nav>
-
 						<nav className={styles.col} aria-label="Content">
 							<p className={styles.colTitle}>Content</p>
 							<ul className={styles.colList}>
@@ -220,6 +207,19 @@ export function Footer() {
 										Cookie settings
 									</button>
 								</li>
+							</ul>
+						</nav>
+
+						<nav className={`${styles.col} ${styles.dealsCol}`} aria-label="Deals">
+							<p className={styles.colTitle}>Deals</p>
+							<ul className={styles.colList}>
+								{deals.map((deal) => (
+									<li key={deal.id}>
+										<Link href={`/deals#${deal.id}`} className={styles.colLink}>
+											{deal.title}
+										</Link>
+									</li>
+								))}
 							</ul>
 						</nav>
 					</div>

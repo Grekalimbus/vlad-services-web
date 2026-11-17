@@ -4,7 +4,14 @@ import Image from "next/image";
 import { useCms } from "@/lib/cms/use-cms";
 import { dealsBackground, dealsHeading } from "@/lib/cms/deals-copy";
 import { ConsentFields, HoneypotField, PrivacyNotice } from "@/features/quote";
-import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
+import {
+	allowDigitsOnlyInput,
+	emailPattern,
+	phonePattern,
+	sanitizePhoneInput,
+	sanitizeZipInput,
+	zipPattern,
+} from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { assetPath } from "@/lib/site";
 import { X } from "lucide-react";
@@ -68,7 +75,8 @@ export function DealsSignup({
 			await submitLead(
 				buildLeadPayload({
 					type: "deals",
-					formId: "deals-signup",
+					formId: popup ? "deals-popup" : "deals-signup",
+					formLocation: popup ? "signup-popup" : "deals-signup",
 					fields: { name, phone, zip, email, service: "Sign up" },
 					photos: [],
 					smsConsent: data.get("smsConsent") === "yes",
@@ -162,9 +170,11 @@ export function DealsSignup({
 										label={copy.phoneLabel}
 										cms="copy.home.deals.phoneLabel"
 										type="tel"
+										inputMode="numeric"
 										autoComplete="tel"
 										placeholder={copy.phonePlaceholder}
 										error={errors.phone}
+										digitsOnly="phone"
 									/>
 									<DealField
 										id={ids.zip}
@@ -176,6 +186,7 @@ export function DealsSignup({
 										placeholder={copy.zipPlaceholder}
 										error={errors.zip}
 										required
+										digitsOnly="zip"
 									/>
 									<DealField
 										id={ids.email}
@@ -242,6 +253,7 @@ function DealField({
 	placeholder,
 	error,
 	required = false,
+	digitsOnly,
 }: {
 	id: string;
 	name: string;
@@ -253,6 +265,7 @@ function DealField({
 	placeholder: string;
 	error?: string;
 	required?: boolean;
+	digitsOnly?: "phone" | "zip";
 }) {
 	return (
 		<div className={styles.field}>
@@ -270,6 +283,19 @@ function DealField({
 				aria-invalid={Boolean(error)}
 				aria-describedby={error ? `${id}-error` : undefined}
 				className={error ? `${styles.input} ${styles.inputInvalid}` : styles.input}
+				onBeforeInput={digitsOnly ? allowDigitsOnlyInput : undefined}
+				onInput={
+					digitsOnly
+						? (event) => {
+								const input = event.currentTarget;
+								const next =
+									digitsOnly === "phone"
+										? sanitizePhoneInput(input.value)
+										: sanitizeZipInput(input.value);
+								if (input.value !== next) input.value = next;
+							}
+						: undefined
+				}
 			/>
 			{error ? (
 				<p id={`${id}-error`} className={styles.error}>

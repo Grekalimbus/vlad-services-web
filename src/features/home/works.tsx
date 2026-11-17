@@ -13,6 +13,7 @@ import { pageSlugForCategory } from "@/lib/service-pages";
 import { categoryHref } from "@/lib/services";
 import { assetPath } from "@/lib/site";
 import shared from "@/styles/shared.module.css";
+import { WorksVideos } from "./works-videos";
 import styles from "./works.module.css";
 
 function exploreLabel(value: string) {
@@ -154,6 +155,8 @@ export function Works() {
         <button ref={buttonRef} type="button" className={styles.projectsButton} onClick={() => setOpen(true)}>
           <span data-cms="copy.home.works.explore">{exploreLabel(works.explore)}</span>
         </button>
+
+        <WorksVideos />
       </div>
 
       {open ? createPortal(<ServicePicker services={services} onClose={closePicker} />, document.body) : null}

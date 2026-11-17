@@ -16,18 +16,7 @@ export function QuoteCta({ className = buttonPrimaryClass, children }: CtaProps)
   const quote = useCms().ctas.quote;
 
   return (
-    <button type="button" className={className} onClick={() => openQuote("quote")}>
-      {children ?? quote}
-    </button>
-  );
-}
-
-export function TvQuoteCta({ className = buttonPrimaryClass, children }: CtaProps) {
-  const { openQuote } = useQuote();
-  const quote = useCms().ctas.quote;
-
-  return (
-    <button type="button" className={className} onClick={() => openQuote("tv")}>
+    <button type="button" className={className} onClick={() => openQuote()}>
       {children ?? quote}
     </button>
   );

@@ -7,12 +7,24 @@ export const yelpReviewsUrl = `${yelpProfileUrl}#reviews`;
 
 export const yelpListing = {
   rating: 5,
-  reviewCount: 1,
+  reviewCount: 2,
   profileUrl: yelpReviewsUrl,
   writeReviewUrl: yelpReviewsUrl,
 };
 
 export const yelpReviews: GoogleReview[] = [
+  {
+    id: "iryna-w",
+    author: "Iryna W.",
+    dateLabel: "Nov 2026",
+    rating: 5,
+    quote:
+      "We hired Vlad to hang on a TV in our bedroom, which he did perfectly. Turned out they also do landscape work. I had this front yard vision for years and these guys gave it a life! Smooth and quick execution, they don't waste any time. Highly recommend!",
+    photos: [
+      "/api/media/uploads/yelp-review-iryna-w-1-f5939706.jpg",
+      "/api/media/uploads/yelp-review-iryna-w-2-3620aef2.jpg",
+    ],
+  },
   {
     id: "gina-c",
     author: "Gina C.",

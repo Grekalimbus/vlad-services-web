@@ -79,7 +79,7 @@ export function ServiceLanding({
   const { openQuote } = useQuote();
   const figureRef = useRef<HTMLElement>(null);
   const [figureVisible, setFigureVisible] = useState(false);
-  const iconIntro = category.id !== "electrical" && category.slug !== "electrical";
+  const largeIcons = category.id !== "electrical" && category.slug !== "electrical";
 
   useEffect(() => {
     const node = figureRef.current;
@@ -106,19 +106,17 @@ export function ServiceLanding({
     <>
       <section
         className={styles.iconBlock}
-        data-large={iconIntro ? "" : undefined}
+        data-large={largeIcons ? "" : undefined}
         aria-label={`${category.name.trim()} services`}
       >
-        {iconIntro ? (
-          <header className={styles.iconIntro}>
-            <h2 className={styles.iconsTitle} data-cms={`${copyBase}.iconsTitle`}>
-              {landing.iconsTitle || "—"}
-            </h2>
-            <p className={styles.iconsSubtitle} data-cms={`${copyBase}.iconsSubtitle`}>
-              {landing.iconsSubtitle || "—"}
-            </p>
-          </header>
-        ) : null}
+        <header className={styles.iconIntro}>
+          <h2 className={styles.iconsTitle} data-cms={`${copyBase}.iconsTitle`}>
+            {landing.iconsTitle || "—"}
+          </h2>
+          <p className={styles.iconsSubtitle} data-cms={`${copyBase}.iconsSubtitle`}>
+            {landing.iconsSubtitle || "—"}
+          </p>
+        </header>
         <ul className={styles.iconRow}>
           {landing.icons.map((icon, index) => (
             <li key={`${icon.src}-${index}`}>
@@ -127,7 +125,7 @@ export function ServiceLanding({
                 className={styles.iconButton}
                 data-cms-card={`serviceIcon:${category.id}:${index}`}
                 aria-label={`${icon.text}. Book ${category.name.trim()}`}
-                onClick={() => openQuote("quote", undefined, category.name)}
+                onClick={() => openQuote({ service: category.name })}
               >
                 <LandingIcon src={icon.src} />
                 <span className={styles.iconLabel} data-cms={`${copyBase}.icons.${index}.text`}>

@@ -19,7 +19,7 @@ export function GetQuoteButton({
     <button
       type="button"
       className={tight ? `${styles.quote} ${styles.quoteTight}` : styles.quote}
-      onClick={() => openQuote("quote", undefined, serviceName)}
+      onClick={() => openQuote({ service: serviceName })}
     >
       GET A QUOTE
     </button>

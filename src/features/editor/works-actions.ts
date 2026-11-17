@@ -1,5 +1,17 @@
 import { updateDraft } from "@/lib/cms/edit-store";
+import { emptyWorksVideo, type WorksVideo } from "@/lib/cms/works-videos";
 import { emptyWorksCard } from "@/lib/project-cards";
+
+type WorksWithVideos = {
+  copy: {
+    home: {
+      works: {
+        cards: unknown[];
+        videos?: WorksVideo[];
+      };
+    };
+  };
+};
 
 /**
  * Add Projects carousel card(s) in the admin editor.
@@ -16,5 +28,22 @@ export function addWorksCard() {
       return;
     }
     cards.push(emptyWorksCard());
+  });
+}
+
+/** Append one empty Projects video slot for the admin editor. */
+export function addWorksVideo() {
+  updateDraft((document) => {
+    const works = (document as WorksWithVideos).copy.home.works;
+    if (!Array.isArray(works.videos)) works.videos = [];
+    works.videos.push(emptyWorksVideo(works.videos.length));
+  });
+}
+
+export function removeWorksVideo(index: number) {
+  updateDraft((document) => {
+    const videos = (document as WorksWithVideos).copy.home.works.videos;
+    if (!videos || index < 0 || index >= videos.length) return;
+    videos.splice(index, 1);
   });
 }

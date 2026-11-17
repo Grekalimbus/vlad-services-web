@@ -196,75 +196,94 @@ function SlideStage({
 
   return (
     <>
-    <div className={compact ? styles.featureCompact : large ? styles.featureMedia : styles.media} data-cms-gallery={galleryPath} data-empty={slide ? undefined : ""}>
-      {slide ? (
-        <>
-      {leaving ? (
-        <Image
-          key={`${leaving.image}-out`}
-          src={assetPath(leaving.image)}
-          alt=""
-          fill
-          sizes={sizes}
-          className={frame?.direction === 1 ? styles.leaveLeft : styles.leaveRight}
-          style={{ objectPosition: leaving.position ?? "center" }}
+      <div
+        className={compact ? styles.featureCompact : large ? styles.featureMedia : styles.media}
+        data-cms-gallery={galleryPath}
+        data-empty={slide ? undefined : ""}
+        aria-roledescription="carousel"
+        aria-label={label}
+      >
+        {slide ? (
+          <>
+            {leaving ? (
+              <Image
+                key={`${leaving.image}-out`}
+                src={assetPath(leaving.image)}
+                alt=""
+                fill
+                sizes={sizes}
+                className={frame?.direction === 1 ? styles.leaveLeft : styles.leaveRight}
+                style={{ objectPosition: leaving.position ?? "center" }}
+              />
+            ) : null}
+            <Image
+              key={`${slide.image}-${index}`}
+              src={assetPath(slide.image)}
+              alt={slide.alt}
+              fill
+              sizes={sizes}
+              className={frame ? (frame.direction === 1 ? styles.enterRight : styles.enterLeft) : styles.image}
+              style={{ objectPosition: slide.position ?? "center" }}
+              onAnimationEnd={(event) => {
+                if (event.target === event.currentTarget) setFrame(null);
+              }}
+            />
+            {editing ? (
+              <span className={styles.shade} aria-hidden="true" />
+            ) : (
+              <button
+                type="button"
+                className={styles.hit}
+                aria-label={`View ${slide.alt || `${label} photo ${index + 1}`}`}
+                onClick={() => setZoom(true)}
+              >
+                <span className={styles.shade} aria-hidden="true" />
+              </button>
+            )}
+            {count > 1 ? (
+              <>
+                <button
+                  type="button"
+                  className={`${styles.arrow} ${styles.arrowPrev}`}
+                  aria-label={`Previous photo, ${label}`}
+                  onClick={() => go((index - 1 + count) % count, -1)}
+                >
+                  <ChevronLeft size={18} strokeWidth={2.25} />
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.arrow} ${styles.arrowNext}`}
+                  aria-label={`Next photo, ${label}`}
+                  onClick={() => go((index + 1) % count, 1)}
+                >
+                  <ChevronRight size={18} strokeWidth={2.25} />
+                </button>
+                <span className={styles.pager}>
+                  {slides.map((item, dotIndex) => (
+                    <button
+                      key={`${item.image}-${dotIndex}`}
+                      type="button"
+                      className={dotIndex === index ? styles.dotActive : styles.dot}
+                      aria-label={`${label}, photo ${dotIndex + 1} of ${count}`}
+                      aria-current={dotIndex === index ? "true" : undefined}
+                      onClick={() => go(dotIndex, dotIndex > index ? 1 : -1)}
+                    />
+                  ))}
+                </span>
+              </>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+      {zoom && !editing ? (
+        <PhotoLightbox
+          photos={slides}
+          index={Math.min(index, Math.max(count - 1, 0))}
+          label={label}
+          onIndex={setIndex}
+          onClose={() => setZoom(false)}
         />
       ) : null}
-      <Image
-        key={`${slide.image}-${index}`}
-        src={assetPath(slide.image)}
-        alt={slide.alt}
-        fill
-        sizes={sizes}
-        className={
-          frame ? (frame.direction === 1 ? styles.enterRight : styles.enterLeft) : styles.image
-        }
-        style={{ objectPosition: slide.position ?? "center", cursor: large && !editing ? "pointer" : undefined }}
-        onClick={() => {
-          if (large && !editing) setZoom(true);
-        }}
-        onAnimationEnd={(event) => {
-          if (event.target === event.currentTarget) setFrame(null);
-        }}
-      />
-      {count > 1 ? (
-        <>
-          <button
-            type="button"
-            className={`${styles.arrow} ${styles.arrowPrev}`}
-            aria-label={`Previous photo, ${label}`}
-            onClick={() => go((index - 1 + count) % count, -1)}
-          >
-            <ChevronLeft size={18} strokeWidth={2.25} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.arrow} ${styles.arrowNext}`}
-            aria-label={`Next photo, ${label}`}
-            onClick={() => go((index + 1) % count, 1)}
-          >
-            <ChevronRight size={18} strokeWidth={2.25} />
-          </button>
-          <span className={styles.pager}>
-            {slides.map((item, dotIndex) => (
-              <button
-                key={`${item.image}-${dotIndex}`}
-                type="button"
-                className={dotIndex === index ? styles.dotActive : styles.dot}
-                aria-label={`${label}, photo ${dotIndex + 1} of ${count}`}
-                aria-current={dotIndex === index ? "true" : undefined}
-                onClick={() => go(dotIndex, dotIndex > index ? 1 : -1)}
-              />
-            ))}
-          </span>
-        </>
-      ) : null}
-        </>
-      ) : null}
-    </div>
-    {zoom && large ? (
-      <PhotoLightbox photos={slides} index={Math.min(index, Math.max(count - 1, 0))} onIndex={setIndex} onClose={() => setZoom(false)} />
-    ) : null}
     </>
   );
 }

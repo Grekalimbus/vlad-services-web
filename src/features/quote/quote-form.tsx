@@ -1,11 +1,19 @@
 "use client";
 
 import { FormEvent, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Mail, MapPin, Phone, Upload, User, List, MessageCircle } from "lucide-react";
+import { Mail, MapPin, Phone, Upload, User, List, MessageCircle, Tag } from "lucide-react";
 import { PrivacyNotice } from "./consent-fields";
 import { HoneypotField } from "./honeypot-field";
+import type { DealQuoteContext } from "./quote-provider";
 import { useCms } from "@/lib/cms/use-cms";
-import { emailPattern, phonePattern, zipPattern } from "@/lib/forms";
+import {
+  allowDigitsOnlyInput,
+  emailPattern,
+  phonePattern,
+  sanitizePhoneInput,
+  sanitizeZipInput,
+  zipPattern,
+} from "@/lib/forms";
 import { hearAboutOptions } from "@/lib/hear-about";
 import { trackGenerateLead } from "@/lib/ga4";
 import { quoteSuccessMessage } from "@/lib/leads";
@@ -16,15 +24,18 @@ const MAX_BYTES = 10 * 1024 * 1024;
 const MAX_DESCRIPTION = 450;
 
 type Status = "idle" | "loading" | "success" | "error";
-type FieldKey = "name" | "phone" | "email" | "zip" | "service" | "hearAbout";
+type FieldKey = "name" | "phone" | "email" | "zip" | "service" | "hearAbout" | "dealOffer";
 
 export function QuoteForm({
   initialService = "",
   formLocation = "general-quote",
+  dealQuote = null,
 }: {
   initialService?: string;
   /** GA4 form_location (placement id). Not shown in the UI. */
   formLocation?: string;
+  /** Present only when opened from a Deals-page offer card. */
+  dealQuote?: DealQuoteContext | null;
 }) {
   const ids = {
     name: useId(),
@@ -33,10 +44,10 @@ export function QuoteForm({
     zip: useId(),
     hearAbout: useId(),
     service: useId(),
+    dealOffer: useId(),
     description: useId(),
     photos: useId(),
     error: useId(),
-    photoHelp: useId(),
   };
   const [status, setStatus] = useState<Status>("idle");
   const [formError, setFormError] = useState("");
@@ -53,8 +64,11 @@ export function QuoteForm({
   const preset =
     quoteServices.find((item) => item.name === initialService)?.name ??
     quoteServices.find((item) => item.name.trim() === initialService.trim())?.name ??
+    quoteServices.find((item) => item.slug === initialService || item.id === initialService)?.name ??
     "";
   const [service, setService] = useState(preset);
+  const fromDeals = Boolean(dealQuote?.offers.length);
+  const [dealOfferId, setDealOfferId] = useState(dealQuote?.selectedOfferId ?? "");
   const [photos, setPhotos] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const previewsRef = useRef<string[]>([]);
@@ -111,6 +125,7 @@ export function QuoteForm({
     if (email.trim() && !emailPattern.test(email.trim())) next.email = true;
     if (!zipPattern.test(zip.trim())) next.zip = true;
     if (!service) next.service = true;
+    if (fromDeals && !dealOfferId) next.dealOffer = true;
     if (!hearAbout) next.hearAbout = true;
     setInvalid(next);
     if (Object.keys(next).length > 0 || photoError) {
@@ -126,7 +141,9 @@ export function QuoteForm({
               ? ids.zip
               : next.service
                 ? ids.service
-                : ids.hearAbout;
+                : next.dealOffer
+                  ? ids.dealOffer
+                  : ids.hearAbout;
       document.getElementById(focusId)?.focus();
       return;
     }
@@ -137,6 +154,7 @@ export function QuoteForm({
       typeof crypto !== "undefined" && "randomUUID" in crypto
         ? crypto.randomUUID()
         : `quote-${Date.now()}`;
+    const selectedDeal = dealQuote?.offers.find((item) => item.id === dealOfferId);
     const body = new FormData();
     body.set("name", name.trim());
     body.set("phone", phone.trim());
@@ -146,6 +164,18 @@ export function QuoteForm({
     body.set("service", service);
     body.set("description", description.trim().slice(0, MAX_DESCRIPTION));
     body.set("company_url", honeypotRef.current?.value ?? "");
+    if (fromDeals) {
+      body.set("leadSource", "Deals page");
+      if (selectedDeal) body.set("dealOffer", selectedDeal.label);
+    }
+    body.set("formId", fromDeals ? "deals-quote" : "quote-dialog");
+    body.set("formLocation", formLocation);
+    body.set(
+      "sourcePage",
+      typeof window !== "undefined"
+        ? `${window.location.pathname}${window.location.search}${window.location.hash}`
+        : "/",
+    );
     photos.forEach((file) => body.append("photos", file));
     try {
       const response = await fetch("/api/applications", { method: "POST", body });
@@ -203,13 +233,14 @@ export function QuoteForm({
           required
           invalid={invalid.phone}
           type="tel"
-          inputMode="tel"
+          inputMode="numeric"
           icon={<Phone size={16} aria-hidden="true" />}
           value={phone}
           autoComplete="tel"
-          placeholder="(619) 736-3016"
+          placeholder="16197363016"
+          onBeforeInput={allowDigitsOnlyInput}
           onChange={(value) => {
-            setPhone(value);
+            setPhone(sanitizePhoneInput(value));
             clearInvalid("phone");
           }}
         />
@@ -239,8 +270,9 @@ export function QuoteForm({
           value={zip}
           autoComplete="postal-code"
           placeholder="Enter ZIP code"
+          onBeforeInput={allowDigitsOnlyInput}
           onChange={(value) => {
-            setZip(value);
+            setZip(sanitizeZipInput(value));
             clearInvalid("zip");
           }}
         />
@@ -272,6 +304,36 @@ export function QuoteForm({
             </select>
           </div>
         </div>
+
+        {fromDeals && dealQuote ? (
+          <div className={styles.bookSpan}>
+            <label htmlFor={ids.dealOffer} className={styles.bookLabel}>
+              Selected Deal <span aria-hidden="true"> *</span>
+            </label>
+            <div className={styles.bookControl}>
+              <Tag size={16} aria-hidden="true" className={styles.bookIcon} />
+              <select
+                id={ids.dealOffer}
+                name="dealOffer"
+                value={dealOfferId}
+                required
+                aria-invalid={invalid.dealOffer || undefined}
+                onChange={(event) => {
+                  setDealOfferId(event.target.value);
+                  clearInvalid("dealOffer");
+                }}
+                className={invalid.dealOffer ? `${styles.bookSelect} ${styles.bookInvalid}` : styles.bookSelect}
+              >
+                <option value="">Select a deal</option>
+                {dealQuote.offers.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ) : null}
 
         <div className={styles.bookSpan}>
           <label htmlFor={ids.hearAbout} className={styles.bookLabel}>
@@ -310,7 +372,7 @@ export function QuoteForm({
             name="description"
             value={description}
             maxLength={MAX_DESCRIPTION}
-            rows={4}
+            rows={2}
             placeholder="Tell us about the job"
             className={styles.bookTextarea}
             onChange={(event) => setDescription(event.target.value.slice(0, MAX_DESCRIPTION))}
@@ -333,12 +395,9 @@ export function QuoteForm({
               addPhotos(Array.from(event.dataTransfer.files));
             }}
           >
-            <Upload size={22} aria-hidden="true" />
+            <Upload size={20} aria-hidden="true" />
             <span>
               <span className={styles.bookDropAction}>Click to upload</span> or drag and drop
-            </span>
-            <span id={ids.photoHelp} className={styles.bookDropHelp}>
-              You can add multiple images. JPG, PNG up to 10MB each.
             </span>
           </label>
           <input
@@ -348,7 +407,6 @@ export function QuoteForm({
             accept="image/jpeg,image/png"
             multiple
             className={styles.bookFile}
-            aria-describedby={ids.photoHelp}
             onChange={(event) => {
               addPhotos(Array.from(event.target.files ?? []));
               event.target.value = "";
@@ -395,6 +453,7 @@ function Field({
   value,
   autoComplete,
   placeholder,
+  onBeforeInput,
   onChange,
 }: {
   id: string;
@@ -409,6 +468,7 @@ function Field({
   value: string;
   autoComplete?: string;
   placeholder: string;
+  onBeforeInput?: (event: FormEvent<HTMLInputElement>) => void;
   onChange: (value: string) => void;
 }) {
   return (
@@ -431,6 +491,7 @@ function Field({
           aria-invalid={invalid || undefined}
           required={required}
           className={invalid ? `${styles.bookInput} ${styles.bookInvalid}` : styles.bookInput}
+          onBeforeInput={onBeforeInput}
           onChange={(event) => onChange(event.target.value)}
         />
       </div>

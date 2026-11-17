@@ -1,0 +1,64 @@
+[
+  {
+    "index": 0,
+    "id": "tv-mounting",
+    "title": "TV Mounting up to 40%OFF",
+    "found": true,
+    "hasCards": false,
+    "existingCardCount": 0,
+    "willSeed": true,
+    "cardCount": 4,
+    "cardIds": [
+      "tv-complete-setup",
+      "tv-basic-mounting",
+      "tv-wire-hiding",
+      "tv-free-mount"
+    ]
+  },
+  {
+    "index": 2,
+    "id": "handyman",
+    "title": "Handyman Tasks up to 30%OFF",
+    "found": true,
+    "hasCards": false,
+    "existingCardCount": 0,
+    "willSeed": true,
+    "cardCount": 2,
+    "cardIds": [
+      "handyman-hourly",
+      "handyman-project"
+    ]
+  },
+  {
+    "index": 3,
+    "id": "landscaping",
+    "title": "Landscaping Services up to 35%OFF",
+    "found": true,
+    "hasCards": false,
+    "existingCardCount": 0,
+    "willSeed": true,
+    "cardCount": 4,
+    "cardIds": [
+      "landscape-custom-package",
+      "landscape-yard-refresh",
+      "landscape-patio",
+      "landscape-transformations"
+    ]
+  },
+  {
+    "index": 4,
+    "id": "deal-4c628af6",
+    "title": "Seasonal Outdoor Decoration up to 35%OFF",
+    "found": true,
+    "hasCards": false,
+    "existingCardCount": 0,
+    "willSeed": true,
+    "cardCount": 4,
+    "cardIds": [
+      "holiday-christmas-lights",
+      "holiday-outdoor-displays",
+      "holiday-tree-setup",
+      "holiday-backyard"
+    ]
+  }
+]

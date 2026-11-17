@@ -46,6 +46,20 @@ html[data-editing] [data-cms-card^="deal:"][data-empty]::before {
   font-weight: 600;
 }
 
+html[data-editing] [data-cms-card^="worksVideo:"][data-empty] {
+  display: grid;
+  place-items: center;
+}
+
+html[data-editing] [data-cms-card^="worksVideo:"][data-empty]::before {
+  content: "Add video";
+  position: relative;
+  z-index: 1;
+  color: #2580cd;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 html[data-editing] [data-cms-card^="works:"] {
   cursor: pointer;
 }

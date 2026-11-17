@@ -1,12 +1,14 @@
 "use client";
 
 import { FormEvent, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import { isDiscountCard, planDescriptions, planQuiz, planQuizForm, type TvQuizStep } from "@/lib/cms/tv-page";
 import { peekReveal, revealSurface, subscribeReveal } from "@/lib/cms/reveal";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { HoneypotField, PrivacyNotice } from "@/features/quote";
 import { hearAboutOptions } from "@/lib/hear-about";
-import { zipPattern } from "@/lib/forms";
+import { allowDigitsOnlyInput, sanitizeZipInput, zipPattern } from "@/lib/forms";
 import { buildLeadPayload, submitLead } from "@/lib/leads";
 import { nationalDigits, useUsPhone } from "@/lib/use-us-phone";
 import shared from "@/styles/shared.module.css";
@@ -28,7 +30,21 @@ export function Plan() {
 	const [step, setStep] = useState(0);
 	const [answers, setAnswers] = useState<Record<string, string>>({});
 	const [multiAnswers, setMultiAnswers] = useState<Record<string, string[]>>({});
+	const [submittedOpen, setSubmittedOpen] = useState(false);
 	const headingRef = useRef<HTMLHeadingElement>(null);
+
+	function resetPlan() {
+		setSelected(null);
+		setOffer(null);
+		setStep(0);
+		setAnswers({});
+		setMultiAnswers({});
+	}
+
+	function handleQuizSubmitted() {
+		resetPlan();
+		setSubmittedOpen(true);
+	}
 	const revealedOffer = revealed?.startsWith("tv-offer:") ? revealed.slice("tv-offer:".length) : "";
 	const editingOffer = isDiscountCard(revealedOffer) ? revealedOffer : null;
 	const activeOffer = editing ? editingOffer : offer;
@@ -187,6 +203,7 @@ export function Plan() {
 						button={quizForm.button}
 						answers={answers}
 						steps={quiz}
+						onSubmitted={handleQuizSubmitted}
 					/>
 				)}
 				{step > 0 ? (
@@ -242,7 +259,65 @@ export function Plan() {
 					}}
 				/>
 			) : null}
+			{submittedOpen ? (
+				<QuizSubmittedModal onClose={() => setSubmittedOpen(false)} />
+			) : null}
 		</section>
+	);
+}
+
+function QuizSubmittedModal({ onClose }: { onClose: () => void }) {
+	const titleId = useId();
+	const dialogRef = useRef<HTMLDivElement>(null);
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	useEffect(() => {
+		const previous = document.body.style.overflow;
+		document.body.style.overflow = "hidden";
+		dialogRef.current?.focus();
+		const onKey = (event: KeyboardEvent) => {
+			if (event.key === "Escape") onClose();
+		};
+		window.addEventListener("keydown", onKey);
+		return () => {
+			document.body.style.overflow = previous;
+			window.removeEventListener("keydown", onKey);
+		};
+	}, [onClose]);
+
+	if (!mounted) return null;
+
+	return createPortal(
+		<div className={styles.successBackdrop}>
+			<button type="button" className={styles.successDismiss} aria-label="Close confirmation" onClick={onClose} />
+			<div
+				ref={dialogRef}
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby={titleId}
+				tabIndex={-1}
+				className={styles.successDialog}
+			>
+				<button type="button" className={styles.successClose} onClick={onClose}>
+					<X size={18} aria-hidden="true" />
+					<span className={shared.visuallyHidden}>Close</span>
+				</button>
+				<h2 id={titleId} className={styles.successTitle}>
+					Request sent
+				</h2>
+				<p className={styles.successText} role="status">
+					Thank you. We&apos;ll call you with your quote.
+				</p>
+				<button type="button" className={styles.successAction} onClick={onClose}>
+					Close
+				</button>
+			</div>
+		</div>,
+		document.body,
 	);
 }
 
@@ -250,11 +325,14 @@ function QuizForm({
 	button,
 	answers,
 	steps,
+	onSubmitted,
 }: {
 	button: string;
 	answers: Record<string, string>;
 	steps: TvQuizStep[];
+	onSubmitted: () => void;
 }) {
+	const cms = useCms();
 	const editing = useEditing();
 	const nameId = useId();
 	const phoneId = useId();
@@ -262,10 +340,13 @@ function QuizForm({
 	const hearId = useId();
 	const errorId = useId();
 	const phoneField = useUsPhone();
-	const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
 	const [formError, setFormError] = useState("");
 	const [hearAbout, setHearAbout] = useState("");
 	const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean; zip?: boolean; hearAbout?: boolean }>({});
+	const serviceName =
+		cms.serviceCategories.find((item) => item.id === "tv-mounting" || item.slug === "tv-mounting")?.name?.trim() ||
+		"TV Technician";
 
 	async function onSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -275,7 +356,7 @@ function QuizForm({
 		const zip = String(data.get("zip") ?? "").trim();
 		const next: { name?: boolean; phone?: boolean; zip?: boolean; hearAbout?: boolean } = {};
 		if (name.length < 2) next.name = true;
-		if (nationalDigits(phoneField.phone).length !== 10) next.phone = true;
+		if (nationalDigits(phoneField.phone).length < 7) next.phone = true;
 		if (!zipPattern.test(zip)) next.zip = true;
 		if (!hearAbout) next.hearAbout = true;
 		setErrors(next);
@@ -291,7 +372,7 @@ function QuizForm({
 			name,
 			phone: phoneField.phone,
 			zip,
-			service: "1 TV quote",
+			service: serviceName,
 			tvCount: "1",
 			hearAbout,
 		};
@@ -304,6 +385,7 @@ function QuizForm({
 				buildLeadPayload({
 					type: "tv-mounting",
 					formId: "tv-quiz",
+					formLocation: "tv-quiz",
 					fields,
 					photos: [],
 					smsConsent: null,
@@ -311,20 +393,12 @@ function QuizForm({
 				}),
 				{ companyUrl: String(data.get("company_url") ?? "") },
 			);
-			setStatus("success");
+			onSubmitted();
 		} catch (error) {
 			setStatus("error");
 			setFormError(error instanceof Error ? error.message : "Could not send the request.");
 			document.getElementById(errorId)?.focus();
 		}
-	}
-
-	if (status === "success") {
-		return (
-			<p role="status" className={styles.quizSuccess}>
-				Thank you. We&apos;ll call you with your quote.
-			</p>
-		);
 	}
 
 	return (
@@ -368,7 +442,7 @@ function QuizForm({
 					required
 					onChange={(event) => {
 						const count = phoneField.onPhoneChange(event);
-						if (errors.phone && count === 10) setErrors((current) => ({ ...current, phone: undefined }));
+						if (errors.phone && count >= 7) setErrors((current) => ({ ...current, phone: undefined }));
 					}}
 					onBeforeInput={phoneField.onBeforeInput}
 					className={errors.phone ? `${styles.quizInput} ${styles.quizInvalid}` : styles.quizInput}
@@ -388,6 +462,12 @@ function QuizForm({
 					required
 					className={errors.zip ? `${styles.quizInput} ${styles.quizInvalid}` : styles.quizInput}
 					aria-invalid={errors.zip ? true : undefined}
+					onBeforeInput={allowDigitsOnlyInput}
+					onInput={(event) => {
+						const input = event.currentTarget;
+						const next = sanitizeZipInput(input.value);
+						if (input.value !== next) input.value = next;
+					}}
 					onChange={() => {
 						if (errors.zip) setErrors((current) => ({ ...current, zip: undefined }));
 					}}
