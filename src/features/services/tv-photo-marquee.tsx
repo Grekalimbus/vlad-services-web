@@ -37,6 +37,7 @@ export function TvPhotoMarquee({
 	direction = "left",
 	paired = false,
 	seamless = false,
+	plain = false,
 }: {
 	photos: Photo[];
 	label?: string;
@@ -45,6 +46,8 @@ export function TvPhotoMarquee({
 	direction?: "left" | "right";
 	paired?: boolean;
 	seamless?: boolean;
+	/** Transparent photo strip without the service-page overlap padding. */
+	plain?: boolean;
 }) {
 	const editing = useEditing();
 	const viewportRef = useRef<HTMLDivElement>(null);
@@ -105,7 +108,7 @@ export function TvPhotoMarquee({
 
 	const marqueeClass = [
 		styles.marquee,
-		roomy ? styles.marqueeRoom : "",
+		roomy || plain ? styles.marqueeRoom : "",
 		paired ? styles.marqueePaired : "",
 		seamless ? styles.marqueeSeamless : "",
 	]
@@ -121,7 +124,7 @@ export function TvPhotoMarquee({
 			onMouseEnter={() => setHovering(true)}
 			onMouseLeave={() => setHovering(false)}
 		>
-			{roomy || !heading ? null : <h1 className={shared.visuallyHidden}>{label}</h1>}
+			{roomy || plain || !heading ? null : <h1 className={shared.visuallyHidden}>{label}</h1>}
 			{photos.length > 1 ? (
 				<>
 					<button

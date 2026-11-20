@@ -7,9 +7,11 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { AreasSection } from "@/features/areas";
 import { addDeal } from "@/features/editor/deal-actions";
 import { dealsPage } from "@/lib/cms/deals-page";
+import { serviceReel } from "@/lib/cms/service-reel";
 import { useCms, useEditing } from "@/lib/cms/use-cms";
 import { assetPath, routes } from "@/lib/site";
 import { PageFrame } from "@/shared/layout";
+import { TvPhotoMarquee } from "@/features/services/tv-photo-marquee";
 import { DealOfferCards } from "./deal-offer-cards";
 import { DealsSignup } from "./deals-signup";
 import styles from "./deals-page.module.css";
@@ -29,6 +31,17 @@ export function serviceSlugForDeal(dealId: string, dealIndex: number): string {
   if (dealId === "handyman") return "handyman";
   if (dealId === "landscaping" || dealId === "landscaper") return "landscaper";
   return DEAL_SERVICE_LINKS[dealIndex]?.slug ?? "";
+}
+
+const SERVICE_REEL_SLUGS = new Set(["tv-mounting", "electrical", "handyman", "landscaper"]);
+
+/** Service deals reuse that service page's photos. Custom deals, including Outdoor, keep their own. */
+function dealReelSlug(dealId: string) {
+  if (dealId === "tv-mounting") return "tv-mounting";
+  if (dealId === "electrical") return "electrical";
+  if (dealId === "handyman") return "handyman";
+  if (dealId === "landscaping" || dealId === "landscaper") return "landscaper";
+  return "";
 }
 
 function splitDealLead(text: string) {
@@ -134,6 +147,7 @@ export function DealsPageView() {
         </aside>
 
         <div className={styles.main}>
+          {ready && deal ? <DealReel index={index} /> : null}
           {!ready ? (
             <div className={styles.stage} aria-hidden="true" />
           ) : deal ? (
@@ -196,5 +210,35 @@ export function DealsPageView() {
         </div>
       </div>
     </PageFrame>
+  );
+}
+
+function DealReel({ index }: { index: number }) {
+  const cms = useCms();
+  const deal = dealsPage(cms).items[index];
+  if (!deal) return null;
+  const slug = dealReelSlug(deal.id);
+  const shared = SERVICE_REEL_SLUGS.has(slug);
+  const photos = shared
+    ? serviceReel(cms, slug)
+    : deal.photos.flatMap((photo, photoIndex) =>
+        photo.image ? [{ id: `${deal.id}-${photoIndex}`, src: photo.image, alt: photo.alt }] : [],
+      );
+
+  return (
+    <div
+      key={deal.id}
+      className={styles.reel}
+      data-cms-gallery={shared ? undefined : `slides:copy.dealsPage.items.${index}.photos`}
+      data-empty={!shared && photos.length === 0 ? "" : undefined}
+    >
+      <TvPhotoMarquee
+        photos={photos}
+        label={deal.title || "Deal"}
+        heading={false}
+        seamless={slug === "tv-mounting"}
+        plain={slug !== "tv-mounting"}
+      />
+    </div>
   );
 }

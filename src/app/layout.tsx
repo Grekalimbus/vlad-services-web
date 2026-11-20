@@ -75,7 +75,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: meta.siteName,
       images: [
         {
-          url: "/og.jpg",
+          url: "/og.jpg?v=2",
           width: 1024,
           height: 576,
           alt: meta.imageAlt,
@@ -85,7 +85,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      images: ["/og.jpg"],
+      images: ["/og.jpg?v=2"],
     },
     formatDetection: { telephone: false },
   };

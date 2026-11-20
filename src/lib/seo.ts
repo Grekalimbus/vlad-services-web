@@ -307,7 +307,7 @@ function businessNode(document: CmsDocument, origin: string, area: Area, descrip
     url: `${origin}/`,
     telephone: phone || undefined,
     email: document.site.email,
-    image: [absolute(origin, document.site.logo), absolute(origin, "/og.jpg"), absolute(origin, document.copy.home.hero.image)],
+    image: [absolute(origin, document.site.logo), absolute(origin, "/og.jpg?v=2"), absolute(origin, document.copy.home.hero.image)],
     logo: { "@type": "ImageObject", url: absolute(origin, document.site.logo) },
     slogan: document.site.tagline,
     areaServed: areaServed(area),
@@ -367,7 +367,7 @@ function hiddenPage(document: CmsDocument, title: string, canonicalPath: string)
     index: false,
     follow: true,
     siteName: document.site.legalName,
-    image: absolute(origin, "/og.jpg"),
+    image: absolute(origin, "/og.jpg?v=2"),
     imageAlt: `${document.site.legalName} in ${areaLabel(document.site).full}`,
     keywords: [],
     jsonLd: {},
@@ -380,7 +380,7 @@ export function pageMeta(pathname: string, source: CmsDocument): PageMeta {
   const origin = publicOrigin();
   const area = areaLabel(document.site);
   const description = homeDescription(document.site, area);
-  const image = absolute(origin, "/og.jpg");
+  const image = absolute(origin, "/og.jpg?v=2");
   const imageAlt = `${document.site.shortName} — TV mounting, electrical, and handyman in ${area.short}`;
   const siteName = document.site.legalName;
   const keywords = keywordsFor(document.site, area);

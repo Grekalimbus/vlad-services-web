@@ -35,12 +35,12 @@
 	flex-grow: 0;
 	flex-shrink: 0;
 	align-self: flex-start;
-	width: 190px;
-	height: 290px;
-	min-width: 190px;
-	max-width: 190px;
-	min-height: 290px;
-	max-height: 290px;
+	width: 119px;
+	height: 181px;
+	min-width: 119px;
+	max-width: 119px;
+	min-height: 181px;
+	max-height: 181px;
 }
 
 .card {
@@ -293,23 +293,23 @@
 
 @media (min-width: 640px) {
 	.item {
-		width: 235px;
-		height: 370px;
-		min-width: 235px;
-		max-width: 235px;
-		min-height: 370px;
-		max-height: 370px;
+		width: 157px;
+		height: 247px;
+		min-width: 157px;
+		max-width: 157px;
+		min-height: 247px;
+		max-height: 247px;
 	}
 }
 
 @media (min-width: 1024px) {
 	.item {
-		width: 280px;
-		height: 450px;
-		min-width: 280px;
-		max-width: 280px;
-		min-height: 450px;
-		max-height: 450px;
+		width: 187px;
+		height: 300px;
+		min-width: 187px;
+		max-width: 187px;
+		min-height: 300px;
+		max-height: 300px;
 	}
 }
 

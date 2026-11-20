@@ -171,6 +171,11 @@
   overflow-x: clip;
 }
 
+.reel {
+  width: 100%;
+  min-width: 0;
+}
+
 .stage,
 .empty {
   box-sizing: border-box;

@@ -25,6 +25,7 @@ export function addDeal() {
       alt: "New deal",
       offerCards: [],
       offersFooter: null,
+      photos: [],
     });
   });
 }

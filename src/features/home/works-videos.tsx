@@ -14,9 +14,9 @@ import styles from "./works-videos.module.css";
 
 /** Vertical Shorts/TikTok frame (9:16) — pinned on outer .item via inline style. */
 const CARD_SIZES = {
-	mobile: { width: 190, height: 290 },
-	tablet: { width: 235, height: 370 },
-	desktop: { width: 280, height: 450 },
+	mobile: { width: 119, height: 181 },
+	tablet: { width: 157, height: 247 },
+	desktop: { width: 187, height: 300 },
 } as const;
 
 function cardSizeForWidth(width: number) {
@@ -57,9 +57,24 @@ function useVideoCardFrame(): CSSProperties {
 
 function stepSize(viewport: HTMLElement) {
 	const item = viewport.querySelector<HTMLElement>(`.${styles.item}`);
-	if (!item) return 320;
+	if (!item) return 201;
 	const gap = Number.parseFloat(getComputedStyle(viewport.querySelector(`.${styles.track}`) ?? item).columnGap || "14") || 14;
 	return item.getBoundingClientRect().width + gap;
+}
+
+/** Distance from the first card to its duplicate, so the loop can wrap without a jump. */
+function loopWidth(viewport: HTMLElement) {
+	const first = viewport.querySelector<HTMLElement>(`.${styles.item}`);
+	const duplicate = viewport.querySelector<HTMLElement>("[data-loop-start]");
+	if (!first || !duplicate) return 0;
+	return duplicate.offsetLeft - first.offsetLeft;
+}
+
+function wrapLoop(viewport: HTMLElement) {
+	const loop = loopWidth(viewport);
+	if (loop <= 0) return;
+	if (viewport.scrollLeft >= loop) viewport.scrollLeft -= loop;
+	if (viewport.scrollLeft < 0) viewport.scrollLeft += loop;
 }
 
 export function WorksVideos() {
@@ -95,8 +110,7 @@ export function WorksVideos() {
 			const dt = Math.min(now - last, 48);
 			last = now;
 			viewport.scrollLeft += (speed * dt) / 1000;
-			const max = viewport.scrollWidth - viewport.clientWidth;
-			if (max > 0 && viewport.scrollLeft >= max - 1) viewport.scrollLeft = 0;
+			wrapLoop(viewport);
 			frame = requestAnimationFrame(tick);
 		};
 
@@ -109,7 +123,12 @@ export function WorksVideos() {
 		if (!viewport) return;
 		setNudging(true);
 		if (nudgeTimer.current != null) window.clearTimeout(nudgeTimer.current);
-		viewport.scrollBy({ left: dir * stepSize(viewport), behavior: "smooth" });
+		wrapLoop(viewport);
+		const step = dir * stepSize(viewport);
+		const loop = loopWidth(viewport);
+		if (loop > 0 && dir > 0 && viewport.scrollLeft + step >= loop) viewport.scrollLeft -= loop;
+		if (loop > 0 && dir < 0 && viewport.scrollLeft + step <= 0) viewport.scrollLeft += loop;
+		viewport.scrollBy({ left: step, behavior: "smooth" });
 		nudgeTimer.current = window.setTimeout(() => setNudging(false), 520);
 	}
 
@@ -144,20 +163,29 @@ export function WorksVideos() {
 
 			<div className={styles.viewport} ref={viewportRef}>
 				<ul className={styles.track}>
-					{videos.map((video, index) => (
-						<li key={video.id || index} className={styles.item} style={cardFrame}>
-							<VideoCard
-								video={video}
-								index={index}
-								editing={editing}
-								onOpen={() => {
-									if (editing || !video.media) return;
-									const playableIndex = playable.findIndex((item) => item.id === video.id);
-									setOpenAt(playableIndex >= 0 ? playableIndex : 0);
-								}}
-							/>
-						</li>
-					))}
+					{[0, 1].flatMap((copy) =>
+						videos.map((video, index) => (
+							<li
+								key={`${copy}-${video.id || index}`}
+								className={styles.item}
+								style={cardFrame}
+								data-loop-start={copy === 1 && index === 0 ? "" : undefined}
+								aria-hidden={copy === 1 ? true : undefined}
+							>
+								<VideoCard
+									video={video}
+									index={index}
+									editing={editing}
+									mirror={copy === 1}
+									onOpen={() => {
+										if (editing || !video.media) return;
+										const playableIndex = playable.findIndex((item) => item.id === video.id);
+										setOpenAt(playableIndex >= 0 ? playableIndex : 0);
+									}}
+								/>
+							</li>
+						)),
+					)}
 				</ul>
 			</div>
 
@@ -202,11 +230,13 @@ function VideoCard({
 	video,
 	index,
 	editing,
+	mirror = false,
 	onOpen,
 }: {
 	video: WorksVideo;
 	index: number;
 	editing: boolean;
+	mirror?: boolean;
 	onOpen: () => void;
 }) {
 	const empty = !video.media;
@@ -215,8 +245,8 @@ function VideoCard({
 	return (
 		<div
 			className={styles.card}
-			data-cms-card={`worksVideo:${index}`}
-			data-empty={empty ? "" : undefined}
+			data-cms-card={mirror ? undefined : `worksVideo:${index}`}
+			data-empty={mirror || !empty ? undefined : ""}
 		>
 			{video.media ? (
 				<video
@@ -227,7 +257,7 @@ function VideoCard({
 					playsInline
 					preload="metadata"
 					aria-hidden="true"
-					data-cms-src={`copy.home.works.videos.${index}.media`}
+					data-cms-src={mirror ? undefined : `copy.home.works.videos.${index}.media`}
 				/>
 			) : (
 				<span className={styles.placeholder} aria-hidden="true" />
@@ -236,7 +266,13 @@ function VideoCard({
 			{editing ? (
 				<span className={styles.shade} aria-hidden="true" />
 			) : video.media ? (
-				<button type="button" className={styles.hit} aria-label={`Play ${label}`} onClick={onOpen}>
+				<button
+					type="button"
+					className={styles.hit}
+					aria-label={`Play ${label}`}
+					tabIndex={mirror ? -1 : undefined}
+					onClick={onOpen}
+				>
 					<span className={styles.shade} aria-hidden="true" />
 					<span className={styles.play} aria-hidden="true">
 						<Play size={28} strokeWidth={2.25} fill="currentColor" />

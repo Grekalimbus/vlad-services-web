@@ -24,6 +24,12 @@ export type DealOffersFooter = {
   ctaButtonLabel: string;
 };
 
+export type DealPhoto = {
+  image: string;
+  alt: string;
+  position: string;
+};
+
 export type DealItem = {
   id: string;
   title: string;
@@ -33,6 +39,7 @@ export type DealItem = {
   alt: string;
   offerCards: DealOfferCard[];
   offersFooter: DealOffersFooter | null;
+  photos: DealPhoto[];
 };
 
 export type DealsPageCopy = {
@@ -76,6 +83,21 @@ function normalizeOfferCard(item: Partial<DealOfferCard> | null | undefined, ind
     icon: item?.icon ?? "layers",
     buttonLabel: item?.buttonLabel ?? "GET DEAL",
   };
+}
+
+function normalizePhotos(value: unknown): DealPhoto[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const photo = item as Partial<DealPhoto>;
+    return [
+      {
+        image: photo.image ?? "",
+        alt: photo.alt ?? "",
+        position: photo.position || "center",
+      },
+    ];
+  });
 }
 
 function normalizeFooter(value: Partial<DealOffersFooter> | null | undefined): DealOffersFooter | null {
@@ -124,6 +146,7 @@ export function dealsPage(document: CmsDocument): DealsPageCopy {
       alt: item?.alt ?? "",
       offerCards: (item?.offerCards ?? []).map((card, index) => normalizeOfferCard(card, index)),
       offersFooter: normalizeFooter(item?.offersFooter),
+      photos: normalizePhotos(item?.photos),
     })),
   };
 }
