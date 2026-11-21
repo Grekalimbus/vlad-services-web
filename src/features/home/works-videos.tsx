@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
-import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
 import { createPortal } from "react-dom";
 import { addWorksVideo } from "@/features/editor/works-actions";
 import { worksVideos, type WorksVideo } from "@/lib/cms/works-videos";
@@ -231,6 +231,22 @@ export function WorksVideos() {
 	);
 }
 
+/** iOS leaves a video black until playback. Seeking past the first frame paints a preview. */
+function previewSource(media: string) {
+	const src = assetPath(media);
+	return src.includes("#") ? src : `${src}#t=1`;
+}
+
+function showPreviewFrame(event: SyntheticEvent<HTMLVideoElement>) {
+	const node = event.currentTarget;
+	if (node.currentTime > 0) return;
+	try {
+		node.currentTime = 1;
+	} catch {
+		return;
+	}
+}
+
 function VideoCard({
 	video,
 	index,
@@ -256,13 +272,14 @@ function VideoCard({
 			{video.media ? (
 				<video
 					className={styles.preview}
-					src={assetPath(video.media)}
+					src={previewSource(video.media)}
 					poster={video.poster ? assetPath(video.poster) : undefined}
 					muted
 					playsInline
 					preload="metadata"
 					aria-hidden="true"
 					data-cms-src={mirror ? undefined : `copy.home.works.videos.${index}.media`}
+					onLoadedMetadata={showPreviewFrame}
 				/>
 			) : (
 				<span className={styles.placeholder} aria-hidden="true" />
