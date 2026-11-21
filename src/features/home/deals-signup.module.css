@@ -161,6 +161,11 @@
 	color: #fff;
 }
 
+.requiredMark {
+	margin-left: 0.2rem;
+	color: #ff6b5a;
+}
+
 .input {
 	margin-top: 0.45rem;
 	width: 100%;

@@ -344,6 +344,7 @@ async function createApplication(
     form: row.form,
     name: row.name,
     phone: row.phone,
+    email: row.email,
     service: row.service,
     zip: row.zip,
   });

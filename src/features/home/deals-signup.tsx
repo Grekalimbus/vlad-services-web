@@ -61,7 +61,8 @@ export function DealsSignup({
 		if (name.length < 2) nextErrors.name = "Enter your name.";
 		if (!phonePattern.test(phone)) nextErrors.phone = "Enter a phone number.";
 		if (!zipPattern.test(zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
-		if (!emailPattern.test(email)) nextErrors.email = "Enter a valid email.";
+		if (!email) nextErrors.email = "Enter your email.";
+		else if (!emailPattern.test(email)) nextErrors.email = "Enter a valid email.";
 
 		setErrors(nextErrors);
 		if (Object.keys(nextErrors).length > 0) {
@@ -234,7 +235,7 @@ function clearFixedErrors(current: Record<string, string>, data: FormData) {
 	if (name.length >= 2) delete next.name;
 	if (phonePattern.test(phone)) delete next.phone;
 	if (zipPattern.test(zip)) delete next.zip;
-	if (emailPattern.test(email)) delete next.email;
+	if (email && emailPattern.test(email)) delete next.email;
 	return next;
 }
 
@@ -271,6 +272,11 @@ function DealField({
 		<div className={styles.field}>
 			<label htmlFor={id} className={styles.label}>
 				<span data-cms={cms}>{label}</span>
+				{required ? (
+					<span className={styles.requiredMark} aria-hidden="true">
+						*
+					</span>
+				) : null}
 			</label>
 			<input
 				id={id}
@@ -280,6 +286,7 @@ function DealField({
 				inputMode={inputMode}
 				placeholder={placeholder}
 				required={required}
+				aria-required={required || undefined}
 				aria-invalid={Boolean(error)}
 				aria-describedby={error ? `${id}-error` : undefined}
 				className={error ? `${styles.input} ${styles.inputInvalid}` : styles.input}

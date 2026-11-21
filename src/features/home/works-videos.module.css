@@ -291,6 +291,32 @@
 	right: 0.85rem;
 }
 
+.close {
+	position: absolute;
+	top: max(0.85rem, env(safe-area-inset-top));
+	right: max(0.85rem, env(safe-area-inset-right));
+	z-index: 4;
+	display: grid;
+	width: 2.75rem;
+	height: 2.75rem;
+	place-items: center;
+	border: 0;
+	border-radius: 999px;
+	background: rgb(255 255 255 / 0.94);
+	color: #121820;
+	box-shadow: 0 8px 22px rgb(0 0 0 / 0.28);
+	cursor: pointer;
+}
+
+.close:hover {
+	background: #fff;
+}
+
+.close:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
+
 @media (min-width: 640px) {
 	.item {
 		width: 157px;

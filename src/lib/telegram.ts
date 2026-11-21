@@ -11,6 +11,7 @@ type LeadNotification = {
   form: ApplicationForm;
   name: string;
   phone: string;
+  email: string;
   service: string;
   zip: string;
 };
@@ -34,6 +35,7 @@ export function formatLeadTelegramMessage(lead: LeadNotification) {
     "",
     `👤 Name: ${lead.name || "—"}`,
     `📞 Phone: ${lead.phone || "—"}`,
+    `✉️ Email: ${lead.email || "—"}`,
     `🔧 Service: ${lead.service || "—"}`,
     `📍 ZIP: ${lead.zip || "—"}`,
   ].join("\n");

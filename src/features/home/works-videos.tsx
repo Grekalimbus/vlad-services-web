@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { addWorksVideo } from "@/features/editor/works-actions";
@@ -322,7 +322,7 @@ function VideoFullscreen({
 
 	return (
 		<div className={styles.lightbox} data-editor-ui>
-			<button type="button" className={styles.dismiss} aria-label="Close video" onClick={onClose} />
+			<button type="button" className={styles.dismiss} tabIndex={-1} aria-hidden="true" onClick={onClose} />
 			<div
 				className={styles.dialog}
 				role="dialog"
@@ -363,6 +363,9 @@ function VideoFullscreen({
 					</>
 				) : null}
 			</div>
+			<button type="button" className={styles.close} aria-label="Close video" onClick={onClose}>
+				<X size={22} strokeWidth={2.25} aria-hidden="true" />
+			</button>
 		</div>
 	);
 }
