@@ -94,18 +94,26 @@ export function mediaBytesResponse(request: Request, bytes: Uint8Array, type: st
   return partialMediaResponse(body, type, parsed.start, parsed.end, total);
 }
 
-function fullMediaResponse(body: BodyInit, type: string) {
+function fullMediaResponse(body: Uint8Array, type: string) {
   const headers = mediaHeaders(type);
-  if (body instanceof Uint8Array) headers.set("content-length", String(body.byteLength));
-  return new Response(body, { status: 200, headers });
+  headers.set("content-length", String(body.byteLength));
+  return new Response(responseBody(body), { status: 200, headers });
 }
 
-function partialMediaResponse(body: BodyInit, type: string, start: number, end: number, total: number) {
+function partialMediaResponse(body: Uint8Array | ReadableStream, type: string, start: number, end: number, total: number) {
   const headers = mediaHeaders(type);
   headers.set("content-range", `bytes ${start}-${end}/${total}`);
-  const length = end - start + 1;
-  headers.set("content-length", String(length));
-  return new Response(body, { status: 206, headers });
+  headers.set("content-length", String(end - start + 1));
+  return new Response(responseBody(body), { status: 206, headers });
+}
+
+function responseBody(body: Uint8Array | ReadableStream): BodyInit {
+  if (body instanceof Uint8Array) {
+    const copy = new ArrayBuffer(body.byteLength);
+    new Uint8Array(copy).set(body);
+    return copy;
+  }
+  return body;
 }
 
 function unsatisfiableRange(type: string, total: number) {
