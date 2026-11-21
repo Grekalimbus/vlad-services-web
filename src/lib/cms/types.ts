@@ -86,8 +86,17 @@ type R2Like = {
     value: ArrayBuffer | ArrayBufferView,
     options?: { httpMetadata?: { contentType?: string } },
   ) => Promise<unknown>;
-  get: (key: string) => Promise<{
+  head?: (key: string) => Promise<{
+    size: number;
+    httpMetadata?: { contentType?: string };
+  } | null>;
+  get: (
+    key: string,
+    options?: { range?: { offset: number; length: number } },
+  ) => Promise<{
     body: ReadableStream | null;
+    size?: number;
+    range?: { offset?: number; length?: number };
     httpMetadata?: { contentType?: string };
     arrayBuffer?: () => Promise<ArrayBuffer>;
   } | null>;
