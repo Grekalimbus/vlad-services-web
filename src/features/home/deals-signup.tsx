@@ -63,11 +63,13 @@ export function DealsSignup({
 		if (!zipPattern.test(zip)) nextErrors.zip = "Enter a 5-digit ZIP code.";
 		if (!email) nextErrors.email = "Enter your email.";
 		else if (!emailPattern.test(email)) nextErrors.email = "Enter a valid email.";
+		if (data.get("smsConsent") !== "yes") nextErrors.sms = "Check this box to continue.";
+		if (data.get("emailConsent") !== "yes") nextErrors.emailConsent = "Check this box to continue.";
 
 		setErrors(nextErrors);
 		if (Object.keys(nextErrors).length > 0) {
 			setStatus("error");
-			document.getElementById(ids.error)?.focus();
+			if (hasFieldErrors(nextErrors)) document.getElementById(ids.error)?.focus();
 			return;
 		}
 
@@ -143,7 +145,7 @@ export function DealsSignup({
 								}}
 							>
 								<HoneypotField />
-								{status === "error" && Object.keys(errors).length > 0 ? (
+								{status === "error" && hasFieldErrors(errors) ? (
 									<p
 										id={ids.error}
 										tabIndex={-1}
@@ -202,7 +204,12 @@ export function DealsSignup({
 									/>
 								</div>
 								<div className={styles.consentWrap}>
-									<ConsentFields tone="inverse" />
+									<ConsentFields
+										tone="inverse"
+										required
+										invalidSms={Boolean(errors.sms)}
+										invalidEmail={Boolean(errors.emailConsent)}
+									/>
 								</div>
 								<button
 									type="submit"
@@ -225,6 +232,10 @@ export function DealsSignup({
 	);
 }
 
+function hasFieldErrors(errors: Record<string, string>) {
+	return Object.keys(errors).some((key) => key !== "sms" && key !== "emailConsent");
+}
+
 function clearFixedErrors(current: Record<string, string>, data: FormData) {
 	if (Object.keys(current).length === 0) return current;
 	const next = { ...current };
@@ -236,6 +247,8 @@ function clearFixedErrors(current: Record<string, string>, data: FormData) {
 	if (phonePattern.test(phone)) delete next.phone;
 	if (zipPattern.test(zip)) delete next.zip;
 	if (email && emailPattern.test(email)) delete next.email;
+	if (data.get("smsConsent") === "yes") delete next.sms;
+	if (data.get("emailConsent") === "yes") delete next.emailConsent;
 	return next;
 }
 

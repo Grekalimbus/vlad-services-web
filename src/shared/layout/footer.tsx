@@ -8,7 +8,7 @@ import { useCms } from "@/lib/cms/use-cms";
 import { socialLinks } from "@/lib/social";
 import { openCookieConsentBanner } from "@/lib/cookie-consent";
 import { phoneHref } from "@/lib/site";
-import { InstagramIcon, LinkedInIcon, YelpIcon } from "@/shared/brand-icons";
+import { InstagramIcon, LinkedInIcon, YouTubeIcon, YelpIcon } from "@/shared/brand-icons";
 import { BrandLogo } from "@/shared/ui";
 import { HashLink } from "./hash-link";
 import shared from "@/styles/shared.module.css";
@@ -50,6 +50,7 @@ const brandSocial = [
 	{ href: "https://maps.app.goo.gl/cZ8BVENdcqzqpoXh8", label: "Google", Icon: GoogleIcon },
 	{ href: socialLinks.bbb, label: "BBB", Icon: BbbIcon },
 	{ href: socialLinks.instagram, label: "Instagram", Icon: InstagramIcon },
+	{ href: socialLinks.youtube, label: "YouTube", Icon: YouTubeIcon },
 	{ href: socialLinks.yelp, label: "Yelp", Icon: YelpIcon },
 	{ href: socialLinks.linkedin, label: "LinkedIn", Icon: LinkedInIcon },
 ] as const;

@@ -171,8 +171,7 @@
 	margin-top: 1.25rem;
 }
 
-.socialLink,
-.socialMuted {
+.socialLink {
 	display: inline-flex;
 	min-height: 2.75rem;
 	align-items: center;
@@ -197,12 +196,6 @@
 .socialLink:focus-visible {
 	outline: 2px solid #fff;
 	outline-offset: 3px;
-}
-
-.socialMuted {
-	opacity: 0.72;
-	cursor: default;
-	user-select: none;
 }
 
 .socialIcon {

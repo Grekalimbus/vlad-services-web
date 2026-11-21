@@ -143,6 +143,10 @@
 	text-underline-offset: 2px;
 }
 
+.requiredMark {
+	color: #ff6b5a;
+}
+
 .privacyNotice,
 .privacyNoticeInverse,
 .privacyNoticeOnDark {

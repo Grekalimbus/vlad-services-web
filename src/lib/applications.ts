@@ -239,6 +239,9 @@ async function handleJsonApplication(request: Request, env: CmsEnv) {
   if (!zipPattern.test(zip)) return json({ error: "Enter a 5-digit ZIP code." }, 400);
   if (form === "signup") {
     if (!emailPattern.test(email)) return json({ error: "Enter a valid email." }, 400);
+    if (parseJsonConsentFlag(record.smsConsent) !== true || parseJsonConsentFlag(record.emailConsent) !== true) {
+      return json({ error: "Check both consent boxes." }, 400);
+    }
   }
   if (form === "book") {
     if (email && !emailPattern.test(email)) return json({ error: "Enter a valid email." }, 400);

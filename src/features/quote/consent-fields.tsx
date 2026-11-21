@@ -12,12 +12,14 @@ export function ConsentFields({
   sms = true,
   email = true,
   tone = "default",
+  required = false,
   invalidSms = false,
   invalidEmail = false,
 }: {
   sms?: boolean;
   email?: boolean;
   tone?: "default" | "inverse";
+  required?: boolean;
   invalidSms?: boolean;
   invalidEmail?: boolean;
 }) {
@@ -31,7 +33,19 @@ export function ConsentFields({
     <fieldset className={styles.consentFields}>
       <legend className={styles.srOnly}>Message preferences</legend>
       {sms ? (
-        <Checkbox name="smsConsent" value="yes" className={choice} invalid={invalidSms}>
+        <Checkbox
+          name="smsConsent"
+          value="yes"
+          className={choice}
+          invalid={invalidSms}
+          required={required}
+          aria-required={required || undefined}
+        >
+          {required ? (
+            <span className={styles.requiredMark} aria-hidden="true">
+              *{" "}
+            </span>
+          ) : null}
           {smsBefore}
           {linkAt >= 0 ? (
             <>
@@ -49,7 +63,19 @@ export function ConsentFields({
         </Checkbox>
       ) : null}
       {email ? (
-        <Checkbox name="emailConsent" value="yes" className={choice} invalid={invalidEmail}>
+        <Checkbox
+          name="emailConsent"
+          value="yes"
+          className={choice}
+          invalid={invalidEmail}
+          required={required}
+          aria-required={required || undefined}
+        >
+          {required ? (
+            <span className={styles.requiredMark} aria-hidden="true">
+              *{" "}
+            </span>
+          ) : null}
           {EMAIL_CONSENT_TEXT}
         </Checkbox>
       ) : null}

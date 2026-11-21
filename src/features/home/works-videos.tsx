@@ -199,10 +199,15 @@ export function WorksVideos() {
 					<InstagramIcon className={styles.socialIcon} />
 					Instagram
 				</a>
-				<span className={styles.socialMuted} aria-disabled="true">
+				<a
+					href={socialLinks.youtube}
+					className={styles.socialLink}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<YouTubeIcon className={`${styles.socialIcon} ${styles.youtubeIcon}`} />
 					YouTube
-				</span>
+				</a>
 			</div>
 
 			{editing ? (
