@@ -407,7 +407,8 @@
 
 @media (max-width: 1023px) {
   .iconBlock {
-    margin-top: calc(2.15rem - 5px - 25px);
+    /* The photo strip has little padding here, so the title needs its own gap under the carousel. */
+    margin-top: 2.25rem;
   }
 }
 
